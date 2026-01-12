@@ -15,14 +15,11 @@ async test "D1: create and get user" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create user
-  create_user(
+  @gen.create_user(
     db,
-    CreateUserParams::new(
+    @gen.CreateUserParams::new(
       "alice",
       "alice@example.com",
       "Alice Developer",
@@ -31,8 +28,7 @@ async test "D1: create and get user" {
     ),
   )
 
-  // Get user by username
-  let user = get_user_by_username(db, GetUserByUsernameParams::new("alice"))
+  let user = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("alice"))
   assert_true(user is Some(_))
   let u = user.unwrap()
   assert_eq(u.username, "alice")
@@ -51,18 +47,14 @@ async test "D1: create and list categories" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create category
-  create_category(
+  @gen.create_category(
     db,
-    CreateCategoryParams::new("Technology", "tech", Some("Tech articles")),
+    @gen.CreateCategoryParams::new("Technology", "tech", Some("Tech articles")),
   )
 
-  // List categories
-  let categories = list_categories(db)
+  let categories = @gen.list_categories(db)
   assert_eq(categories.length(), 1)
   let cat = categories[0]
   assert_eq(cat.name, "Technology")
@@ -80,16 +72,12 @@ async test "D1: create and list tags" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create tags
-  create_tag(db, CreateTagParams::new("MoonBit", "moonbit"))
-  create_tag(db, CreateTagParams::new("WebAssembly", "wasm"))
+  @gen.create_tag(db, @gen.CreateTagParams::new("MoonBit", "moonbit"))
+  @gen.create_tag(db, @gen.CreateTagParams::new("WebAssembly", "wasm"))
 
-  // List tags
-  let tags = list_tags(db)
+  let tags = @gen.list_tags(db)
   assert_eq(tags.length(), 2)
   let tag_names = tags.map(fn(t) { t.name })
   assert_true(tag_names.contains("MoonBit"))
@@ -106,22 +94,18 @@ async test "D1: post lifecycle - create, publish, delete" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create author
-  create_user(
+  @gen.create_user(
     db,
-    CreateUserParams::new("author_test", "author@test.com", "Test Author", None, None),
+    @gen.CreateUserParams::new("author_test", "author@test.com", "Test Author", None, None),
   )
-  let author = get_user_by_username(db, GetUserByUsernameParams::new("author_test"))
+  let author = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("author_test"))
   let author_id = author.map(fn(u) { u.id }).unwrap_or(1L)
 
-  // Create draft post
-  create_post(
+  @gen.create_post(
     db,
-    CreatePostParams::new(
+    @gen.CreatePostParams::new(
       author_id,
       None,
       "Test Post",
@@ -132,27 +116,22 @@ async test "D1: post lifecycle - create, publish, delete" {
     ),
   )
 
-  // Verify post created as draft
-  let post = get_post_by_slug(db, GetPostBySlugParams::new("test-post-slug"))
+  let post = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("test-post-slug"))
   assert_true(post is Some(_))
   let p = post.unwrap()
   assert_eq(p.title, "Test Post")
   assert_eq(p.status, "draft")
 
-  // Publish post
-  publish_post(db, PublishPostParams::new(p.id))
+  @gen.publish_post(db, @gen.PublishPostParams::new(p.id))
 
-  // Verify published
-  let published = get_post_by_slug(db, GetPostBySlugParams::new("test-post-slug"))
+  let published = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("test-post-slug"))
   assert_true(published is Some(_))
   let pp = published.unwrap()
   assert_eq(pp.status, "published")
 
-  // Delete post
-  delete_post(db, DeletePostParams::new(p.id))
+  @gen.delete_post(db, @gen.DeletePostParams::new(p.id))
 
-  // Verify deleted
-  let deleted = get_post_by_slug(db, GetPostBySlugParams::new("test-post-slug"))
+  let deleted = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("test-post-slug"))
   assert_true(deleted is None)
 
   mf.dispose()
@@ -166,21 +145,18 @@ async test "D1: create comment (not approved by default)" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create author and post
-  create_user(
+  @gen.create_user(
     db,
-    CreateUserParams::new("comment_author", "comment@test.com", "Comment Author", None, None),
+    @gen.CreateUserParams::new("comment_author", "comment@test.com", "Comment Author", None, None),
   )
-  let author = get_user_by_username(db, GetUserByUsernameParams::new("comment_author"))
+  let author = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("comment_author"))
   let author_id = author.map(fn(u) { u.id }).unwrap_or(1L)
 
-  create_post(
+  @gen.create_post(
     db,
-    CreatePostParams::new(
+    @gen.CreatePostParams::new(
       author_id,
       None,
       "Post for Comments",
@@ -191,24 +167,20 @@ async test "D1: create comment (not approved by default)" {
     ),
   )
 
-  let post = get_post_by_slug(db, GetPostBySlugParams::new("post-for-comments-test"))
+  let post = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("post-for-comments-test"))
   let post_id = post.map(fn(p) { p.id }).unwrap_or(1L)
 
-  // Create comment
-  create_comment(
+  @gen.create_comment(
     db,
-    CreateCommentParams::new(post_id, "John", "john@example.com", "Great!"),
+    @gen.CreateCommentParams::new(post_id, "John", "john@example.com", "Great!"),
   )
 
-  // Comments are not approved by default, so list should be empty
-  let comments = list_comments_for_post(db, ListCommentsForPostParams::new(post_id))
+  let comments = @gen.list_comments_for_post(db, @gen.ListCommentsForPostParams::new(post_id))
   assert_eq(comments.length(), 0)
 
-  // Approve comment
-  approve_all_comments_for_post(db, ApproveAllCommentsForPostParams::new(post_id))
+  @gen.approve_all_comments_for_post(db, @gen.ApproveAllCommentsForPostParams::new(post_id))
 
-  // Now should have approved comments
-  let approved_comments = list_comments_for_post(db, ListCommentsForPostParams::new(post_id))
+  let approved_comments = @gen.list_comments_for_post(db, @gen.ListCommentsForPostParams::new(post_id))
   assert_eq(approved_comments.length(), 1)
   assert_eq(approved_comments[0].author_name, "John")
   assert_eq(approved_comments[0].content, "Great!")
@@ -224,26 +196,13 @@ async test "D1: list users" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create multiple users
-  create_user(
-    db,
-    CreateUserParams::new("user1", "user1@example.com", "User One", None, None),
-  )
-  create_user(
-    db,
-    CreateUserParams::new("user2", "user2@example.com", "User Two", None, None),
-  )
-  create_user(
-    db,
-    CreateUserParams::new("user3", "user3@example.com", "User Three", None, None),
-  )
+  @gen.create_user(db, @gen.CreateUserParams::new("user1", "user1@example.com", "User One", None, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("user2", "user2@example.com", "User Two", None, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("user3", "user3@example.com", "User Three", None, None))
 
-  // List users
-  let users = list_users(db)
+  let users = @gen.list_users(db)
   assert_eq(users.length(), 3)
 
   mf.dispose()
@@ -257,23 +216,15 @@ async test "D1: get user by id" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create user
-  create_user(
-    db,
-    CreateUserParams::new("testuser", "testuser@example.com", "Test User", None, None),
-  )
+  @gen.create_user(db, @gen.CreateUserParams::new("testuser", "testuser@example.com", "Test User", None, None))
 
-  // Get user by username first to get ID
-  let user = get_user_by_username(db, GetUserByUsernameParams::new("testuser"))
+  let user = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("testuser"))
   assert_true(user is Some(_))
   let user_id = user.unwrap().id
 
-  // Get user by ID
-  let user_by_id = get_user_by_id(db, GetUserByIdParams::new(user_id))
+  let user_by_id = @gen.get_user_by_id(db, @gen.GetUserByIdParams::new(user_id))
   assert_true(user_by_id is Some(_))
   assert_eq(user_by_id.unwrap().username, "testuser")
 
@@ -288,22 +239,15 @@ async test "D1: post with author join" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create author
-  create_user(
-    db,
-    CreateUserParams::new("join_author", "join@test.com", "Join Author", None, None),
-  )
-  let author = get_user_by_username(db, GetUserByUsernameParams::new("join_author"))
+  @gen.create_user(db, @gen.CreateUserParams::new("join_author", "join@test.com", "Join Author", None, None))
+  let author = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("join_author"))
   let author_id = author.unwrap().id
 
-  // Create post
-  create_post(
+  @gen.create_post(
     db,
-    CreatePostParams::new(
+    @gen.CreatePostParams::new(
       author_id,
       None,
       "Join Test Post",
@@ -314,11 +258,10 @@ async test "D1: post with author join" {
     ),
   )
 
-  // Get post with author
-  let post = get_post_by_slug(db, GetPostBySlugParams::new("join-test-post"))
+  let post = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("join-test-post"))
   let post_id = post.unwrap().id
 
-  let post_with_author = get_post_with_author(db, GetPostWithAuthorParams::new(post_id))
+  let post_with_author = @gen.get_post_with_author(db, @gen.GetPostWithAuthorParams::new(post_id))
   assert_true(post_with_author is Some(_))
   let pwa = post_with_author.unwrap()
   assert_eq(pwa.title, "Join Test Post")
@@ -336,51 +279,32 @@ async test "D1: add and list tags for post" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create author
-  create_user(
-    db,
-    CreateUserParams::new("tag_author", "tag@test.com", "Tag Author", None, None),
-  )
-  let author = get_user_by_username(db, GetUserByUsernameParams::new("tag_author"))
+  @gen.create_user(db, @gen.CreateUserParams::new("tag_author", "tag@test.com", "Tag Author", None, None))
+  let author = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("tag_author"))
   let author_id = author.unwrap().id
 
-  // Create post
-  create_post(
+  @gen.create_post(
     db,
-    CreatePostParams::new(
-      author_id,
-      None,
-      "Tagged Post",
-      "tagged-post",
-      "Content",
-      None,
-      "published",
-    ),
+    @gen.CreatePostParams::new(author_id, None, "Tagged Post", "tagged-post", "Content", None, "published"),
   )
-  let post = get_post_by_slug(db, GetPostBySlugParams::new("tagged-post"))
+  let post = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("tagged-post"))
   let post_id = post.unwrap().id
 
-  // Create tags
-  let tag1 = get_or_create_tag(db, GetOrCreateTagParams::new("Rust", "rust"))
-  let tag2 = get_or_create_tag(db, GetOrCreateTagParams::new("Go", "go"))
+  let tag1 = @gen.get_or_create_tag(db, @gen.GetOrCreateTagParams::new("Rust", "rust"))
+  let tag2 = @gen.get_or_create_tag(db, @gen.GetOrCreateTagParams::new("Go", "go"))
   let tag1_id = tag1.unwrap().id
   let tag2_id = tag2.unwrap().id
 
-  // Add tags to post
-  add_tag_to_post(db, AddTagToPostParams::new(post_id, tag1_id))
-  add_tag_to_post(db, AddTagToPostParams::new(post_id, tag2_id))
+  @gen.add_tag_to_post(db, @gen.AddTagToPostParams::new(post_id, tag1_id))
+  @gen.add_tag_to_post(db, @gen.AddTagToPostParams::new(post_id, tag2_id))
 
-  // List tags for post
-  let tags = list_tags_for_post(db, ListTagsForPostParams::new(post_id))
+  let tags = @gen.list_tags_for_post(db, @gen.ListTagsForPostParams::new(post_id))
   assert_eq(tags.length(), 2)
 
-  // Remove tag
-  remove_tag_from_post(db, RemoveTagFromPostParams::new(post_id, tag1_id))
-  let tags_after = list_tags_for_post(db, ListTagsForPostParams::new(post_id))
+  @gen.remove_tag_from_post(db, @gen.RemoveTagFromPostParams::new(post_id, tag1_id))
+  let tags_after = @gen.list_tags_for_post(db, @gen.ListTagsForPostParams::new(post_id))
   assert_eq(tags_after.length(), 1)
   assert_eq(tags_after[0].name, "Go")
 
@@ -395,58 +319,17 @@ async test "D1: list published posts" {
   })
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
-
-  // Apply schema
   let _ = db.exec(get_schema_sql())
 
-  // Create author
-  create_user(
-    db,
-    CreateUserParams::new("pub_author", "pub@test.com", "Pub Author", None, None),
-  )
-  let author = get_user_by_username(db, GetUserByUsernameParams::new("pub_author"))
+  @gen.create_user(db, @gen.CreateUserParams::new("pub_author", "pub@test.com", "Pub Author", None, None))
+  let author = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new("pub_author"))
   let author_id = author.unwrap().id
 
-  // Create draft and published posts
-  create_post(
-    db,
-    CreatePostParams::new(
-      author_id,
-      None,
-      "Draft Post",
-      "draft-post",
-      "Draft content",
-      None,
-      "draft",
-    ),
-  )
-  create_post(
-    db,
-    CreatePostParams::new(
-      author_id,
-      None,
-      "Published Post 1",
-      "published-post-1",
-      "Published content",
-      None,
-      "published",
-    ),
-  )
-  create_post(
-    db,
-    CreatePostParams::new(
-      author_id,
-      None,
-      "Published Post 2",
-      "published-post-2",
-      "Published content 2",
-      None,
-      "published",
-    ),
-  )
+  @gen.create_post(db, @gen.CreatePostParams::new(author_id, None, "Draft Post", "draft-post", "Draft content", None, "draft"))
+  @gen.create_post(db, @gen.CreatePostParams::new(author_id, None, "Published Post 1", "published-post-1", "Published content", None, "published"))
+  @gen.create_post(db, @gen.CreatePostParams::new(author_id, None, "Published Post 2", "published-post-2", "Published content 2", None, "published"))
 
-  // List published posts (should not include draft)
-  let published = list_published_posts(db, ListPublishedPostsParams::new(10L))
+  let published = @gen.list_published_posts(db, @gen.ListPublishedPostsParams::new(10L))
   assert_eq(published.length(), 2)
 
   mf.dispose()

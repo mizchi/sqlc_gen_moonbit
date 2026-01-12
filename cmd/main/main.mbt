@@ -1,6 +1,3 @@
-///|
-fn async_run(f : async () -> Unit noraise) -> Unit = "%async.run"
-
 // Backend types
 ///|
 pub enum Backend {
@@ -79,17 +76,16 @@ fn main {
   // Read stdin
   let input = read_all_stdin()
 
-  // Parse GenerateRequest from protobuf
+  // Parse GenerateRequest from protobuf (using synchronous Read)
   let reader = @protobuf.BytesReader::from_bytes(input)
-  let mut request = @plugin.GenerateRequest::default()
-  async_run(async fn() -> Unit noraise {
-    request = @protobuf.AsyncRead::read(reader) catch {
-      err => {
-        write_stderr("Parse error: " + err.to_string() + "\n")
-        @plugin.GenerateRequest::default()
-      }
+  let request : @plugin.GenerateRequest = try {
+    @protobuf.Read::read(reader)
+  } catch {
+    err => {
+      write_stderr("Parse error: " + err.to_string() + "\n")
+      @plugin.GenerateRequest::default()
     }
-  })
+  }
 
   // Parse plugin options
   let options = parse_plugin_options(request.plugin_options)
@@ -958,8 +954,10 @@ fn column_from_js_any(col : @plugin.Column, obj_expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   let field_name = "\"" + col.name + "\""
   match type_name {
+    // Use @cloudflare.js_number_to_int64 for INTEGER types
+    // D1/SQLite returns JavaScript numbers which need conversion to MoonBit Int64 ({hi, lo} format)
     "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
-      obj_expr + "[" + field_name + "].cast()"
+      "@cloudflare.js_number_to_int64(" + obj_expr + "[" + field_name + "])"
     "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
       obj_expr + "[" + field_name + "].cast()"
     "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
@@ -975,18 +973,33 @@ fn column_from_js_any(col : @plugin.Column, obj_expr : String) -> String {
 fn column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   let field_name = "\"" + col.name + "\""
-  // Access field from @core.Any using subscript and cast
-  match type_name {
-    "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
-      obj_expr + "[" + field_name + "].cast()"
-    "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
-      obj_expr + "[" + field_name + "].cast()"
-    "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
-      obj_expr + "[" + field_name + "].cast()"
-    "BOOLEAN" | "BOOL" =>
-      obj_expr + "[" + field_name + "].cast()"
-    _ =>
-      obj_expr + "[" + field_name + "].cast()"
+  let field_access = obj_expr + "[" + field_name + "]"
+
+  // Handle nullable columns
+  if not(col.not_null) {
+    // For nullable columns, check for null/undefined first
+    match type_name {
+      "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
+        "(if @core.is_null(" + field_access + ") || @core.typeof_(" + field_access + ") == \"undefined\" { None } else { Some(@cloudflare.js_number_to_int64(" + field_access + ")) })"
+      _ =>
+        "(if @core.is_null(" + field_access + ") || @core.typeof_(" + field_access + ") == \"undefined\" { None } else { Some(" + field_access + ".cast()) })"
+    }
+  } else {
+    // Non-nullable columns
+    match type_name {
+      // Use @cloudflare.js_number_to_int64 for INTEGER types
+      // D1/SQLite returns JavaScript numbers which need conversion to MoonBit Int64 ({hi, lo} format)
+      "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
+        "@cloudflare.js_number_to_int64(" + field_access + ")"
+      "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
+        field_access + ".cast()"
+      "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
+        field_access + ".cast()"
+      "BOOLEAN" | "BOOL" =>
+        field_access + ".cast()"
+      _ =>
+        field_access + ".cast()"
+    }
   }
 }
 

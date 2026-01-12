@@ -1,12 +1,10 @@
 import {
   "mizchi/js/core",
   "mizchi/cloudflare",
-}
-
-import "test" {
-  "moonbitlang/async",
+  "example_d1/db/gen",
 }
 
 options(
+  "is-main": true,
   "supported-targets": [ "js" ],
 )
