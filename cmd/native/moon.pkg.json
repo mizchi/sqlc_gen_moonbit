@@ -1,0 +1,8 @@
+{
+  "is-main": true,
+  "import": [
+    { "path": "sqlc_gen_moonbit/lib/codegen", "alias": "codegen" }
+  ],
+  "native-stub": ["stub.c"],
+  "supported-targets": ["native"]
+}

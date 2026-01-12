@@ -8,41 +8,62 @@
 
 - Generates type-safe MoonBit structs from SQL schemas
 - Generates query functions with proper parameter binding
-- Supports SQLite with `mizchi/sqlite` binding
+- Supports SQLite (native) with `mizchi/sqlite` binding
+- Supports Cloudflare D1 with `mizchi/cloudflare` binding
 - Supports `:one`, `:many`, `:exec` query types
+- Optional validators and JSON Schema generation
 
 ## Installation
 
-Build the plugin from source:
+### WASM Plugin (Recommended)
 
-```bash
-moon build --target native --release
-```
-
-The binary will be at `target/native/release/build/cmd/main/main.exe`.
-
-## Usage
-
-### 1. Create `sqlc.yaml`
+Add to your `sqlc.yaml`:
 
 ```yaml
 version: "2"
 plugins:
   - name: moonbit
-    process:
-      cmd: "path/to/main.exe"
+    wasm:
+      url: "https://raw.githubusercontent.com/mizchi/sqlc_gen_moonbit/main/bin/sqlc-gen-moonbit.wasm"
+      sha256: "c97e4c6198c13f3244456cf481f77143c3a9b5a86c382019ff378b2729c76615"
 sql:
   - engine: sqlite
-    schema: "sqlite/schema.sql"
-    queries: "sqlite/query.sql"
+    schema: "schema.sql"
+    queries: "query.sql"
     codegen:
       - plugin: moonbit
         out: "gen"
+        options:
+          backend: "sqlite"  # or "d1" for Cloudflare D1
 ```
 
-### 2. Define your schema
+### Local WASM File
 
-`sqlite/schema.sql`:
+Download `bin/sqlc-gen-moonbit.wasm` and use local path:
+
+```yaml
+plugins:
+  - name: moonbit
+    wasm:
+      url: "file://./sqlc-gen-moonbit.wasm"
+      sha256: ""  # Optional for local files
+```
+
+### Build from Source
+
+```bash
+# Native plugin
+just build-plugin
+
+# WASM plugin
+just build-plugin-wasm
+```
+
+## Usage
+
+### 1. Define your schema
+
+`db/schema.sql`:
 
 ```sql
 CREATE TABLE users (
@@ -52,9 +73,9 @@ CREATE TABLE users (
 );
 ```
 
-### 3. Write queries with sqlc annotations
+### 2. Write queries with sqlc annotations
 
-`sqlite/query.sql`:
+`db/query.sql`:
 
 ```sql
 -- name: GetUser :one
@@ -67,13 +88,15 @@ SELECT * FROM users ORDER BY name;
 INSERT INTO users (name, email) VALUES (?, ?);
 ```
 
-### 4. Generate code
+### 3. Generate code
 
 ```bash
 sqlc generate
 ```
 
-### 5. Use generated code
+### 4. Use generated code
+
+**For SQLite (native):**
 
 Add dependencies to `moon.mod.json`:
 
@@ -86,25 +109,15 @@ Add dependencies to `moon.mod.json`:
 }
 ```
 
-Import and use in your MoonBit code:
-
 ```moonbit
 fn main {
-  let db = @sqlite.sqlite_open_v2(
-    cstring(":memory:"),
-    @sqlite.SQLITE_OPEN_READWRITE | @sqlite.SQLITE_OPEN_CREATE | @sqlite.SQLITE_OPEN_MEMORY,
-    Bytes::new(0)
-  )
+  let db = @sqlite.sqlite_open_v2(...)
 
   // Create user
-  let params = @gen.CreateUserParams::new("Alice", "alice@example.com")
-  @gen.create_user(db, params)
+  @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com"))
 
   // List users
   let users = @gen.list_users(db)
-  for user in users {
-    println("name=" + user.name + " email=" + user.email)
-  }
 
   // Get user by ID
   match @gen.get_user(db, @gen.GetUserParams::new(1L)) {
@@ -114,6 +127,55 @@ fn main {
 }
 ```
 
+**For Cloudflare D1:**
+
+Add dependencies to `moon.mod.json`:
+
+```json
+{
+  "deps": {
+    "mizchi/cloudflare": "0.0.13",
+    "mizchi/js": "0.6.4"
+  }
+}
+```
+
+```moonbit
+pub async fn handler(db : @cloudflare.D1Database) -> Unit {
+  // Create user
+  @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com"))
+
+  // List users (async)
+  let users = @gen.list_users(db)
+
+  // Get user by ID (async)
+  match @gen.get_user(db, @gen.GetUserParams::new(1L)) {
+    Some(user) => println("Found: " + user.name)
+    None => println("Not found")
+  }
+}
+```
+
+## Plugin Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `backend` | `"sqlite"` \| `"d1"` | `"sqlite"` | Target backend |
+| `validators` | `bool` | `false` | Generate validation functions |
+| `json_schema` | `bool` | `false` | Generate JSON Schema |
+
+Example with all options:
+
+```yaml
+codegen:
+  - plugin: moonbit
+    out: "db/gen"
+    options:
+      backend: "d1"
+      validators: true
+      json_schema: true
+```
+
 ## Generated Code
 
 For each query, sqlc-gen-moonbit generates:
@@ -121,6 +183,8 @@ For each query, sqlc-gen-moonbit generates:
 - **Param structs**: `GetUserParams`, `CreateUserParams` with `::new()` constructor
 - **Row structs**: `GetUserRow`, `ListUsersRow` with fields matching SELECT columns
 - **Query functions**: `get_user()`, `list_users()`, `create_user()` with type-safe parameters
+- **Validators** (optional): `GetUserParams::validate()` returning `Result[Unit, String]`
+- **JSON Schema** (optional): `sqlc_schema.json` with type definitions
 
 ## Query Types
 
@@ -129,6 +193,21 @@ For each query, sqlc-gen-moonbit generates:
 | `:one`     | `T?`        | Returns single row or None |
 | `:many`    | `Array[T]`  | Returns all matching rows |
 | `:exec`    | `Unit`      | Executes without returning data |
+
+## Examples
+
+- [`examples/sqlite-native`](./examples/sqlite-native) - SQLite with native binding
+- [`examples/d1`](./examples/d1) - Cloudflare D1 with Atlas migrations
+
+## Development
+
+```bash
+just --list              # Show available commands
+just build-plugin        # Build native plugin
+just build-plugin-wasm   # Build WASM plugin
+just generate            # Generate code for examples
+just test                # Run all tests
+```
 
 ## License
 

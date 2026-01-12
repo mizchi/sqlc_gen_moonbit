@@ -2,10 +2,10 @@ version: "2"
 plugins:
   - name: moonbit
     process:
-      cmd: "/Users/mz/ghq/github.com/mizchi/sqlc_gen_moonbit/_build/native/release/build/cmd/main/main.exe"
+      cmd: "/Users/mz/ghq/github.com/mizchi/sqlc_gen_moonbit/_build/native/release/build/cmd/native/native.exe"
 sql:
   - engine: sqlite
-    schema: "db/migrations/0001_schema.sql"
+    schema: "db/schema.sql"
     queries: "db/sqlite/query.sql"
     codegen:
       - plugin: moonbit

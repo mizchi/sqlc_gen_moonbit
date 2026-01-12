@@ -27,7 +27,7 @@ pub fn Options::default() -> Options {
 }
 
 ///|
-fn parse_plugin_options(data : Bytes) -> Options {
+pub fn parse_plugin_options(data : Bytes) -> Options {
   if data.length() == 0 {
     return Options::default()
   }
@@ -55,36 +55,15 @@ fn bytes_to_string_simple(b : Bytes) -> String {
   buf.to_string()
 }
 
-// FFI declarations for native stdin/stdout handling
+// Process request and generate response
 ///|
-extern "C" fn moonbit_read_stdin_size() -> Int64 = "moonbit_read_stdin_size"
-
-///|
-#borrow(dest)
-extern "C" fn moonbit_copy_stdin_data(dest : Bytes) -> Unit = "moonbit_copy_stdin_data"
-
-///|
-#borrow(data)
-extern "C" fn moonbit_write_all_stdout(data : Bytes, len : Int64) -> Int = "moonbit_write_all_stdout"
-
-///|
-#borrow(data)
-extern "C" fn moonbit_write_stderr(data : Bytes, len : Int64) -> Int = "moonbit_write_stderr"
-
-///|
-fn main {
-  // Read stdin
-  let input = read_all_stdin()
-
-  // Parse GenerateRequest from protobuf (using synchronous Read)
+pub fn process_request(input : Bytes) -> Bytes {
+  // Parse GenerateRequest from protobuf
   let reader = @protobuf.BytesReader::from_bytes(input)
   let request : @plugin.GenerateRequest = try {
     @protobuf.Read::read(reader)
   } catch {
-    err => {
-      write_stderr("Parse error: " + err.to_string() + "\n")
-      @plugin.GenerateRequest::default()
-    }
+    _ => @plugin.GenerateRequest::default()
   }
 
   // Parse plugin options
@@ -122,15 +101,8 @@ fn main {
 
   let response = @plugin.GenerateResponse::new(files)
 
-  // Serialize response to protobuf and write to stdout
-  let output = serialize_response(response)
-  write_all_stdout(output)
-}
-
-///|
-fn write_stderr(msg : String) -> Unit {
-  let bytes = string_to_utf8(msg)
-  let _ = moonbit_write_stderr(bytes, bytes.length().to_int64())
+  // Serialize response to protobuf
+  serialize_response(response)
 }
 
 ///|
@@ -240,33 +212,6 @@ fn generate_queries_d1(request : @plugin.GenerateRequest) -> String {
   }
 
   buf.to_string()
-}
-
-///|
-fn generate_d1_bind_function(buf : StringBuilder, n : Int) -> Unit {
-  buf.write_string("extern \"js\" fn d1_bind")
-  buf.write_string(n.to_string())
-  buf.write_string("(stmt : @js.Any")
-  for i = 1; i <= n; i = i + 1 {
-    buf.write_string(", p")
-    buf.write_string(i.to_string())
-    buf.write_string(" : @js.Any")
-  }
-  buf.write_string(") -> @js.Any =\n")
-  buf.write_string("  #| (stmt")
-  for i = 1; i <= n; i = i + 1 {
-    buf.write_string(", p")
-    buf.write_string(i.to_string())
-  }
-  buf.write_string(") => stmt.bind(")
-  for i = 1; i <= n; i = i + 1 {
-    if i > 1 {
-      buf.write_string(", ")
-    }
-    buf.write_string("p")
-    buf.write_string(i.to_string())
-  }
-  buf.write_string(")\n\n")
 }
 
 ///|
@@ -919,37 +864,6 @@ fn generate_json_schema_property(
 }
 
 ///|
-fn param_to_js_any(col : @plugin.Column, expr : String) -> String {
-  let type_name = col.type_.name.to_upper()
-  // For nullable types, we need to handle Option
-  let is_nullable = not(col.not_null)
-  if is_nullable {
-    // For nullable params, use match to handle None
-    match type_name {
-      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-        "(match " + expr + " { Some(v) => @js.any(v.to_int()); None => js_null() })"
-      _ =>
-        "(match " + expr + " { Some(v) => @js.any(v); None => js_null() })"
-    }
-  } else {
-    match type_name {
-      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-        "@js.any(" + expr + ".to_int())"
-      "INT8" | "BIGINT" =>
-        "@js.any(" + expr + ")"
-      "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
-        "@js.any(" + expr + ")"
-      "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
-        "@js.any(" + expr + ")"
-      "BOOLEAN" | "BOOL" =>
-        "@js.any(" + expr + ")"
-      _ =>
-        "@js.any(" + expr + ".to_string())"
-    }
-  }
-}
-
-///|
 fn param_to_core_any(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   // For nullable types, we need to handle Option
@@ -977,26 +891,6 @@ fn param_to_core_any(col : @plugin.Column, expr : String) -> String {
       _ =>
         "@core.any(" + expr + ".to_string())"
     }
-  }
-}
-
-///|
-fn column_from_js_any(col : @plugin.Column, obj_expr : String) -> String {
-  let type_name = col.type_.name.to_upper()
-  let field_name = "\"" + col.name + "\""
-  match type_name {
-    // Use @cloudflare.js_number_to_int64 for INTEGER types
-    // D1/SQLite returns JavaScript numbers which need conversion to MoonBit Int64 ({hi, lo} format)
-    "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
-      "@cloudflare.js_number_to_int64(" + obj_expr + "[" + field_name + "])"
-    "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
-      obj_expr + "[" + field_name + "].cast()"
-    "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
-      obj_expr + "[" + field_name + "].cast()"
-    "BOOLEAN" | "BOOL" =>
-      obj_expr + "[" + field_name + "].cast()"
-    _ =>
-      obj_expr + "[" + field_name + "].cast()"
   }
 }
 
@@ -1213,7 +1107,7 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     // Write file size as varint
     let mut sz = file_size
     while sz >= 0x80U {
-      bytes.push((sz.land(0x7FU).lor(0x80U)).to_byte())
+      bytes.push((sz & 0x7FU | 0x80U).to_byte())
       sz = sz >> 7
     }
     bytes.push(sz.to_byte())
@@ -1224,7 +1118,7 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     let name_len = name_bytes.length()
     let mut nl = name_len.reinterpret_as_uint()
     while nl >= 0x80U {
-      bytes.push((nl.land(0x7FU).lor(0x80U)).to_byte())
+      bytes.push((nl & 0x7FU | 0x80U).to_byte())
       nl = nl >> 7
     }
     bytes.push(nl.to_byte())
@@ -1238,7 +1132,7 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     let contents_len = contents.length()
     let mut cl = contents_len.reinterpret_as_uint()
     while cl >= 0x80U {
-      bytes.push((cl.land(0x7FU).lor(0x80U)).to_byte())
+      bytes.push((cl & 0x7FU | 0x80U).to_byte())
       cl = cl >> 7
     }
     bytes.push(cl.to_byte())
@@ -1251,43 +1145,25 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
 }
 
 ///|
-fn string_to_utf8(s : String) -> Bytes {
+pub fn string_to_utf8(s : String) -> Bytes {
   let arr : Array[Byte] = []
   for c in s {
     let code = c.to_uint()
     if code < 0x80U {
       arr.push(code.to_byte())
     } else if code < 0x800U {
-      arr.push((0xC0U.lor(code >> 6)).to_byte())
-      arr.push((0x80U.lor(code.land(0x3FU))).to_byte())
+      arr.push((0xC0U | (code >> 6)).to_byte())
+      arr.push((0x80U | (code & 0x3FU)).to_byte())
     } else if code < 0x10000U {
-      arr.push((0xE0U.lor(code >> 12)).to_byte())
-      arr.push((0x80U.lor((code >> 6).land(0x3FU))).to_byte())
-      arr.push((0x80U.lor(code.land(0x3FU))).to_byte())
+      arr.push((0xE0U | (code >> 12)).to_byte())
+      arr.push((0x80U | ((code >> 6) & 0x3FU)).to_byte())
+      arr.push((0x80U | (code & 0x3FU)).to_byte())
     } else {
-      arr.push((0xF0U.lor(code >> 18)).to_byte())
-      arr.push((0x80U.lor((code >> 12).land(0x3FU))).to_byte())
-      arr.push((0x80U.lor((code >> 6).land(0x3FU))).to_byte())
-      arr.push((0x80U.lor(code.land(0x3FU))).to_byte())
+      arr.push((0xF0U | (code >> 18)).to_byte())
+      arr.push((0x80U | ((code >> 12) & 0x3FU)).to_byte())
+      arr.push((0x80U | ((code >> 6) & 0x3FU)).to_byte())
+      arr.push((0x80U | (code & 0x3FU)).to_byte())
     }
   }
   Bytes::from_iter(arr.iter())
-}
-
-///|
-fn read_all_stdin() -> Bytes {
-  // Use C FFI to read all data from stdin
-  let size = moonbit_read_stdin_size()
-  if size <= 0L {
-    Bytes::new(0)
-  } else {
-    let buffer = Bytes::make(size.to_int(), 0)
-    moonbit_copy_stdin_data(buffer)
-    buffer
-  }
-}
-
-///|
-fn write_all_stdout(data : Bytes) -> Unit {
-  let _ = moonbit_write_all_stdout(data, data.length().to_int64())
 }

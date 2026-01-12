@@ -1,4 +1,4 @@
--- Blog Schema for D1
+-- Blog Schema for D1 (Atlas managed)
 
 -- Users table (authors)
 CREATE TABLE users (

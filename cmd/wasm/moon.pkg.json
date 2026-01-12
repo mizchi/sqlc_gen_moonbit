@@ -1,0 +1,7 @@
+{
+  "is-main": true,
+  "import": [
+    { "path": "sqlc_gen_moonbit/lib/codegen", "alias": "codegen" }
+  ],
+  "supported-targets": ["wasm", "wasm-gc"]
+}

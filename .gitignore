@@ -4,4 +4,4 @@ _build/
 .mooncakes/
 .moonagent/
 .wrangler/
-node_modules/
+node_modules/gen/

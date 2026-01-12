@@ -1,8 +1,6 @@
 {
-  "is-main": true,
   "import": [
     "moonbitlang/protobuf",
     { "path": "sqlc_gen_moonbit/gen/plugin", "alias": "plugin" }
-  ],
-  "native-stub": ["stub.c"]
+  ]
 }
