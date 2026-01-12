@@ -1,0 +1,14 @@
+version: "2"
+plugins:
+  - name: moonbit
+    process:
+      cmd: "/Users/mz/ghq/github.com/mizchi/sqlc_gen_moonbit/_build/native/release/build/cmd/main/main.exe"
+sql:
+  - engine: sqlite
+    schema: "sqlite/schema.sql"
+    queries: "sqlite/query.sql"
+    codegen:
+      - plugin: moonbit
+        out: "gen"
+        options:
+          backend: "sqlite"
