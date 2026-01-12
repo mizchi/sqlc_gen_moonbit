@@ -9,12 +9,12 @@ pub async fn get_user_by_id(db : @cloudflare.D1Database, params : GetUserByIdPar
   match stmt.first() {
     None => None
     Some(result) => Some({
-      id: result["id"].cast(),
+      id: @cloudflare.js_number_to_int64(result["id"]),
       username: result["username"].cast(),
       email: result["email"].cast(),
       display_name: result["display_name"].cast(),
-      bio: result["bio"].cast(),
-      avatar_url: result["avatar_url"].cast(),
+      bio: (if @core.is_null(result["bio"]) || @core.typeof_(result["bio"]) == "undefined" { None } else { Some(result["bio"].cast()) }),
+      avatar_url: (if @core.is_null(result["avatar_url"]) || @core.typeof_(result["avatar_url"]) == "undefined" { None } else { Some(result["avatar_url"].cast()) }),
       created_at: result["created_at"].cast(),
       updated_at: result["updated_at"].cast(),
     })
@@ -28,12 +28,12 @@ pub async fn get_user_by_username(db : @cloudflare.D1Database, params : GetUserB
   match stmt.first() {
     None => None
     Some(result) => Some({
-      id: result["id"].cast(),
+      id: @cloudflare.js_number_to_int64(result["id"]),
       username: result["username"].cast(),
       email: result["email"].cast(),
       display_name: result["display_name"].cast(),
-      bio: result["bio"].cast(),
-      avatar_url: result["avatar_url"].cast(),
+      bio: (if @core.is_null(result["bio"]) || @core.typeof_(result["bio"]) == "undefined" { None } else { Some(result["bio"].cast()) }),
+      avatar_url: (if @core.is_null(result["avatar_url"]) || @core.typeof_(result["avatar_url"]) == "undefined" { None } else { Some(result["avatar_url"].cast()) }),
       created_at: result["created_at"].cast(),
       updated_at: result["updated_at"].cast(),
     })
@@ -49,12 +49,12 @@ pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
   let results : Array[ListUsersRow] = []
   for row in results_arr {
     results.push({
-      id: row["id"].cast(),
+      id: @cloudflare.js_number_to_int64(row["id"]),
       username: row["username"].cast(),
       email: row["email"].cast(),
       display_name: row["display_name"].cast(),
-      bio: row["bio"].cast(),
-      avatar_url: row["avatar_url"].cast(),
+      bio: (if @core.is_null(row["bio"]) || @core.typeof_(row["bio"]) == "undefined" { None } else { Some(row["bio"].cast()) }),
+      avatar_url: (if @core.is_null(row["avatar_url"]) || @core.typeof_(row["avatar_url"]) == "undefined" { None } else { Some(row["avatar_url"].cast()) }),
       created_at: row["created_at"].cast(),
       updated_at: row["updated_at"].cast(),
     })
@@ -76,10 +76,10 @@ pub async fn get_category_by_id(db : @cloudflare.D1Database, params : GetCategor
   match stmt.first() {
     None => None
     Some(result) => Some({
-      id: result["id"].cast(),
+      id: @cloudflare.js_number_to_int64(result["id"]),
       name: result["name"].cast(),
       slug: result["slug"].cast(),
-      description: result["description"].cast(),
+      description: (if @core.is_null(result["description"]) || @core.typeof_(result["description"]) == "undefined" { None } else { Some(result["description"].cast()) }),
     })
   }
 }
@@ -93,10 +93,10 @@ pub async fn list_categories(db : @cloudflare.D1Database) -> Array[ListCategorie
   let results : Array[ListCategoriesRow] = []
   for row in results_arr {
     results.push({
-      id: row["id"].cast(),
+      id: @cloudflare.js_number_to_int64(row["id"]),
       name: row["name"].cast(),
       slug: row["slug"].cast(),
-      description: row["description"].cast(),
+      description: (if @core.is_null(row["description"]) || @core.typeof_(row["description"]) == "undefined" { None } else { Some(row["description"].cast()) }),
     })
   }
   results
@@ -116,15 +116,15 @@ pub async fn get_post_by_id(db : @cloudflare.D1Database, params : GetPostByIdPar
   match stmt.first() {
     None => None
     Some(result) => Some({
-      id: result["id"].cast(),
-      author_id: result["author_id"].cast(),
-      category_id: result["category_id"].cast(),
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      author_id: @cloudflare.js_number_to_int64(result["author_id"]),
+      category_id: (if @core.is_null(result["category_id"]) || @core.typeof_(result["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(result["category_id"])) }),
       title: result["title"].cast(),
       slug: result["slug"].cast(),
       content: result["content"].cast(),
-      excerpt: result["excerpt"].cast(),
+      excerpt: (if @core.is_null(result["excerpt"]) || @core.typeof_(result["excerpt"]) == "undefined" { None } else { Some(result["excerpt"].cast()) }),
       status: result["status"].cast(),
-      published_at: result["published_at"].cast(),
+      published_at: (if @core.is_null(result["published_at"]) || @core.typeof_(result["published_at"]) == "undefined" { None } else { Some(result["published_at"].cast()) }),
       created_at: result["created_at"].cast(),
       updated_at: result["updated_at"].cast(),
     })
@@ -138,15 +138,15 @@ pub async fn get_post_by_slug(db : @cloudflare.D1Database, params : GetPostBySlu
   match stmt.first() {
     None => None
     Some(result) => Some({
-      id: result["id"].cast(),
-      author_id: result["author_id"].cast(),
-      category_id: result["category_id"].cast(),
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      author_id: @cloudflare.js_number_to_int64(result["author_id"]),
+      category_id: (if @core.is_null(result["category_id"]) || @core.typeof_(result["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(result["category_id"])) }),
       title: result["title"].cast(),
       slug: result["slug"].cast(),
       content: result["content"].cast(),
-      excerpt: result["excerpt"].cast(),
+      excerpt: (if @core.is_null(result["excerpt"]) || @core.typeof_(result["excerpt"]) == "undefined" { None } else { Some(result["excerpt"].cast()) }),
       status: result["status"].cast(),
-      published_at: result["published_at"].cast(),
+      published_at: (if @core.is_null(result["published_at"]) || @core.typeof_(result["published_at"]) == "undefined" { None } else { Some(result["published_at"].cast()) }),
       created_at: result["created_at"].cast(),
       updated_at: result["updated_at"].cast(),
     })
@@ -162,15 +162,15 @@ pub async fn list_published_posts(db : @cloudflare.D1Database, params : ListPubl
   let results : Array[ListPublishedPostsRow] = []
   for row in results_arr {
     results.push({
-      id: row["id"].cast(),
-      author_id: row["author_id"].cast(),
-      category_id: row["category_id"].cast(),
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      category_id: (if @core.is_null(row["category_id"]) || @core.typeof_(row["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(row["category_id"])) }),
       title: row["title"].cast(),
       slug: row["slug"].cast(),
       content: row["content"].cast(),
-      excerpt: row["excerpt"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
       status: row["status"].cast(),
-      published_at: row["published_at"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
       created_at: row["created_at"].cast(),
       updated_at: row["updated_at"].cast(),
     })
@@ -187,15 +187,15 @@ pub async fn list_posts_by_author(db : @cloudflare.D1Database, params : ListPost
   let results : Array[ListPostsByAuthorRow] = []
   for row in results_arr {
     results.push({
-      id: row["id"].cast(),
-      author_id: row["author_id"].cast(),
-      category_id: row["category_id"].cast(),
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      category_id: (if @core.is_null(row["category_id"]) || @core.typeof_(row["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(row["category_id"])) }),
       title: row["title"].cast(),
       slug: row["slug"].cast(),
       content: row["content"].cast(),
-      excerpt: row["excerpt"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
       status: row["status"].cast(),
-      published_at: row["published_at"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
       created_at: row["created_at"].cast(),
       updated_at: row["updated_at"].cast(),
     })
@@ -233,7 +233,7 @@ pub async fn list_tags(db : @cloudflare.D1Database) -> Array[ListTagsRow] {
   let results : Array[ListTagsRow] = []
   for row in results_arr {
     results.push({
-      id: row["id"].cast(),
+      id: @cloudflare.js_number_to_int64(row["id"]),
       name: row["name"].cast(),
       slug: row["slug"].cast(),
     })
@@ -257,12 +257,12 @@ pub async fn list_comments_for_post(db : @cloudflare.D1Database, params : ListCo
   let results : Array[ListCommentsForPostRow] = []
   for row in results_arr {
     results.push({
-      id: row["id"].cast(),
-      post_id: row["post_id"].cast(),
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      post_id: @cloudflare.js_number_to_int64(row["post_id"]),
       author_name: row["author_name"].cast(),
       author_email: row["author_email"].cast(),
       content: row["content"].cast(),
-      is_approved: row["is_approved"].cast(),
+      is_approved: @cloudflare.js_number_to_int64(row["is_approved"]),
       created_at: row["created_at"].cast(),
     })
   }
@@ -273,6 +273,229 @@ pub async fn list_comments_for_post(db : @cloudflare.D1Database, params : ListCo
 /// INSERT INTO comments (post_id, author_name, author_email, content) VALUES (?, ?, ?, ?)
 pub async fn create_comment(db : @cloudflare.D1Database, params : CreateCommentParams) -> Unit {
   let stmt = db.prepare(create_comment_sql).bind([@core.any(params.post_id.to_int()), @core.any(params.author_name), @core.any(params.author_email), @core.any(params.content)])
+  stmt.run() |> ignore
+}
+
+///| GetPostWithAuthor
+///  SELECT   p.id, p.title, p.slug, p.content, p.excerpt, p.status,   p.published_at, p.created_at, p.updated_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name, u.avatar_url as author_avatar_url FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id = ?
+pub async fn get_post_with_author(db : @cloudflare.D1Database, params : GetPostWithAuthorParams) -> GetPostWithAuthorRow? {
+  let stmt = db.prepare(get_post_with_author_sql).bind([@core.any(params.id.to_int())])
+  match stmt.first() {
+    None => None
+    Some(result) => Some({
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      title: result["title"].cast(),
+      slug: result["slug"].cast(),
+      content: result["content"].cast(),
+      excerpt: (if @core.is_null(result["excerpt"]) || @core.typeof_(result["excerpt"]) == "undefined" { None } else { Some(result["excerpt"].cast()) }),
+      status: result["status"].cast(),
+      published_at: (if @core.is_null(result["published_at"]) || @core.typeof_(result["published_at"]) == "undefined" { None } else { Some(result["published_at"].cast()) }),
+      created_at: result["created_at"].cast(),
+      updated_at: result["updated_at"].cast(),
+      author_id: @cloudflare.js_number_to_int64(result["author_id"]),
+      author_username: result["author_username"].cast(),
+      author_display_name: result["author_display_name"].cast(),
+      author_avatar_url: (if @core.is_null(result["author_avatar_url"]) || @core.typeof_(result["author_avatar_url"]) == "undefined" { None } else { Some(result["author_avatar_url"].cast()) }),
+    })
+  }
+}
+
+///| GetPostWithAuthorBySlug
+/// SELECT   p.id, p.title, p.slug, p.content, p.excerpt, p.status,   p.published_at, p.created_at, p.updated_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name, u.avatar_url as author_avatar_url FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.slug = ?
+pub async fn get_post_with_author_by_slug(db : @cloudflare.D1Database, params : GetPostWithAuthorBySlugParams) -> GetPostWithAuthorBySlugRow? {
+  let stmt = db.prepare(get_post_with_author_by_slug_sql).bind([@core.any(params.slug)])
+  match stmt.first() {
+    None => None
+    Some(result) => Some({
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      title: result["title"].cast(),
+      slug: result["slug"].cast(),
+      content: result["content"].cast(),
+      excerpt: (if @core.is_null(result["excerpt"]) || @core.typeof_(result["excerpt"]) == "undefined" { None } else { Some(result["excerpt"].cast()) }),
+      status: result["status"].cast(),
+      published_at: (if @core.is_null(result["published_at"]) || @core.typeof_(result["published_at"]) == "undefined" { None } else { Some(result["published_at"].cast()) }),
+      created_at: result["created_at"].cast(),
+      updated_at: result["updated_at"].cast(),
+      author_id: @cloudflare.js_number_to_int64(result["author_id"]),
+      author_username: result["author_username"].cast(),
+      author_display_name: result["author_display_name"].cast(),
+      author_avatar_url: (if @core.is_null(result["author_avatar_url"]) || @core.typeof_(result["author_avatar_url"]) == "undefined" { None } else { Some(result["author_avatar_url"].cast()) }),
+    })
+  }
+}
+
+///| ListPostsWithAuthors
+/// SELECT   p.id, p.title, p.slug, p.excerpt, p.status,   p.published_at, p.created_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.status = 'published' ORDER BY p.published_at DESC LIMIT ?
+pub async fn list_posts_with_authors(db : @cloudflare.D1Database, params : ListPostsWithAuthorsParams) -> Array[ListPostsWithAuthorsRow] {
+  let stmt = db.prepare(list_posts_with_authors_sql).bind([@core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPostsWithAuthorsRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
+      status: row["status"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
+      created_at: row["created_at"].cast(),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      author_username: row["author_username"].cast(),
+      author_display_name: row["author_display_name"].cast(),
+    })
+  }
+  results
+}
+
+///| GetPostWithCategory
+/// SELECT   p.id, p.title, p.slug, p.content, p.status,   c.id as category_id, c.name as category_name, c.slug as category_slug FROM posts p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?
+pub async fn get_post_with_category(db : @cloudflare.D1Database, params : GetPostWithCategoryParams) -> GetPostWithCategoryRow? {
+  let stmt = db.prepare(get_post_with_category_sql).bind([@core.any(params.id.to_int())])
+  match stmt.first() {
+    None => None
+    Some(result) => Some({
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      title: result["title"].cast(),
+      slug: result["slug"].cast(),
+      content: result["content"].cast(),
+      status: result["status"].cast(),
+      category_id: (if @core.is_null(result["category_id"]) || @core.typeof_(result["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(result["category_id"])) }),
+      category_name: (if @core.is_null(result["category_name"]) || @core.typeof_(result["category_name"]) == "undefined" { None } else { Some(result["category_name"].cast()) }),
+      category_slug: (if @core.is_null(result["category_slug"]) || @core.typeof_(result["category_slug"]) == "undefined" { None } else { Some(result["category_slug"].cast()) }),
+    })
+  }
+}
+
+///| ListPostsWithDetails
+/// SELECT   p.id, p.title, p.slug, p.excerpt, p.status, p.published_at,   u.id as author_id, u.username as author_username, u.display_name as author_display_name,   c.id as category_id, c.name as category_name FROM posts p INNER JOIN users u ON p.author_id = u.id LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'published' ORDER BY p.published_at DESC LIMIT ?
+pub async fn list_posts_with_details(db : @cloudflare.D1Database, params : ListPostsWithDetailsParams) -> Array[ListPostsWithDetailsRow] {
+  let stmt = db.prepare(list_posts_with_details_sql).bind([@core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPostsWithDetailsRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
+      status: row["status"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      author_username: row["author_username"].cast(),
+      author_display_name: row["author_display_name"].cast(),
+      category_id: (if @core.is_null(row["category_id"]) || @core.typeof_(row["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(row["category_id"])) }),
+      category_name: (if @core.is_null(row["category_name"]) || @core.typeof_(row["category_name"]) == "undefined" { None } else { Some(row["category_name"].cast()) }),
+    })
+  }
+  results
+}
+
+///| ListTagsForPost
+/// SELECT t.id, t.name, t.slug FROM tags t INNER JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ? ORDER BY t.name
+pub async fn list_tags_for_post(db : @cloudflare.D1Database, params : ListTagsForPostParams) -> Array[ListTagsForPostRow] {
+  let stmt = db.prepare(list_tags_for_post_sql).bind([@core.any(params.post_id.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListTagsForPostRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      name: row["name"].cast(),
+      slug: row["slug"].cast(),
+    })
+  }
+  results
+}
+
+///| ListPostsWithTagCount
+/// SELECT   p.id, p.title, p.slug, p.status,   COUNT(pt.tag_id) as tag_count FROM posts p LEFT JOIN post_tags pt ON p.id = pt.post_id GROUP BY p.id ORDER BY tag_count DESC LIMIT ?
+pub async fn list_posts_with_tag_count(db : @cloudflare.D1Database, params : ListPostsWithTagCountParams) -> Array[ListPostsWithTagCountRow] {
+  let stmt = db.prepare(list_posts_with_tag_count_sql).bind([@core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPostsWithTagCountRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      status: row["status"].cast(),
+      tag_count: @cloudflare.js_number_to_int64(row["tag_count"]),
+    })
+  }
+  results
+}
+
+///| GetPostCommentsWithCount
+/// SELECT   p.id, p.title,   COUNT(c.id) as comment_count,   SUM(CASE WHEN c.is_approved = 1 THEN 1 ELSE 0 END) as approved_count FROM posts p LEFT JOIN comments c ON p.id = c.post_id WHERE p.id = ? GROUP BY p.id
+pub async fn get_post_comments_with_count(db : @cloudflare.D1Database, params : GetPostCommentsWithCountParams) -> GetPostCommentsWithCountRow? {
+  let stmt = db.prepare(get_post_comments_with_count_sql).bind([@core.any(params.id.to_int())])
+  match stmt.first() {
+    None => None
+    Some(result) => Some({
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      title: result["title"].cast(),
+      comment_count: @cloudflare.js_number_to_int64(result["comment_count"]),
+      approved_count: (if @core.is_null(result["approved_count"]) || @core.typeof_(result["approved_count"]) == "undefined" { None } else { Some(result["approved_count"].cast()) }),
+    })
+  }
+}
+
+///| AddTagToPost
+///  INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)
+pub async fn add_tag_to_post(db : @cloudflare.D1Database, params : AddTagToPostParams) -> Unit {
+  let stmt = db.prepare(add_tag_to_post_sql).bind([@core.any(params.post_id.to_int()), @core.any(params.tag_id.to_int())])
+  stmt.run() |> ignore
+}
+
+///| RemoveTagFromPost
+/// DELETE FROM post_tags WHERE post_id = ? AND tag_id = ?
+pub async fn remove_tag_from_post(db : @cloudflare.D1Database, params : RemoveTagFromPostParams) -> Unit {
+  let stmt = db.prepare(remove_tag_from_post_sql).bind([@core.any(params.post_id.to_int()), @core.any(params.tag_id.to_int())])
+  stmt.run() |> ignore
+}
+
+///| RemoveAllTagsFromPost
+/// DELETE FROM post_tags WHERE post_id = ?
+pub async fn remove_all_tags_from_post(db : @cloudflare.D1Database, params : RemoveAllTagsFromPostParams) -> Unit {
+  let stmt = db.prepare(remove_all_tags_from_post_sql).bind([@core.any(params.post_id.to_int())])
+  stmt.run() |> ignore
+}
+
+///| GetOrCreateTag
+/// INSERT INTO tags (name, slug) VALUES (?, ?) ON CONFLICT (slug) DO UPDATE SET name = excluded.name RETURNING id, name, slug
+pub async fn get_or_create_tag(db : @cloudflare.D1Database, params : GetOrCreateTagParams) -> GetOrCreateTagRow? {
+  let stmt = db.prepare(get_or_create_tag_sql).bind([@core.any(params.name), @core.any(params.slug)])
+  match stmt.first() {
+    None => None
+    Some(result) => Some({
+      id: @cloudflare.js_number_to_int64(result["id"]),
+      name: result["name"].cast(),
+      slug: result["slug"].cast(),
+    })
+  }
+}
+
+///| ApproveComment
+/// UPDATE comments SET is_approved = 1 WHERE id = ?
+pub async fn approve_comment(db : @cloudflare.D1Database, params : ApproveCommentParams) -> Unit {
+  let stmt = db.prepare(approve_comment_sql).bind([@core.any(params.id.to_int())])
+  stmt.run() |> ignore
+}
+
+///| ApproveAllCommentsForPost
+/// UPDATE comments SET is_approved = 1 WHERE post_id = ?
+pub async fn approve_all_comments_for_post(db : @cloudflare.D1Database, params : ApproveAllCommentsForPostParams) -> Unit {
+  let stmt = db.prepare(approve_all_comments_for_post_sql).bind([@core.any(params.post_id.to_int())])
+  stmt.run() |> ignore
+}
+
+///| DeleteAllCommentsForPost
+/// DELETE FROM comments WHERE post_id = ?
+pub async fn delete_all_comments_for_post(db : @cloudflare.D1Database, params : DeleteAllCommentsForPostParams) -> Unit {
+  let stmt = db.prepare(delete_all_comments_for_post_sql).bind([@core.any(params.post_id.to_int())])
   stmt.run() |> ignore
 }
 

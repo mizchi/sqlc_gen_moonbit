@@ -122,6 +122,114 @@
         "content": { "type": "string", "minLength": 1 }
       }
     },
+    "GetPostWithAuthorParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "GetPostWithAuthorBySlugParams": {
+      "type": "object",
+      "required": ["slug"],
+      "properties": {
+        "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPostsWithAuthorsParams": {
+      "type": "object",
+      "required": ["limit"],
+      "properties": {
+        "limit": { "type": "integer" }
+      }
+    },
+    "GetPostWithCategoryParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "ListPostsWithDetailsParams": {
+      "type": "object",
+      "required": ["limit"],
+      "properties": {
+        "limit": { "type": "integer" }
+      }
+    },
+    "ListTagsForPostParams": {
+      "type": "object",
+      "required": ["post_id"],
+      "properties": {
+        "post_id": { "type": "integer" }
+      }
+    },
+    "ListPostsWithTagCountParams": {
+      "type": "object",
+      "required": ["limit"],
+      "properties": {
+        "limit": { "type": "integer" }
+      }
+    },
+    "GetPostCommentsWithCountParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "AddTagToPostParams": {
+      "type": "object",
+      "required": ["post_id", "tag_id"],
+      "properties": {
+        "post_id": { "type": "integer" },
+        "tag_id": { "type": "integer" }
+      }
+    },
+    "RemoveTagFromPostParams": {
+      "type": "object",
+      "required": ["post_id", "tag_id"],
+      "properties": {
+        "post_id": { "type": "integer" },
+        "tag_id": { "type": "integer" }
+      }
+    },
+    "RemoveAllTagsFromPostParams": {
+      "type": "object",
+      "required": ["post_id"],
+      "properties": {
+        "post_id": { "type": "integer" }
+      }
+    },
+    "GetOrCreateTagParams": {
+      "type": "object",
+      "required": ["name", "slug"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ApproveCommentParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "ApproveAllCommentsForPostParams": {
+      "type": "object",
+      "required": ["post_id"],
+      "properties": {
+        "post_id": { "type": "integer" }
+      }
+    },
+    "DeleteAllCommentsForPostParams": {
+      "type": "object",
+      "required": ["post_id"],
+      "properties": {
+        "post_id": { "type": "integer" }
+      }
+    },
     "GetUserByIdRow": {
       "type": "object",
       "required": ["id", "username", "email", "display_name", "created_at", "updated_at"],
@@ -272,6 +380,130 @@
         "content": { "type": "string", "minLength": 1 },
         "is_approved": { "type": "integer" },
         "created_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GetPostWithAuthorRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "content", "status", "created_at", "updated_at", "author_id", "author_username", "author_display_name"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 },
+        "author_id": { "type": "integer" },
+        "author_username": { "type": "string", "minLength": 1 },
+        "author_display_name": { "type": "string", "minLength": 1 },
+        "author_avatar_url": { "type": ["string", "null"] }
+      }
+    },
+    "GetPostWithAuthorBySlugRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "content", "status", "created_at", "updated_at", "author_id", "author_username", "author_display_name"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 },
+        "author_id": { "type": "integer" },
+        "author_username": { "type": "string", "minLength": 1 },
+        "author_display_name": { "type": "string", "minLength": 1 },
+        "author_avatar_url": { "type": ["string", "null"] }
+      }
+    },
+    "ListPostsWithAuthorsRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "status", "created_at", "author_id", "author_username", "author_display_name"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "author_id": { "type": "integer" },
+        "author_username": { "type": "string", "minLength": 1 },
+        "author_display_name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GetPostWithCategoryRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "content", "status"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 },
+        "category_id": { "type": ["integer", "null"] },
+        "category_name": { "type": ["string", "null"] },
+        "category_slug": { "type": ["string", "null"] }
+      }
+    },
+    "ListPostsWithDetailsRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "status", "author_id", "author_username", "author_display_name"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "author_id": { "type": "integer" },
+        "author_username": { "type": "string", "minLength": 1 },
+        "author_display_name": { "type": "string", "minLength": 1 },
+        "category_id": { "type": ["integer", "null"] },
+        "category_name": { "type": ["string", "null"] }
+      }
+    },
+    "ListTagsForPostRow": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPostsWithTagCountRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "status", "tag_count"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 },
+        "tag_count": { "type": "integer" }
+      }
+    },
+    "GetPostCommentsWithCountRow": {
+      "type": "object",
+      "required": ["id", "title", "comment_count"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "comment_count": { "type": "integer" },
+        "approved_count": { "type": ["number", "null"] }
+      }
+    },
+    "GetOrCreateTagRow": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 }
       }
     }
   }

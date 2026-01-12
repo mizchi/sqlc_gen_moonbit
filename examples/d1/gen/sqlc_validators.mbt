@@ -124,3 +124,87 @@ pub fn CreateCommentParams::validate(self : CreateCommentParams) -> Result[Unit,
   Ok(())
 }
 
+///| Validate GetPostWithAuthorParams
+pub fn GetPostWithAuthorParams::validate(_self : GetPostWithAuthorParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate GetPostWithAuthorBySlugParams
+pub fn GetPostWithAuthorBySlugParams::validate(self : GetPostWithAuthorBySlugParams) -> Result[Unit, String] {
+  if self.slug.length() == 0 {
+    return Err("slug is required")
+  }
+  Ok(())
+}
+
+///| Validate ListPostsWithAuthorsParams
+pub fn ListPostsWithAuthorsParams::validate(_self : ListPostsWithAuthorsParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate GetPostWithCategoryParams
+pub fn GetPostWithCategoryParams::validate(_self : GetPostWithCategoryParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListPostsWithDetailsParams
+pub fn ListPostsWithDetailsParams::validate(_self : ListPostsWithDetailsParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListTagsForPostParams
+pub fn ListTagsForPostParams::validate(_self : ListTagsForPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListPostsWithTagCountParams
+pub fn ListPostsWithTagCountParams::validate(_self : ListPostsWithTagCountParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate GetPostCommentsWithCountParams
+pub fn GetPostCommentsWithCountParams::validate(_self : GetPostCommentsWithCountParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate AddTagToPostParams
+pub fn AddTagToPostParams::validate(_self : AddTagToPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate RemoveTagFromPostParams
+pub fn RemoveTagFromPostParams::validate(_self : RemoveTagFromPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate RemoveAllTagsFromPostParams
+pub fn RemoveAllTagsFromPostParams::validate(_self : RemoveAllTagsFromPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate GetOrCreateTagParams
+pub fn GetOrCreateTagParams::validate(self : GetOrCreateTagParams) -> Result[Unit, String] {
+  if self.name.length() == 0 {
+    return Err("name is required")
+  }
+  if self.slug.length() == 0 {
+    return Err("slug is required")
+  }
+  Ok(())
+}
+
+///| Validate ApproveCommentParams
+pub fn ApproveCommentParams::validate(_self : ApproveCommentParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ApproveAllCommentsForPostParams
+pub fn ApproveAllCommentsForPostParams::validate(_self : ApproveAllCommentsForPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate DeleteAllCommentsForPostParams
+pub fn DeleteAllCommentsForPostParams::validate(_self : DeleteAllCommentsForPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+

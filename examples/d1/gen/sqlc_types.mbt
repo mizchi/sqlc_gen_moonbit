@@ -132,6 +132,112 @@ pub struct ListCommentsForPostRow {
 } derive(Show, Eq)
 
 ///|
+pub struct GetPostWithAuthorRow {
+  id : Int64
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+  author_avatar_url : String?
+} derive(Show, Eq)
+
+///|
+pub struct GetPostWithAuthorBySlugRow {
+  id : Int64
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+  author_avatar_url : String?
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsWithAuthorsRow {
+  id : Int64
+  title : String
+  slug : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+} derive(Show, Eq)
+
+///|
+pub struct GetPostWithCategoryRow {
+  id : Int64
+  title : String
+  slug : String
+  content : String
+  status : String
+  category_id : Int64?
+  category_name : String?
+  category_slug : String?
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsWithDetailsRow {
+  id : Int64
+  title : String
+  slug : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+  category_id : Int64?
+  category_name : String?
+} derive(Show, Eq)
+
+///|
+pub struct ListTagsForPostRow {
+  id : Int64
+  name : String
+  slug : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsWithTagCountRow {
+  id : Int64
+  title : String
+  slug : String
+  status : String
+  tag_count : Int64
+} derive(Show, Eq)
+
+///|
+pub struct GetPostCommentsWithCountRow {
+  id : Int64
+  title : String
+  comment_count : Int64
+  approved_count : Double?
+} derive(Show, Eq)
+
+///|
+pub struct GetOrCreateTagRow {
+  id : Int64
+  name : String
+  slug : String
+} derive(Show, Eq)
+
+///|
 pub struct GetUserByIdParams {
   id : Int64
 } derive(Show, Eq)
@@ -297,6 +403,159 @@ pub fn CreateCommentParams::new(post_id : Int64, author_name : String, author_em
   { post_id, author_name, author_email, content, }
 }
 
+///|
+pub struct GetPostWithAuthorParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetPostWithAuthorParams::new(id : Int64) -> GetPostWithAuthorParams {
+  { id, }
+}
+
+///|
+pub struct GetPostWithAuthorBySlugParams {
+  slug : String
+} derive(Show, Eq)
+
+///|
+pub fn GetPostWithAuthorBySlugParams::new(slug : String) -> GetPostWithAuthorBySlugParams {
+  { slug, }
+}
+
+///|
+pub struct ListPostsWithAuthorsParams {
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsWithAuthorsParams::new(limit : Int64) -> ListPostsWithAuthorsParams {
+  { limit, }
+}
+
+///|
+pub struct GetPostWithCategoryParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetPostWithCategoryParams::new(id : Int64) -> GetPostWithCategoryParams {
+  { id, }
+}
+
+///|
+pub struct ListPostsWithDetailsParams {
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsWithDetailsParams::new(limit : Int64) -> ListPostsWithDetailsParams {
+  { limit, }
+}
+
+///|
+pub struct ListTagsForPostParams {
+  post_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListTagsForPostParams::new(post_id : Int64) -> ListTagsForPostParams {
+  { post_id, }
+}
+
+///|
+pub struct ListPostsWithTagCountParams {
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsWithTagCountParams::new(limit : Int64) -> ListPostsWithTagCountParams {
+  { limit, }
+}
+
+///|
+pub struct GetPostCommentsWithCountParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetPostCommentsWithCountParams::new(id : Int64) -> GetPostCommentsWithCountParams {
+  { id, }
+}
+
+///|
+pub struct AddTagToPostParams {
+  post_id : Int64
+  tag_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn AddTagToPostParams::new(post_id : Int64, tag_id : Int64) -> AddTagToPostParams {
+  { post_id, tag_id, }
+}
+
+///|
+pub struct RemoveTagFromPostParams {
+  post_id : Int64
+  tag_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn RemoveTagFromPostParams::new(post_id : Int64, tag_id : Int64) -> RemoveTagFromPostParams {
+  { post_id, tag_id, }
+}
+
+///|
+pub struct RemoveAllTagsFromPostParams {
+  post_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn RemoveAllTagsFromPostParams::new(post_id : Int64) -> RemoveAllTagsFromPostParams {
+  { post_id, }
+}
+
+///|
+pub struct GetOrCreateTagParams {
+  name : String
+  slug : String
+} derive(Show, Eq)
+
+///|
+pub fn GetOrCreateTagParams::new(name : String, slug : String) -> GetOrCreateTagParams {
+  { name, slug, }
+}
+
+///|
+pub struct ApproveCommentParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ApproveCommentParams::new(id : Int64) -> ApproveCommentParams {
+  { id, }
+}
+
+///|
+pub struct ApproveAllCommentsForPostParams {
+  post_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ApproveAllCommentsForPostParams::new(post_id : Int64) -> ApproveAllCommentsForPostParams {
+  { post_id, }
+}
+
+///|
+pub struct DeleteAllCommentsForPostParams {
+  post_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn DeleteAllCommentsForPostParams::new(post_id : Int64) -> DeleteAllCommentsForPostParams {
+  { post_id, }
+}
+
 // SQL queries
 pub let get_user_by_id_sql : String = "\nSELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE id = ?"
 
@@ -333,4 +592,34 @@ pub let create_tag_sql : String = "INSERT INTO tags (name, slug) VALUES (?, ?)"
 pub let list_comments_for_post_sql : String = "\nSELECT id, post_id, author_name, author_email, content, is_approved, created_at FROM comments\nWHERE post_id = ? AND is_approved = 1\nORDER BY created_at ASC"
 
 pub let create_comment_sql : String = "INSERT INTO comments (post_id, author_name, author_email, content)\nVALUES (?, ?, ?, ?)"
+
+pub let get_post_with_author_sql : String = "\nSELECT\n  p.id, p.title, p.slug, p.content, p.excerpt, p.status,\n  p.published_at, p.created_at, p.updated_at,\n  u.id as author_id, u.username as author_username,\n  u.display_name as author_display_name, u.avatar_url as author_avatar_url\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nWHERE p.id = ?"
+
+pub let get_post_with_author_by_slug_sql : String = "SELECT\n  p.id, p.title, p.slug, p.content, p.excerpt, p.status,\n  p.published_at, p.created_at, p.updated_at,\n  u.id as author_id, u.username as author_username,\n  u.display_name as author_display_name, u.avatar_url as author_avatar_url\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nWHERE p.slug = ?"
+
+pub let list_posts_with_authors_sql : String = "SELECT\n  p.id, p.title, p.slug, p.excerpt, p.status,\n  p.published_at, p.created_at,\n  u.id as author_id, u.username as author_username,\n  u.display_name as author_display_name\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nWHERE p.status = 'published'\nORDER BY p.published_at DESC\nLIMIT ?"
+
+pub let get_post_with_category_sql : String = "SELECT\n  p.id, p.title, p.slug, p.content, p.status,\n  c.id as category_id, c.name as category_name, c.slug as category_slug\nFROM posts p\nLEFT JOIN categories c ON p.category_id = c.id\nWHERE p.id = ?"
+
+pub let list_posts_with_details_sql : String = "SELECT\n  p.id, p.title, p.slug, p.excerpt, p.status, p.published_at,\n  u.id as author_id, u.username as author_username, u.display_name as author_display_name,\n  c.id as category_id, c.name as category_name\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nLEFT JOIN categories c ON p.category_id = c.id\nWHERE p.status = 'published'\nORDER BY p.published_at DESC\nLIMIT ?"
+
+pub let list_tags_for_post_sql : String = "SELECT t.id, t.name, t.slug\nFROM tags t\nINNER JOIN post_tags pt ON t.id = pt.tag_id\nWHERE pt.post_id = ?\nORDER BY t.name"
+
+pub let list_posts_with_tag_count_sql : String = "SELECT\n  p.id, p.title, p.slug, p.status,\n  COUNT(pt.tag_id) as tag_count\nFROM posts p\nLEFT JOIN post_tags pt ON p.id = pt.post_id\nGROUP BY p.id\nORDER BY tag_count DESC\nLIMIT ?"
+
+pub let get_post_comments_with_count_sql : String = "SELECT\n  p.id, p.title,\n  COUNT(c.id) as comment_count,\n  SUM(CASE WHEN c.is_approved = 1 THEN 1 ELSE 0 END) as approved_count\nFROM posts p\nLEFT JOIN comments c ON p.id = c.post_id\nWHERE p.id = ?\nGROUP BY p.id"
+
+pub let add_tag_to_post_sql : String = "\nINSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)"
+
+pub let remove_tag_from_post_sql : String = "DELETE FROM post_tags WHERE post_id = ? AND tag_id = ?"
+
+pub let remove_all_tags_from_post_sql : String = "DELETE FROM post_tags WHERE post_id = ?"
+
+pub let get_or_create_tag_sql : String = "INSERT INTO tags (name, slug) VALUES (?, ?)\nON CONFLICT (slug) DO UPDATE SET name = excluded.name\nRETURNING id, name, slug"
+
+pub let approve_comment_sql : String = "UPDATE comments SET is_approved = 1 WHERE id = ?"
+
+pub let approve_all_comments_for_post_sql : String = "UPDATE comments SET is_approved = 1 WHERE post_id = ?"
+
+pub let delete_all_comments_for_post_sql : String = "DELETE FROM comments WHERE post_id = ?"
 

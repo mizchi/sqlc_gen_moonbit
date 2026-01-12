@@ -1,0 +1,19 @@
+{
+  "name": "example-d1",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "moon build --target js",
+    "test:d1": "node scripts/run-d1-tests.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "@cloudflare/workers-types": "^4.20241230.0",
+    "@mizchi/cloudflare-mbt": "link:../../../cloudflare.mbt",
+    "vitest": "^3.0.0",
+    "wrangler": "^4.0.0"
+  }
+}
