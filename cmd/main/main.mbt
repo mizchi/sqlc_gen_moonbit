@@ -93,6 +93,10 @@ fn main {
   // Generate code files
   let files : Array[@plugin.File] = []
 
+  // Generate moon.pkg (package config)
+  let moon_pkg_content = generate_moon_pkg(options)
+  files.push(@plugin.File::new("moon.pkg", string_to_utf8(moon_pkg_content)))
+
   // Generate types (common for all backends)
   let types_content = generate_types(request)
   files.push(@plugin.File::new("sqlc_types.mbt", string_to_utf8(types_content)))
@@ -127,6 +131,24 @@ fn main {
 fn write_stderr(msg : String) -> Unit {
   let bytes = string_to_utf8(msg)
   let _ = moonbit_write_stderr(bytes, bytes.length().to_int64())
+}
+
+///|
+fn generate_moon_pkg(options : Options) -> String {
+  let buf = StringBuilder::new()
+  buf.write_string("import {\n")
+  match options.backend {
+    Sqlite => {
+      buf.write_string("  \"mizchi/sqlite\",\n")
+      buf.write_string("  \"moonbitlang/x/encoding\",\n")
+    }
+    D1 => {
+      buf.write_string("  \"mizchi/js/core\",\n")
+      buf.write_string("  \"mizchi/cloudflare\",\n")
+    }
+  }
+  buf.write_string("}\n")
+  buf.to_string()
 }
 
 ///|
