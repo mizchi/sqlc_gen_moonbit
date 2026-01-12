@@ -1,0 +1,278 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "GetUserByIdParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "GetUserByUsernameParams": {
+      "type": "object",
+      "required": ["username"],
+      "properties": {
+        "username": { "type": "string", "minLength": 1 }
+      }
+    },
+    "CreateUserParams": {
+      "type": "object",
+      "required": ["username", "email", "display_name"],
+      "properties": {
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "bio": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] }
+      }
+    },
+    "GetCategoryByIdParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "CreateCategoryParams": {
+      "type": "object",
+      "required": ["name", "slug"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+    "GetPostByIdParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "GetPostBySlugParams": {
+      "type": "object",
+      "required": ["slug"],
+      "properties": {
+        "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPublishedPostsParams": {
+      "type": "object",
+      "required": ["limit"],
+      "properties": {
+        "limit": { "type": "integer" }
+      }
+    },
+    "ListPostsByAuthorParams": {
+      "type": "object",
+      "required": ["author_id"],
+      "properties": {
+        "author_id": { "type": "integer" }
+      }
+    },
+    "CreatePostParams": {
+      "type": "object",
+      "required": ["author_id", "title", "slug", "content", "status"],
+      "properties": {
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 }
+      }
+    },
+    "PublishPostParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "DeletePostParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "CreateTagParams": {
+      "type": "object",
+      "required": ["name", "slug"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListCommentsForPostParams": {
+      "type": "object",
+      "required": ["post_id"],
+      "properties": {
+        "post_id": { "type": "integer" }
+      }
+    },
+    "CreateCommentParams": {
+      "type": "object",
+      "required": ["post_id", "author_name", "author_email", "content"],
+      "properties": {
+        "post_id": { "type": "integer" },
+        "author_name": { "type": "string", "minLength": 1 },
+        "author_email": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GetUserByIdRow": {
+      "type": "object",
+      "required": ["id", "username", "email", "display_name", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "bio": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GetUserByUsernameRow": {
+      "type": "object",
+      "required": ["id", "username", "email", "display_name", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "bio": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListUsersRow": {
+      "type": "object",
+      "required": ["id", "username", "email", "display_name", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "bio": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GetCategoryByIdRow": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+    "ListCategoriesRow": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+    "GetPostByIdRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GetPostBySlugRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPublishedPostsRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPostsByAuthorRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListTagsRow": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListCommentsForPostRow": {
+      "type": "object",
+      "required": ["id", "post_id", "author_name", "author_email", "content", "is_approved", "created_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "post_id": { "type": "integer" },
+        "author_name": { "type": "string", "minLength": 1 },
+        "author_email": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "is_approved": { "type": "integer" },
+        "created_at": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

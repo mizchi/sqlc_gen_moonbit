@@ -12,3 +12,5 @@ sql:
         out: "gen"
         options:
           backend: "d1"
+          validators: true
+          json_schema: true
