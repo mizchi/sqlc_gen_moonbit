@@ -1,0 +1,8 @@
+version: v2
+plugins:
+  - local: bin/protoc-gen-mbt
+    out: gen
+    opt:
+      - paths=source_relative
+      - project_name=gen
+      - username=sqlc_gen_moonbit

@@ -1,0 +1,8 @@
+{
+  "name": "sqlc_gen_moonbit/gen",
+  "version": "0.1.0",
+  "source": "src",
+  "deps": {
+    "moonbitlang/protobuf": "0.1.0"
+  }
+}

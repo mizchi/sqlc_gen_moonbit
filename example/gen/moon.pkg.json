@@ -1,0 +1,6 @@
+{
+  "import": [
+    "mizchi/sqlite",
+    "moonbitlang/x/encoding"
+  ]
+}

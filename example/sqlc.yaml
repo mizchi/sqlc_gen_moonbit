@@ -1,0 +1,12 @@
+version: "2"
+plugins:
+  - name: moonbit
+    process:
+      cmd: "../target/native/release/build/cmd/main/main.exe"
+sql:
+  - engine: sqlite
+    schema: "sqlite/schema.sql"
+    queries: "sqlite/query.sql"
+    codegen:
+      - plugin: moonbit
+        out: "gen"
