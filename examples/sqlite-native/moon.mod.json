@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "example_sqlite_native",
   "version": "0.1.0",
   "deps": {
     "mizchi/sqlite": "0.1.3",
