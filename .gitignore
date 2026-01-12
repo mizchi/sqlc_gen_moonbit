@@ -3,4 +3,5 @@ target/
 _build/
 .mooncakes/
 .moonagent/
+.wrangler/
 node_modules/

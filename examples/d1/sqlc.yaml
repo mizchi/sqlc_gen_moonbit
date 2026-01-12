@@ -5,11 +5,11 @@ plugins:
       cmd: "/Users/mz/ghq/github.com/mizchi/sqlc_gen_moonbit/_build/native/release/build/cmd/main/main.exe"
 sql:
   - engine: sqlite
-    schema: "sqlite/schema.sql"
-    queries: "sqlite/query.sql"
+    schema: "db/migrations/0001_schema.sql"
+    queries: "db/sqlite/query.sql"
     codegen:
       - plugin: moonbit
-        out: "gen"
+        out: "db/gen"
         options:
           backend: "d1"
           validators: true

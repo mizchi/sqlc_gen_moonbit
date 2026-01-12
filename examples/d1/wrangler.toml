@@ -1,5 +1,5 @@
 name = "example-d1"
-main = "_build/js/release/build/app/app.js"
+main = "worker.js"
 compatibility_date = "2024-12-01"
 
 [[d1_databases]]
