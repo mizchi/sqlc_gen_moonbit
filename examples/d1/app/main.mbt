@@ -27,8 +27,14 @@ fn user_to_json(u : @gen.ListUsersRow) -> @core.Any {
   obj["username"] = u.username |> @core.any
   obj["email"] = u.email |> @core.any
   obj["display_name"] = u.display_name |> @core.any
-  obj["bio"] = match u.bio { Some(v) => @core.any(v); None => @core.null() }
-  obj["avatar_url"] = match u.avatar_url { Some(v) => @core.any(v); None => @core.null() }
+  obj["bio"] = match u.bio {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
+  obj["avatar_url"] = match u.avatar_url {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
   obj["created_at"] = u.created_at |> @core.any
   obj["updated_at"] = u.updated_at |> @core.any
   obj
@@ -39,12 +45,21 @@ fn post_to_json(p : @gen.ListPublishedPostsRow) -> @core.Any {
   let obj = @core.new_object()
   obj["id"] = p.id.to_int() |> @core.any
   obj["author_id"] = p.author_id.to_int() |> @core.any
-  obj["category_id"] = match p.category_id { Some(v) => @core.any(v.to_int()); None => @core.null() }
+  obj["category_id"] = match p.category_id {
+    Some(v) => @core.any(v.to_int())
+    None => @core.null()
+  }
   obj["title"] = p.title |> @core.any
   obj["slug"] = p.slug |> @core.any
-  obj["excerpt"] = match p.excerpt { Some(v) => @core.any(v); None => @core.null() }
+  obj["excerpt"] = match p.excerpt {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
   obj["status"] = p.status |> @core.any
-  obj["published_at"] = match p.published_at { Some(v) => @core.any(v); None => @core.null() }
+  obj["published_at"] = match p.published_at {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
   obj["created_at"] = p.created_at |> @core.any
   obj["updated_at"] = p.updated_at |> @core.any
   obj
@@ -55,13 +70,22 @@ fn post_detail_to_json(p : @gen.GetPostBySlugRow) -> @core.Any {
   let obj = @core.new_object()
   obj["id"] = p.id.to_int() |> @core.any
   obj["author_id"] = p.author_id.to_int() |> @core.any
-  obj["category_id"] = match p.category_id { Some(v) => @core.any(v.to_int()); None => @core.null() }
+  obj["category_id"] = match p.category_id {
+    Some(v) => @core.any(v.to_int())
+    None => @core.null()
+  }
   obj["title"] = p.title |> @core.any
   obj["slug"] = p.slug |> @core.any
   obj["content"] = p.content |> @core.any
-  obj["excerpt"] = match p.excerpt { Some(v) => @core.any(v); None => @core.null() }
+  obj["excerpt"] = match p.excerpt {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
   obj["status"] = p.status |> @core.any
-  obj["published_at"] = match p.published_at { Some(v) => @core.any(v); None => @core.null() }
+  obj["published_at"] = match p.published_at {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
   obj["created_at"] = p.created_at |> @core.any
   obj["updated_at"] = p.updated_at |> @core.any
   obj
@@ -73,7 +97,10 @@ fn category_to_json(c : @gen.ListCategoriesRow) -> @core.Any {
   obj["id"] = c.id.to_int() |> @core.any
   obj["name"] = c.name |> @core.any
   obj["slug"] = c.slug |> @core.any
-  obj["description"] = match c.description { Some(v) => @core.any(v); None => @core.null() }
+  obj["description"] = match c.description {
+    Some(v) => @core.any(v)
+    None => @core.null()
+  }
   obj
 }
 
@@ -95,10 +122,10 @@ pub fn get_fetch_handler() -> @cloudflare.CloudflareFetchHandler {
   ) -> @http.Response {
     let url = @url.URL::new(req.url)
     let pathname = url.pathname
-
     let db = match get_db(env) {
       Some(d) => d
-      None => return json_response("{\"error\":\"D1 database not configured\"}", 500)
+      None =>
+        return json_response("{\"error\":\"D1 database not configured\"}", 500)
     }
 
     // GET /api/users - list all users
@@ -120,8 +147,12 @@ pub fn get_fetch_handler() -> @cloudflare.CloudflareFetchHandler {
     if pathname.has_prefix("/api/users/") {
       let username = pathname[11:].to_string()
       if username.length() > 0 {
-        let user = @gen.get_user_by_username(db, @gen.GetUserByUsernameParams::new(username)) catch {
-          e => return json_response("{\"error\":\"" + e.to_string() + "\"}", 500)
+        let user = @gen.get_user_by_username(
+          db,
+          @gen.GetUserByUsernameParams::new(username),
+        ) catch {
+          e =>
+            return json_response("{\"error\":\"" + e.to_string() + "\"}", 500)
         }
         match user {
           Some(u) => {
@@ -130,8 +161,14 @@ pub fn get_fetch_handler() -> @cloudflare.CloudflareFetchHandler {
             obj["username"] = u.username |> @core.any
             obj["email"] = u.email |> @core.any
             obj["display_name"] = u.display_name |> @core.any
-            obj["bio"] = match u.bio { Some(v) => @core.any(v); None => @core.null() }
-            obj["avatar_url"] = match u.avatar_url { Some(v) => @core.any(v); None => @core.null() }
+            obj["bio"] = match u.bio {
+              Some(v) => @core.any(v)
+              None => @core.null()
+            }
+            obj["avatar_url"] = match u.avatar_url {
+              Some(v) => @core.any(v)
+              None => @core.null()
+            }
             obj["created_at"] = u.created_at |> @core.any
             obj["updated_at"] = u.updated_at |> @core.any
             return json_response(@json.JSON::stringify(obj), 200)
@@ -154,7 +191,10 @@ pub fn get_fetch_handler() -> @cloudflare.CloudflareFetchHandler {
         }
         None => 20L
       }
-      let posts = @gen.list_published_posts(db, @gen.ListPublishedPostsParams::new(limit)) catch {
+      let posts = @gen.list_published_posts(
+        db,
+        @gen.ListPublishedPostsParams::new(limit),
+      ) catch {
         e => return json_response("{\"error\":\"" + e.to_string() + "\"}", 500)
       }
       let arr = @core.new_array()
@@ -171,11 +211,19 @@ pub fn get_fetch_handler() -> @cloudflare.CloudflareFetchHandler {
     if pathname.has_prefix("/api/posts/") {
       let slug = pathname[11:].to_string()
       if slug.length() > 0 {
-        let post = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new(slug)) catch {
-          e => return json_response("{\"error\":\"" + e.to_string() + "\"}", 500)
+        let post = @gen.get_post_by_slug(
+          db,
+          @gen.GetPostBySlugParams::new(slug),
+        ) catch {
+          e =>
+            return json_response("{\"error\":\"" + e.to_string() + "\"}", 500)
         }
         match post {
-          Some(p) => return json_response(@json.JSON::stringify(post_detail_to_json(p)), 200)
+          Some(p) =>
+            return json_response(
+              @json.JSON::stringify(post_detail_to_json(p)),
+              200,
+            )
           None => return json_response("{\"error\":\"Post not found\"}", 404)
         }
       }
@@ -216,11 +264,16 @@ pub fn get_fetch_handler() -> @cloudflare.CloudflareFetchHandler {
     help["name"] = "D1 Blog API" |> @core.any
     help["version"] = "1.0.0" |> @core.any
     let endpoints = @core.new_array()
-    @core.any(endpoints)._call("push", ["GET /api/users" |> @core.any]) |> ignore
-    @core.any(endpoints)._call("push", ["GET /api/users/:username" |> @core.any]) |> ignore
-    @core.any(endpoints)._call("push", ["GET /api/posts?limit=N" |> @core.any]) |> ignore
-    @core.any(endpoints)._call("push", ["GET /api/posts/:slug" |> @core.any]) |> ignore
-    @core.any(endpoints)._call("push", ["GET /api/categories" |> @core.any]) |> ignore
+    @core.any(endpoints)._call("push", ["GET /api/users" |> @core.any])
+    |> ignore
+    @core.any(endpoints)._call("push", ["GET /api/users/:username" |> @core.any])
+    |> ignore
+    @core.any(endpoints)._call("push", ["GET /api/posts?limit=N" |> @core.any])
+    |> ignore
+    @core.any(endpoints)._call("push", ["GET /api/posts/:slug" |> @core.any])
+    |> ignore
+    @core.any(endpoints)._call("push", ["GET /api/categories" |> @core.any])
+    |> ignore
     @core.any(endpoints)._call("push", ["GET /api/tags" |> @core.any]) |> ignore
     help["endpoints"] = endpoints
     json_response(@json.JSON::stringify(help), 200)

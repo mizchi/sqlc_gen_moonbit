@@ -26,13 +26,7 @@ test "CreateUserParams::validate - empty username" {
 
 ///|
 test "CreateUserParams::validate - empty email" {
-  let params = CreateUserParams::new(
-    "alice",
-    "",
-    "Alice Developer",
-    None,
-    None,
-  )
+  let params = CreateUserParams::new("alice", "", "Alice Developer", None, None)
   inspect(params.validate(), content="Err(\"email is required\")")
 }
 
@@ -151,10 +145,7 @@ test "CreateTagParams::validate - empty slug" {
 ///|
 test "CreateCommentParams::validate - valid" {
   let params = CreateCommentParams::new(
-    1L,
-    "John Doe",
-    "john@example.com",
-    "Great post!",
+    1L, "John Doe", "john@example.com", "Great post!",
   )
   inspect(params.validate(), content="Ok(())")
 }
@@ -162,39 +153,30 @@ test "CreateCommentParams::validate - valid" {
 ///|
 test "CreateCommentParams::validate - empty author_name" {
   let params = CreateCommentParams::new(
-    1L,
-    "",
-    "john@example.com",
-    "Great post!",
+    1L, "", "john@example.com", "Great post!",
   )
   inspect(params.validate(), content="Err(\"author_name is required\")")
 }
 
 ///|
 test "CreateCommentParams::validate - empty author_email" {
-  let params = CreateCommentParams::new(
-    1L,
-    "John Doe",
-    "",
-    "Great post!",
-  )
+  let params = CreateCommentParams::new(1L, "John Doe", "", "Great post!")
   inspect(params.validate(), content="Err(\"author_email is required\")")
 }
 
 ///|
 test "CreateCommentParams::validate - empty content" {
-  let params = CreateCommentParams::new(
-    1L,
-    "John Doe",
-    "john@example.com",
-    "",
-  )
+  let params = CreateCommentParams::new(1L, "John Doe", "john@example.com", "")
   inspect(params.validate(), content="Err(\"content is required\")")
 }
 
 ///|
 test "CreateCategoryParams::validate - valid" {
-  let params = CreateCategoryParams::new("tech", "tech", Some("Technology articles"))
+  let params = CreateCategoryParams::new(
+    "tech",
+    "tech",
+    Some("Technology articles"),
+  )
   inspect(params.validate(), content="Ok(())")
 }
 

@@ -148,6 +148,15 @@ fn generate_moon_pkg(options : Options) -> String {
     }
   }
   buf.write_string("}\n")
+  // Add supported-targets for JS backend
+  match options.backend {
+    D1 => {
+      buf.write_string("\noptions(\n")
+      buf.write_string("  \"supported-targets\": [ \"js\" ],\n")
+      buf.write_string(")\n")
+    }
+    _ => ()
+  }
   buf.to_string()
 }
 

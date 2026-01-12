@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "moon build --target js",
+    "dev": "wrangler dev",
     "test": "moon test --target js"
   },
   "devDependencies": {

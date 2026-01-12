@@ -10,12 +10,6 @@ import {
 }
 
 options(
-  link: {
-    "js": {
-      "exports": [
-        "get_fetch_handler",
-      ],
-    },
-  },
+  link: { "js": { "exports": [ "get_fetch_handler" ] } },
   "supported-targets": [ "js" ],
 )
