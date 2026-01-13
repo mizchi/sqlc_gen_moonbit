@@ -134,7 +134,7 @@ Add dependencies to `moon.mod.json`:
 ```json
 {
   "deps": {
-    "mizchi/cloudflare": "0.1.4",
+    "mizchi/cloudflare": "0.1.5",
     "mizchi/js": "0.10.10",
     "moonbitlang/async": "0.16.0"
   }
@@ -143,7 +143,7 @@ Add dependencies to `moon.mod.json`:
 
 ```moonbit
 ///|
-pub async fn handler(db : @cloudflare.D1Database) -> Unit {
+pub async fn handler(db : @cloudflare.D1Database) -> Unit raise @cloudflare.D1Error {
   // Create user
   @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com"))
 

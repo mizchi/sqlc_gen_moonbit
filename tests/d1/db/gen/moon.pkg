@@ -5,4 +5,11 @@ import {
 
 options(
   "supported-targets": [ "js" ],
+  "formatter": {
+    "ignore": [
+      "sqlc_types.mbt",
+      "sqlc_queries.mbt",
+      "sqlc_validators.mbt"
+    ]
+  },
 )

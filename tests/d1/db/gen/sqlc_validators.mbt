@@ -156,7 +156,7 @@ pub fn GetPostWithAuthorParams::validate(_self : GetPostWithAuthorParams) -> Res
   Ok(())
 }
 
-///| Validatd GetPostWithAuthorBySlugParams
+///| Validate GetPostWithAuthorBySlugParams
 pub fn GetPostWithAuthorBySlugParams::validate(self : GetPostWithAuthorBySlugParams) -> Result[Unit, String] {
   if self.slug.length() == 0 {
     return Err("slug is required")

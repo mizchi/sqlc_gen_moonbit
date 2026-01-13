@@ -11,13 +11,22 @@ fn bytes_to_string(b : Bytes) -> String {
   decoder.decode_lossy(b[0:b.length()])
 }
 
+///|
+fn check_sqlite_error(db : @sqlite.Sqlite3, rc : Int) -> Unit raise SqlError {
+  if rc != @sqlite.SQLITE_ROW && rc != @sqlite.SQLITE_DONE {
+    let msg = bytes_to_string(@sqlite.sqlite_errmsg(db))
+    raise SqlError(msg)
+  }
+}
+
 // Query functions
 ///| GetUserById
 ///  SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id = ?
-pub fn get_user_by_id(db : @sqlite.Sqlite3, params : GetUserByIdParams) -> GetUserByIdRow? {
+pub fn get_user_by_id(db : @sqlite.Sqlite3, params : GetUserByIdParams) -> GetUserByIdRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_user_by_id_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetUserByIdRow = {
       id: @sqlite.sqlite_column_int64(stmt, 0),
       name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
@@ -30,18 +39,23 @@ pub fn get_user_by_id(db : @sqlite.Sqlite3, params : GetUserByIdParams) -> GetUs
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| GetUserByEmail
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE email = ?
-pub fn get_user_by_email(db : @sqlite.Sqlite3, params : GetUserByEmailParams) -> GetUserByEmailRow? {
+pub fn get_user_by_email(db : @sqlite.Sqlite3, params : GetUserByEmailParams) -> GetUserByEmailRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_user_by_email_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.email)) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetUserByEmailRow = {
       id: @sqlite.sqlite_column_int64(stmt, 0),
       name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
@@ -54,29 +68,42 @@ pub fn get_user_by_email(db : @sqlite.Sqlite3, params : GetUserByEmailParams) ->
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| ListUsers
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users ORDER BY name
-pub fn list_users(db : @sqlite.Sqlite3) -> Array[ListUsersRow] {
+pub fn list_users(db : @sqlite.Sqlite3) -> Array[ListUsersRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_sql))
   let results : Array[ListUsersRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListUsersRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListUsersRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -84,21 +111,30 @@ pub fn list_users(db : @sqlite.Sqlite3) -> Array[ListUsersRow] {
 
 ///| ListActiveUsers
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE is_active = 1 ORDER BY name
-pub fn list_active_users(db : @sqlite.Sqlite3) -> Array[ListActiveUsersRow] {
+pub fn list_active_users(db : @sqlite.Sqlite3) -> Array[ListActiveUsersRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_active_users_sql))
   let results : Array[ListActiveUsersRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListActiveUsersRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListActiveUsersRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -106,7 +142,7 @@ pub fn list_active_users(db : @sqlite.Sqlite3) -> Array[ListActiveUsersRow] {
 
 ///| CreateUser
 /// INSERT INTO users (name, email, age, balance, is_active, bio) VALUES (?, ?, ?, ?, ?, ?)
-pub fn create_user(db : @sqlite.Sqlite3, params : CreateUserParams) -> Unit {
+pub fn create_user(db : @sqlite.Sqlite3, params : CreateUserParams) -> Unit raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_user_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.email)) |> ignore
@@ -114,13 +150,14 @@ pub fn create_user(db : @sqlite.Sqlite3, params : CreateUserParams) -> Unit {
   (match params.balance { None => @sqlite.sqlite_bind_null(stmt, 4); Some(v) => @sqlite.sqlite_bind_double(stmt, 4, v) }) |> ignore
   @sqlite.sqlite_bind_int(stmt, 5, params.is_active.to_int()) |> ignore
   (match params.bio { None => @sqlite.sqlite_bind_null(stmt, 6); Some(v) => @sqlite.sqlite_bind_text(stmt, 6, cstring(v)) }) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
 }
 
 ///| CreateUserReturningId
 /// INSERT INTO users (name, email, age, balance, is_active, bio) VALUES (?, ?, ?, ?, ?, ?)
-pub fn create_user_returning_id(db : @sqlite.Sqlite3, params : CreateUserReturningIdParams) -> Int64 {
+pub fn create_user_returning_id(db : @sqlite.Sqlite3, params : CreateUserReturningIdParams) -> Int64 raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_user_returning_id_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.email)) |> ignore
@@ -128,60 +165,73 @@ pub fn create_user_returning_id(db : @sqlite.Sqlite3, params : CreateUserReturni
   (match params.balance { None => @sqlite.sqlite_bind_null(stmt, 4); Some(v) => @sqlite.sqlite_bind_double(stmt, 4, v) }) |> ignore
   @sqlite.sqlite_bind_int(stmt, 5, params.is_active.to_int()) |> ignore
   (match params.bio { None => @sqlite.sqlite_bind_null(stmt, 6); Some(v) => @sqlite.sqlite_bind_text(stmt, 6, cstring(v)) }) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_last_insert_rowid(db)
 }
 
 ///| DeleteUserById
 /// DELETE FROM users WHERE id = ?
-pub fn delete_user_by_id(db : @sqlite.Sqlite3, params : DeleteUserByIdParams) -> Int {
+pub fn delete_user_by_id(db : @sqlite.Sqlite3, params : DeleteUserByIdParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_user_by_id_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| UpdateUserName
 /// UPDATE users SET name = ? WHERE id = ?
-pub fn update_user_name(db : @sqlite.Sqlite3, params : UpdateUserNameParams) -> Int {
+pub fn update_user_name(db : @sqlite.Sqlite3, params : UpdateUserNameParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_name_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| UpdateUserBio
 ///  UPDATE users SET bio = ? WHERE id = ?
-pub fn update_user_bio(db : @sqlite.Sqlite3, params : UpdateUserBioParams) -> Int {
+pub fn update_user_bio(db : @sqlite.Sqlite3, params : UpdateUserBioParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_bio_sql))
   (match params.bio { None => @sqlite.sqlite_bind_null(stmt, 1); Some(v) => @sqlite.sqlite_bind_text(stmt, 1, cstring(v)) }) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| GetUsersWithBio
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE bio IS NOT NULL ORDER BY name
-pub fn get_users_with_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithBioRow] {
+pub fn get_users_with_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithBioRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_users_with_bio_sql))
   let results : Array[GetUsersWithBioRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : GetUsersWithBioRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : GetUsersWithBioRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -189,21 +239,30 @@ pub fn get_users_with_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithBioRow] {
 
 ///| GetUsersWithoutBio
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE bio IS NULL ORDER BY name
-pub fn get_users_without_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithoutBioRow] {
+pub fn get_users_without_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithoutBioRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_users_without_bio_sql))
   let results : Array[GetUsersWithoutBioRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : GetUsersWithoutBioRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : GetUsersWithoutBioRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -211,32 +270,42 @@ pub fn get_users_without_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithoutBioRo
 
 ///| UpdateUserBalance
 ///  UPDATE users SET balance = ? WHERE id = ?
-pub fn update_user_balance(db : @sqlite.Sqlite3, params : UpdateUserBalanceParams) -> Int {
+pub fn update_user_balance(db : @sqlite.Sqlite3, params : UpdateUserBalanceParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_balance_sql))
   (match params.balance { None => @sqlite.sqlite_bind_null(stmt, 1); Some(v) => @sqlite.sqlite_bind_double(stmt, 1, v) }) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| GetUsersWithPositiveBalance
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE balance > 0.0 ORDER BY balance DESC
-pub fn get_users_with_positive_balance(db : @sqlite.Sqlite3) -> Array[GetUsersWithPositiveBalanceRow] {
+pub fn get_users_with_positive_balance(db : @sqlite.Sqlite3) -> Array[GetUsersWithPositiveBalanceRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_users_with_positive_balance_sql))
   let results : Array[GetUsersWithPositiveBalanceRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : GetUsersWithPositiveBalanceRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : GetUsersWithPositiveBalanceRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -244,58 +313,74 @@ pub fn get_users_with_positive_balance(db : @sqlite.Sqlite3) -> Array[GetUsersWi
 
 ///| ActivateUser
 ///  UPDATE users SET is_active = 1 WHERE id = ?
-pub fn activate_user(db : @sqlite.Sqlite3, params : ActivateUserParams) -> Int {
+pub fn activate_user(db : @sqlite.Sqlite3, params : ActivateUserParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(activate_user_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| DeactivateUser
 /// UPDATE users SET is_active = 0 WHERE id = ?
-pub fn deactivate_user(db : @sqlite.Sqlite3, params : DeactivateUserParams) -> Int {
+pub fn deactivate_user(db : @sqlite.Sqlite3, params : DeactivateUserParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(deactivate_user_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| CountActiveUsers
 /// SELECT COUNT(*) as count FROM users WHERE is_active = 1
-pub fn count_active_users(db : @sqlite.Sqlite3) -> CountActiveUsersRow? {
+pub fn count_active_users(db : @sqlite.Sqlite3) -> CountActiveUsersRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(count_active_users_sql))
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : CountActiveUsersRow = {
       count: @sqlite.sqlite_column_int64(stmt, 0),
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| SearchUsersByName
 ///  SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE name LIKE ? ORDER BY name
-pub fn search_users_by_name(db : @sqlite.Sqlite3, params : SearchUsersByNameParams) -> Array[SearchUsersByNameRow] {
+pub fn search_users_by_name(db : @sqlite.Sqlite3, params : SearchUsersByNameParams) -> Array[SearchUsersByNameRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(search_users_by_name_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   let results : Array[SearchUsersByNameRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : SearchUsersByNameRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : SearchUsersByNameRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -303,22 +388,31 @@ pub fn search_users_by_name(db : @sqlite.Sqlite3, params : SearchUsersByNamePara
 
 ///| ListUsersWithLimit
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users ORDER BY id LIMIT ?
-pub fn list_users_with_limit(db : @sqlite.Sqlite3, params : ListUsersWithLimitParams) -> Array[ListUsersWithLimitRow] {
+pub fn list_users_with_limit(db : @sqlite.Sqlite3, params : ListUsersWithLimitParams) -> Array[ListUsersWithLimitRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_with_limit_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.limit.to_int()) |> ignore
   let results : Array[ListUsersWithLimitRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListUsersWithLimitRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListUsersWithLimitRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -326,51 +420,59 @@ pub fn list_users_with_limit(db : @sqlite.Sqlite3, params : ListUsersWithLimitPa
 
 ///| GetUserCount
 /// SELECT COUNT(*) as count FROM users
-pub fn get_user_count(db : @sqlite.Sqlite3) -> GetUserCountRow? {
+pub fn get_user_count(db : @sqlite.Sqlite3) -> GetUserCountRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_user_count_sql))
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetUserCountRow = {
       count: @sqlite.sqlite_column_int64(stmt, 0),
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| CreatePost
 ///  INSERT INTO posts (author_id, title, content, is_published) VALUES (?, ?, ?, ?)
-pub fn create_post(db : @sqlite.Sqlite3, params : CreatePostParams) -> Unit {
+pub fn create_post(db : @sqlite.Sqlite3, params : CreatePostParams) -> Unit raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.title)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 3, cstring(params.content)) |> ignore
   @sqlite.sqlite_bind_int(stmt, 4, params.is_published.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
 }
 
 ///| CreatePostReturningId
 /// INSERT INTO posts (author_id, title, content, is_published) VALUES (?, ?, ?, ?)
-pub fn create_post_returning_id(db : @sqlite.Sqlite3, params : CreatePostReturningIdParams) -> Int64 {
+pub fn create_post_returning_id(db : @sqlite.Sqlite3, params : CreatePostReturningIdParams) -> Int64 raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_post_returning_id_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.title)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 3, cstring(params.content)) |> ignore
   @sqlite.sqlite_bind_int(stmt, 4, params.is_published.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_last_insert_rowid(db)
 }
 
 ///| GetPostById
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE id = ?
-pub fn get_post_by_id(db : @sqlite.Sqlite3, params : GetPostByIdParams) -> GetPostByIdRow? {
+pub fn get_post_by_id(db : @sqlite.Sqlite3, params : GetPostByIdParams) -> GetPostByIdRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_post_by_id_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetPostByIdRow = {
       id: @sqlite.sqlite_column_int64(stmt, 0),
       author_id: @sqlite.sqlite_column_int64(stmt, 1),
@@ -383,30 +485,43 @@ pub fn get_post_by_id(db : @sqlite.Sqlite3, params : GetPostByIdParams) -> GetPo
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| ListPostsByAuthor
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? ORDER BY created_at DESC
-pub fn list_posts_by_author(db : @sqlite.Sqlite3, params : ListPostsByAuthorParams) -> Array[ListPostsByAuthorRow] {
+pub fn list_posts_by_author(db : @sqlite.Sqlite3, params : ListPostsByAuthorParams) -> Array[ListPostsByAuthorRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_by_author_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
   let results : Array[ListPostsByAuthorRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListPostsByAuthorRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      author_id: @sqlite.sqlite_column_int64(stmt, 1),
-      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
-      view_count: @sqlite.sqlite_column_int64(stmt, 4),
-      is_published: @sqlite.sqlite_column_int64(stmt, 5),
-      published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListPostsByAuthorRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        author_id: @sqlite.sqlite_column_int64(stmt, 1),
+        title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+        view_count: @sqlite.sqlite_column_int64(stmt, 4),
+        is_published: @sqlite.sqlite_column_int64(stmt, 5),
+        published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -414,40 +529,44 @@ pub fn list_posts_by_author(db : @sqlite.Sqlite3, params : ListPostsByAuthorPara
 
 ///| PublishPost
 /// UPDATE posts SET is_published = 1, published_at = datetime('now') WHERE id = ?
-pub fn publish_post(db : @sqlite.Sqlite3, params : PublishPostParams) -> Int {
+pub fn publish_post(db : @sqlite.Sqlite3, params : PublishPostParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(publish_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| DeletePost
 /// DELETE FROM posts WHERE id = ?
-pub fn delete_post(db : @sqlite.Sqlite3, params : DeletePostParams) -> Int {
+pub fn delete_post(db : @sqlite.Sqlite3, params : DeletePostParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| IncrementViewCount
 /// UPDATE posts SET view_count = view_count + 1 WHERE id = ?
-pub fn increment_view_count(db : @sqlite.Sqlite3, params : IncrementViewCountParams) -> Int {
+pub fn increment_view_count(db : @sqlite.Sqlite3, params : IncrementViewCountParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(increment_view_count_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| GetPostWithAuthor
 ///  SELECT   p.id, p.title, p.content, p.view_count, p.is_published,   p.published_at, p.created_at,   u.id as author_id, u.name as author_name, u.email as author_email FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id = ?
-pub fn get_post_with_author(db : @sqlite.Sqlite3, params : GetPostWithAuthorParams) -> GetPostWithAuthorRow? {
+pub fn get_post_with_author(db : @sqlite.Sqlite3, params : GetPostWithAuthorParams) -> GetPostWithAuthorRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_post_with_author_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetPostWithAuthorRow = {
       id: @sqlite.sqlite_column_int64(stmt, 0),
       title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
@@ -462,28 +581,41 @@ pub fn get_post_with_author(db : @sqlite.Sqlite3, params : GetPostWithAuthorPara
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| ListPostsWithAuthors
 /// SELECT   p.id, p.title, p.view_count, p.is_published, p.created_at,   u.id as author_id, u.name as author_name FROM posts p INNER JOIN users u ON p.author_id = u.id ORDER BY p.created_at DESC
-pub fn list_posts_with_authors(db : @sqlite.Sqlite3) -> Array[ListPostsWithAuthorsRow] {
+pub fn list_posts_with_authors(db : @sqlite.Sqlite3) -> Array[ListPostsWithAuthorsRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_with_authors_sql))
   let results : Array[ListPostsWithAuthorsRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListPostsWithAuthorsRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      view_count: @sqlite.sqlite_column_int64(stmt, 2),
-      is_published: @sqlite.sqlite_column_int64(stmt, 3),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 4)),
-      author_id: @sqlite.sqlite_column_int64(stmt, 5),
-      author_name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 6)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListPostsWithAuthorsRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        view_count: @sqlite.sqlite_column_int64(stmt, 2),
+        is_published: @sqlite.sqlite_column_int64(stmt, 3),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 4)),
+        author_id: @sqlite.sqlite_column_int64(stmt, 5),
+        author_name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 6)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -491,87 +623,113 @@ pub fn list_posts_with_authors(db : @sqlite.Sqlite3) -> Array[ListPostsWithAutho
 
 ///| GetPostCountByAuthor
 ///  SELECT COUNT(*) as post_count FROM posts WHERE author_id = ?
-pub fn get_post_count_by_author(db : @sqlite.Sqlite3, params : GetPostCountByAuthorParams) -> GetPostCountByAuthorRow? {
+pub fn get_post_count_by_author(db : @sqlite.Sqlite3, params : GetPostCountByAuthorParams) -> GetPostCountByAuthorRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_post_count_by_author_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetPostCountByAuthorRow = {
       post_count: @sqlite.sqlite_column_int64(stmt, 0),
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| GetAuthorStats
 /// SELECT   COUNT(*) as post_count,   COALESCE(SUM(view_count), 0) as total_views FROM posts WHERE author_id = ?
-pub fn get_author_stats(db : @sqlite.Sqlite3, params : GetAuthorStatsParams) -> GetAuthorStatsRow? {
+pub fn get_author_stats(db : @sqlite.Sqlite3, params : GetAuthorStatsParams) -> GetAuthorStatsRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_author_stats_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetAuthorStatsRow = {
       post_count: @sqlite.sqlite_column_int64(stmt, 0),
       total_views: (if @sqlite.sqlite_column_type(stmt, 1) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 1))) }),
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| CreateTag
 ///  INSERT INTO tags (name) VALUES (?)
-pub fn create_tag(db : @sqlite.Sqlite3, params : CreateTagParams) -> Unit {
+pub fn create_tag(db : @sqlite.Sqlite3, params : CreateTagParams) -> Unit raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_tag_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
 }
 
 ///| CreateTagReturningId
 /// INSERT INTO tags (name) VALUES (?)
-pub fn create_tag_returning_id(db : @sqlite.Sqlite3, params : CreateTagReturningIdParams) -> Int64 {
+pub fn create_tag_returning_id(db : @sqlite.Sqlite3, params : CreateTagReturningIdParams) -> Int64 raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_tag_returning_id_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_last_insert_rowid(db)
 }
 
 ///| GetTagByName
 /// SELECT id, name FROM tags WHERE name = ?
-pub fn get_tag_by_name(db : @sqlite.Sqlite3, params : GetTagByNameParams) -> GetTagByNameRow? {
+pub fn get_tag_by_name(db : @sqlite.Sqlite3, params : GetTagByNameParams) -> GetTagByNameRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_tag_by_name_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetTagByNameRow = {
       id: @sqlite.sqlite_column_int64(stmt, 0),
       name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| ListTags
 /// SELECT id, name FROM tags ORDER BY name
-pub fn list_tags(db : @sqlite.Sqlite3) -> Array[ListTagsRow] {
+pub fn list_tags(db : @sqlite.Sqlite3) -> Array[ListTagsRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_tags_sql))
   let results : Array[ListTagsRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListTagsRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListTagsRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -579,47 +737,59 @@ pub fn list_tags(db : @sqlite.Sqlite3) -> Array[ListTagsRow] {
 
 ///| DeleteTag
 /// DELETE FROM tags WHERE id = ?
-pub fn delete_tag(db : @sqlite.Sqlite3, params : DeleteTagParams) -> Int {
+pub fn delete_tag(db : @sqlite.Sqlite3, params : DeleteTagParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_tag_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| AddTagToPost
 ///  INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)
-pub fn add_tag_to_post(db : @sqlite.Sqlite3, params : AddTagToPostParams) -> Unit {
+pub fn add_tag_to_post(db : @sqlite.Sqlite3, params : AddTagToPostParams) -> Unit raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(add_tag_to_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.tag_id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
 }
 
 ///| RemoveTagFromPost
 /// DELETE FROM post_tags WHERE post_id = ? AND tag_id = ?
-pub fn remove_tag_from_post(db : @sqlite.Sqlite3, params : RemoveTagFromPostParams) -> Int {
+pub fn remove_tag_from_post(db : @sqlite.Sqlite3, params : RemoveTagFromPostParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(remove_tag_from_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.tag_id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| ListTagsForPost
 /// SELECT t.id, t.name FROM tags t INNER JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ? ORDER BY t.name
-pub fn list_tags_for_post(db : @sqlite.Sqlite3, params : ListTagsForPostParams) -> Array[ListTagsForPostRow] {
+pub fn list_tags_for_post(db : @sqlite.Sqlite3, params : ListTagsForPostParams) -> Array[ListTagsForPostRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_tags_for_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
   let results : Array[ListTagsForPostRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListTagsForPostRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListTagsForPostRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -627,40 +797,54 @@ pub fn list_tags_for_post(db : @sqlite.Sqlite3, params : ListTagsForPostParams) 
 
 ///| GetTagCountForPost
 /// SELECT COUNT(*) as tag_count FROM post_tags WHERE post_id = ?
-pub fn get_tag_count_for_post(db : @sqlite.Sqlite3, params : GetTagCountForPostParams) -> GetTagCountForPostRow? {
+pub fn get_tag_count_for_post(db : @sqlite.Sqlite3, params : GetTagCountForPostParams) -> GetTagCountForPostRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_tag_count_for_post_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetTagCountForPostRow = {
       tag_count: @sqlite.sqlite_column_int64(stmt, 0),
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| ListUsersPaginated
 ///  SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id > ? ORDER BY id LIMIT ?
-pub fn list_users_paginated(db : @sqlite.Sqlite3, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] {
+pub fn list_users_paginated(db : @sqlite.Sqlite3, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_paginated_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
   let results : Array[ListUsersPaginatedRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListUsersPaginatedRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
-      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
-      is_active: @sqlite.sqlite_column_int64(stmt, 5),
-      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListUsersPaginatedRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+        balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+        is_active: @sqlite.sqlite_column_int64(stmt, 5),
+        bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -668,24 +852,33 @@ pub fn list_users_paginated(db : @sqlite.Sqlite3, params : ListUsersPaginatedPar
 
 ///| ListPostsByAuthorPaginated
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?
-pub fn list_posts_by_author_paginated(db : @sqlite.Sqlite3, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] {
+pub fn list_posts_by_author_paginated(db : @sqlite.Sqlite3, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_by_author_paginated_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 3, params.limit.to_int()) |> ignore
   let results : Array[ListPostsByAuthorPaginatedRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListPostsByAuthorPaginatedRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      author_id: @sqlite.sqlite_column_int64(stmt, 1),
-      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
-      view_count: @sqlite.sqlite_column_int64(stmt, 4),
-      is_published: @sqlite.sqlite_column_int64(stmt, 5),
-      published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListPostsByAuthorPaginatedRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        author_id: @sqlite.sqlite_column_int64(stmt, 1),
+        title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+        view_count: @sqlite.sqlite_column_int64(stmt, 4),
+        is_published: @sqlite.sqlite_column_int64(stmt, 5),
+        published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -693,22 +886,31 @@ pub fn list_posts_by_author_paginated(db : @sqlite.Sqlite3, params : ListPostsBy
 
 ///| ListPostsWithAuthorsPaginated
 /// SELECT   p.id, p.title, p.view_count, p.is_published, p.created_at,   u.id as author_id, u.name as author_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id > ? ORDER BY p.id LIMIT ?
-pub fn list_posts_with_authors_paginated(db : @sqlite.Sqlite3, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] {
+pub fn list_posts_with_authors_paginated(db : @sqlite.Sqlite3, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_with_authors_paginated_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
   let results : Array[ListPostsWithAuthorsPaginatedRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListPostsWithAuthorsPaginatedRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      view_count: @sqlite.sqlite_column_int64(stmt, 2),
-      is_published: @sqlite.sqlite_column_int64(stmt, 3),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 4)),
-      author_id: @sqlite.sqlite_column_int64(stmt, 5),
-      author_name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 6)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListPostsWithAuthorsPaginatedRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        view_count: @sqlite.sqlite_column_int64(stmt, 2),
+        is_published: @sqlite.sqlite_column_int64(stmt, 3),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 4)),
+        author_id: @sqlite.sqlite_column_int64(stmt, 5),
+        author_name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 6)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -716,23 +918,32 @@ pub fn list_posts_with_authors_paginated(db : @sqlite.Sqlite3, params : ListPost
 
 ///| ListPublishedPostsPaginated
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE is_published = 1 AND id > ? ORDER BY id LIMIT ?
-pub fn list_published_posts_paginated(db : @sqlite.Sqlite3, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] {
+pub fn list_published_posts_paginated(db : @sqlite.Sqlite3, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_published_posts_paginated_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
   @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
   let results : Array[ListPublishedPostsPaginatedRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListPublishedPostsPaginatedRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      author_id: @sqlite.sqlite_column_int64(stmt, 1),
-      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
-      view_count: @sqlite.sqlite_column_int64(stmt, 4),
-      is_published: @sqlite.sqlite_column_int64(stmt, 5),
-      published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListPublishedPostsPaginatedRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        author_id: @sqlite.sqlite_column_int64(stmt, 1),
+        title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+        view_count: @sqlite.sqlite_column_int64(stmt, 4),
+        is_published: @sqlite.sqlite_column_int64(stmt, 5),
+        published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results

@@ -4,7 +4,7 @@
 // Query functions
 ///| GetUserById
 ///  SELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE id = ?
-pub async fn get_user_by_id(db : @cloudflare.D1Database, params : GetUserByIdParams) -> GetUserByIdRow? {
+pub async fn get_user_by_id(db : @cloudflare.D1Database, params : GetUserByIdParams) -> GetUserByIdRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_user_by_id_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -23,7 +23,7 @@ pub async fn get_user_by_id(db : @cloudflare.D1Database, params : GetUserByIdPar
 
 ///| GetUserByUsername
 /// SELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE username = ?
-pub async fn get_user_by_username(db : @cloudflare.D1Database, params : GetUserByUsernameParams) -> GetUserByUsernameRow? {
+pub async fn get_user_by_username(db : @cloudflare.D1Database, params : GetUserByUsernameParams) -> GetUserByUsernameRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_user_by_username_sql).bind([@core.any(params.username)])
   match stmt.first() {
     None => None
@@ -42,7 +42,7 @@ pub async fn get_user_by_username(db : @cloudflare.D1Database, params : GetUserB
 
 ///| ListUsers
 /// SELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users ORDER BY created_at DESC
-pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
+pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_users_sql)
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -64,14 +64,14 @@ pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
 
 ///| CreateUser
 /// INSERT INTO users (username, email, display_name, bio, avatar_url) VALUES (?, ?, ?, ?, ?)
-pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams) -> Unit {
+pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(create_user_sql).bind([@core.any(params.username), @core.any(params.email), @core.any(params.display_name), (match params.bio { Some(v) => @core.any(v); None => @core.null() }), (match params.avatar_url { Some(v) => @core.any(v); None => @core.null() })])
   stmt.run() |> ignore
 }
 
 ///| CreateUserReturningId
 /// INSERT INTO users (username, email, display_name, bio, avatar_url) VALUES (?, ?, ?, ?, ?)
-pub async fn create_user_returning_id(db : @cloudflare.D1Database, params : CreateUserReturningIdParams) -> Int64 {
+pub async fn create_user_returning_id(db : @cloudflare.D1Database, params : CreateUserReturningIdParams) -> Int64 raise @cloudflare.D1Error {
   let stmt = db.prepare(create_user_returning_id_sql).bind([@core.any(params.username), @core.any(params.email), @core.any(params.display_name), (match params.bio { Some(v) => @core.any(v); None => @core.null() }), (match params.avatar_url { Some(v) => @core.any(v); None => @core.null() })])
   let result = stmt.run()
   match result.meta() {
@@ -82,7 +82,7 @@ pub async fn create_user_returning_id(db : @cloudflare.D1Database, params : Crea
 
 ///| DeleteUserById
 /// DELETE FROM users WHERE id = ?
-pub async fn delete_user_by_id(db : @cloudflare.D1Database, params : DeleteUserByIdParams) -> Int {
+pub async fn delete_user_by_id(db : @cloudflare.D1Database, params : DeleteUserByIdParams) -> Int raise @cloudflare.D1Error {
   let stmt = db.prepare(delete_user_by_id_sql).bind([@core.any(params.id.to_int())])
   let result = stmt.run()
   match result.meta() {
@@ -93,7 +93,7 @@ pub async fn delete_user_by_id(db : @cloudflare.D1Database, params : DeleteUserB
 
 ///| UpdateUserDisplayName
 /// UPDATE users SET display_name = ? WHERE id = ?
-pub async fn update_user_display_name(db : @cloudflare.D1Database, params : UpdateUserDisplayNameParams) -> Int {
+pub async fn update_user_display_name(db : @cloudflare.D1Database, params : UpdateUserDisplayNameParams) -> Int raise @cloudflare.D1Error {
   let stmt = db.prepare(update_user_display_name_sql).bind([@core.any(params.display_name), @core.any(params.id.to_int())])
   let result = stmt.run()
   match result.meta() {
@@ -104,7 +104,7 @@ pub async fn update_user_display_name(db : @cloudflare.D1Database, params : Upda
 
 ///| GetCategoryById
 ///  SELECT id, name, slug, description FROM categories WHERE id = ?
-pub async fn get_category_by_id(db : @cloudflare.D1Database, params : GetCategoryByIdParams) -> GetCategoryByIdRow? {
+pub async fn get_category_by_id(db : @cloudflare.D1Database, params : GetCategoryByIdParams) -> GetCategoryByIdRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_category_by_id_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -119,7 +119,7 @@ pub async fn get_category_by_id(db : @cloudflare.D1Database, params : GetCategor
 
 ///| ListCategories
 /// SELECT id, name, slug, description FROM categories ORDER BY name
-pub async fn list_categories(db : @cloudflare.D1Database) -> Array[ListCategoriesRow] {
+pub async fn list_categories(db : @cloudflare.D1Database) -> Array[ListCategoriesRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_categories_sql)
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -137,14 +137,14 @@ pub async fn list_categories(db : @cloudflare.D1Database) -> Array[ListCategorie
 
 ///| CreateCategory
 /// INSERT INTO categories (name, slug, description) VALUES (?, ?, ?)
-pub async fn create_category(db : @cloudflare.D1Database, params : CreateCategoryParams) -> Unit {
+pub async fn create_category(db : @cloudflare.D1Database, params : CreateCategoryParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(create_category_sql).bind([@core.any(params.name), @core.any(params.slug), (match params.description { Some(v) => @core.any(v); None => @core.null() })])
   stmt.run() |> ignore
 }
 
 ///| GetPostById
 ///  SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE id = ?
-pub async fn get_post_by_id(db : @cloudflare.D1Database, params : GetPostByIdParams) -> GetPostByIdRow? {
+pub async fn get_post_by_id(db : @cloudflare.D1Database, params : GetPostByIdParams) -> GetPostByIdRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_post_by_id_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -166,7 +166,7 @@ pub async fn get_post_by_id(db : @cloudflare.D1Database, params : GetPostByIdPar
 
 ///| GetPostBySlug
 /// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE slug = ?
-pub async fn get_post_by_slug(db : @cloudflare.D1Database, params : GetPostBySlugParams) -> GetPostBySlugRow? {
+pub async fn get_post_by_slug(db : @cloudflare.D1Database, params : GetPostBySlugParams) -> GetPostBySlugRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_post_by_slug_sql).bind([@core.any(params.slug)])
   match stmt.first() {
     None => None
@@ -188,7 +188,7 @@ pub async fn get_post_by_slug(db : @cloudflare.D1Database, params : GetPostBySlu
 
 ///| ListPublishedPosts
 /// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ?
-pub async fn list_published_posts(db : @cloudflare.D1Database, params : ListPublishedPostsParams) -> Array[ListPublishedPostsRow] {
+pub async fn list_published_posts(db : @cloudflare.D1Database, params : ListPublishedPostsParams) -> Array[ListPublishedPostsRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_published_posts_sql).bind([@core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -213,7 +213,7 @@ pub async fn list_published_posts(db : @cloudflare.D1Database, params : ListPubl
 
 ///| ListPostsByAuthor
 /// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE author_id = ? ORDER BY created_at DESC
-pub async fn list_posts_by_author(db : @cloudflare.D1Database, params : ListPostsByAuthorParams) -> Array[ListPostsByAuthorRow] {
+pub async fn list_posts_by_author(db : @cloudflare.D1Database, params : ListPostsByAuthorParams) -> Array[ListPostsByAuthorRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_by_author_sql).bind([@core.any(params.author_id.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -238,28 +238,28 @@ pub async fn list_posts_by_author(db : @cloudflare.D1Database, params : ListPost
 
 ///| CreatePost
 /// INSERT INTO posts (author_id, category_id, title, slug, content, excerpt, status) VALUES (?, ?, ?, ?, ?, ?, ?)
-pub async fn create_post(db : @cloudflare.D1Database, params : CreatePostParams) -> Unit {
+pub async fn create_post(db : @cloudflare.D1Database, params : CreatePostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(create_post_sql).bind([@core.any(params.author_id.to_int()), (match params.category_id { Some(v) => @core.any(v.to_int()); None => @core.null() }), @core.any(params.title), @core.any(params.slug), @core.any(params.content), (match params.excerpt { Some(v) => @core.any(v); None => @core.null() }), @core.any(params.status)])
   stmt.run() |> ignore
 }
 
 ///| PublishPost
 /// UPDATE posts SET status = 'published', published_at = datetime('now'), updated_at = datetime('now') WHERE id = ?
-pub async fn publish_post(db : @cloudflare.D1Database, params : PublishPostParams) -> Unit {
+pub async fn publish_post(db : @cloudflare.D1Database, params : PublishPostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(publish_post_sql).bind([@core.any(params.id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| DeletePost
 /// DELETE FROM posts WHERE id = ?
-pub async fn delete_post(db : @cloudflare.D1Database, params : DeletePostParams) -> Unit {
+pub async fn delete_post(db : @cloudflare.D1Database, params : DeletePostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(delete_post_sql).bind([@core.any(params.id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| ListTags
 ///  SELECT id, name, slug FROM tags ORDER BY name
-pub async fn list_tags(db : @cloudflare.D1Database) -> Array[ListTagsRow] {
+pub async fn list_tags(db : @cloudflare.D1Database) -> Array[ListTagsRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_tags_sql)
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -276,14 +276,14 @@ pub async fn list_tags(db : @cloudflare.D1Database) -> Array[ListTagsRow] {
 
 ///| CreateTag
 /// INSERT INTO tags (name, slug) VALUES (?, ?)
-pub async fn create_tag(db : @cloudflare.D1Database, params : CreateTagParams) -> Unit {
+pub async fn create_tag(db : @cloudflare.D1Database, params : CreateTagParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(create_tag_sql).bind([@core.any(params.name), @core.any(params.slug)])
   stmt.run() |> ignore
 }
 
 ///| ListCommentsForPost
 ///  SELECT id, post_id, author_name, author_email, content, is_approved, created_at FROM comments WHERE post_id = ? AND is_approved = 1 ORDER BY created_at ASC
-pub async fn list_comments_for_post(db : @cloudflare.D1Database, params : ListCommentsForPostParams) -> Array[ListCommentsForPostRow] {
+pub async fn list_comments_for_post(db : @cloudflare.D1Database, params : ListCommentsForPostParams) -> Array[ListCommentsForPostRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_comments_for_post_sql).bind([@core.any(params.post_id.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -304,14 +304,14 @@ pub async fn list_comments_for_post(db : @cloudflare.D1Database, params : ListCo
 
 ///| CreateComment
 /// INSERT INTO comments (post_id, author_name, author_email, content) VALUES (?, ?, ?, ?)
-pub async fn create_comment(db : @cloudflare.D1Database, params : CreateCommentParams) -> Unit {
+pub async fn create_comment(db : @cloudflare.D1Database, params : CreateCommentParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(create_comment_sql).bind([@core.any(params.post_id.to_int()), @core.any(params.author_name), @core.any(params.author_email), @core.any(params.content)])
   stmt.run() |> ignore
 }
 
 ///| GetPostWithAuthor
 ///  SELECT   p.id, p.title, p.slug, p.content, p.excerpt, p.status,   p.published_at, p.created_at, p.updated_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name, u.avatar_url as author_avatar_url FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id = ?
-pub async fn get_post_with_author(db : @cloudflare.D1Database, params : GetPostWithAuthorParams) -> GetPostWithAuthorRow? {
+pub async fn get_post_with_author(db : @cloudflare.D1Database, params : GetPostWithAuthorParams) -> GetPostWithAuthorRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_post_with_author_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -335,7 +335,7 @@ pub async fn get_post_with_author(db : @cloudflare.D1Database, params : GetPostW
 
 ///| GetPostWithAuthorBySlug
 /// SELECT   p.id, p.title, p.slug, p.content, p.excerpt, p.status,   p.published_at, p.created_at, p.updated_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name, u.avatar_url as author_avatar_url FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.slug = ?
-pub async fn get_post_with_author_by_slug(db : @cloudflare.D1Database, params : GetPostWithAuthorBySlugParams) -> GetPostWithAuthorBySlugRow? {
+pub async fn get_post_with_author_by_slug(db : @cloudflare.D1Database, params : GetPostWithAuthorBySlugParams) -> GetPostWithAuthorBySlugRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_post_with_author_by_slug_sql).bind([@core.any(params.slug)])
   match stmt.first() {
     None => None
@@ -359,7 +359,7 @@ pub async fn get_post_with_author_by_slug(db : @cloudflare.D1Database, params : 
 
 ///| ListPostsWithAuthors
 /// SELECT   p.id, p.title, p.slug, p.excerpt, p.status,   p.published_at, p.created_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.status = 'published' ORDER BY p.published_at DESC LIMIT ?
-pub async fn list_posts_with_authors(db : @cloudflare.D1Database, params : ListPostsWithAuthorsParams) -> Array[ListPostsWithAuthorsRow] {
+pub async fn list_posts_with_authors(db : @cloudflare.D1Database, params : ListPostsWithAuthorsParams) -> Array[ListPostsWithAuthorsRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_with_authors_sql).bind([@core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -383,7 +383,7 @@ pub async fn list_posts_with_authors(db : @cloudflare.D1Database, params : ListP
 
 ///| GetPostWithCategory
 /// SELECT   p.id, p.title, p.slug, p.content, p.status,   c.id as category_id, c.name as category_name, c.slug as category_slug FROM posts p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?
-pub async fn get_post_with_category(db : @cloudflare.D1Database, params : GetPostWithCategoryParams) -> GetPostWithCategoryRow? {
+pub async fn get_post_with_category(db : @cloudflare.D1Database, params : GetPostWithCategoryParams) -> GetPostWithCategoryRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_post_with_category_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -402,7 +402,7 @@ pub async fn get_post_with_category(db : @cloudflare.D1Database, params : GetPos
 
 ///| ListPostsWithDetails
 /// SELECT   p.id, p.title, p.slug, p.excerpt, p.status, p.published_at,   u.id as author_id, u.username as author_username, u.display_name as author_display_name,   c.id as category_id, c.name as category_name FROM posts p INNER JOIN users u ON p.author_id = u.id LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'published' ORDER BY p.published_at DESC LIMIT ?
-pub async fn list_posts_with_details(db : @cloudflare.D1Database, params : ListPostsWithDetailsParams) -> Array[ListPostsWithDetailsRow] {
+pub async fn list_posts_with_details(db : @cloudflare.D1Database, params : ListPostsWithDetailsParams) -> Array[ListPostsWithDetailsRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_with_details_sql).bind([@core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -427,7 +427,7 @@ pub async fn list_posts_with_details(db : @cloudflare.D1Database, params : ListP
 
 ///| ListTagsForPost
 /// SELECT t.id, t.name, t.slug FROM tags t INNER JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ? ORDER BY t.name
-pub async fn list_tags_for_post(db : @cloudflare.D1Database, params : ListTagsForPostParams) -> Array[ListTagsForPostRow] {
+pub async fn list_tags_for_post(db : @cloudflare.D1Database, params : ListTagsForPostParams) -> Array[ListTagsForPostRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_tags_for_post_sql).bind([@core.any(params.post_id.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -444,7 +444,7 @@ pub async fn list_tags_for_post(db : @cloudflare.D1Database, params : ListTagsFo
 
 ///| ListPostsWithTagCount
 /// SELECT   p.id, p.title, p.slug, p.status,   COUNT(pt.tag_id) as tag_count FROM posts p LEFT JOIN post_tags pt ON p.id = pt.post_id GROUP BY p.id ORDER BY tag_count DESC LIMIT ?
-pub async fn list_posts_with_tag_count(db : @cloudflare.D1Database, params : ListPostsWithTagCountParams) -> Array[ListPostsWithTagCountRow] {
+pub async fn list_posts_with_tag_count(db : @cloudflare.D1Database, params : ListPostsWithTagCountParams) -> Array[ListPostsWithTagCountRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_with_tag_count_sql).bind([@core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -463,7 +463,7 @@ pub async fn list_posts_with_tag_count(db : @cloudflare.D1Database, params : Lis
 
 ///| GetPostCommentsWithCount
 /// SELECT   p.id, p.title,   COUNT(c.id) as comment_count,   SUM(CASE WHEN c.is_approved = 1 THEN 1 ELSE 0 END) as approved_count FROM posts p LEFT JOIN comments c ON p.id = c.post_id WHERE p.id = ? GROUP BY p.id
-pub async fn get_post_comments_with_count(db : @cloudflare.D1Database, params : GetPostCommentsWithCountParams) -> GetPostCommentsWithCountRow? {
+pub async fn get_post_comments_with_count(db : @cloudflare.D1Database, params : GetPostCommentsWithCountParams) -> GetPostCommentsWithCountRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_post_comments_with_count_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -478,28 +478,28 @@ pub async fn get_post_comments_with_count(db : @cloudflare.D1Database, params : 
 
 ///| AddTagToPost
 ///  INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)
-pub async fn add_tag_to_post(db : @cloudflare.D1Database, params : AddTagToPostParams) -> Unit {
+pub async fn add_tag_to_post(db : @cloudflare.D1Database, params : AddTagToPostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(add_tag_to_post_sql).bind([@core.any(params.post_id.to_int()), @core.any(params.tag_id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| RemoveTagFromPost
 /// DELETE FROM post_tags WHERE post_id = ? AND tag_id = ?
-pub async fn remove_tag_from_post(db : @cloudflare.D1Database, params : RemoveTagFromPostParams) -> Unit {
+pub async fn remove_tag_from_post(db : @cloudflare.D1Database, params : RemoveTagFromPostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(remove_tag_from_post_sql).bind([@core.any(params.post_id.to_int()), @core.any(params.tag_id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| RemoveAllTagsFromPost
 /// DELETE FROM post_tags WHERE post_id = ?
-pub async fn remove_all_tags_from_post(db : @cloudflare.D1Database, params : RemoveAllTagsFromPostParams) -> Unit {
+pub async fn remove_all_tags_from_post(db : @cloudflare.D1Database, params : RemoveAllTagsFromPostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(remove_all_tags_from_post_sql).bind([@core.any(params.post_id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| GetOrCreateTag
 /// INSERT INTO tags (name, slug) VALUES (?, ?) ON CONFLICT (slug) DO UPDATE SET name = excluded.name RETURNING id, name, slug
-pub async fn get_or_create_tag(db : @cloudflare.D1Database, params : GetOrCreateTagParams) -> GetOrCreateTagRow? {
+pub async fn get_or_create_tag(db : @cloudflare.D1Database, params : GetOrCreateTagParams) -> GetOrCreateTagRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_or_create_tag_sql).bind([@core.any(params.name), @core.any(params.slug)])
   match stmt.first() {
     None => None
@@ -513,28 +513,28 @@ pub async fn get_or_create_tag(db : @cloudflare.D1Database, params : GetOrCreate
 
 ///| ApproveComment
 /// UPDATE comments SET is_approved = 1 WHERE id = ?
-pub async fn approve_comment(db : @cloudflare.D1Database, params : ApproveCommentParams) -> Unit {
+pub async fn approve_comment(db : @cloudflare.D1Database, params : ApproveCommentParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(approve_comment_sql).bind([@core.any(params.id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| ApproveAllCommentsForPost
 /// UPDATE comments SET is_approved = 1 WHERE post_id = ?
-pub async fn approve_all_comments_for_post(db : @cloudflare.D1Database, params : ApproveAllCommentsForPostParams) -> Unit {
+pub async fn approve_all_comments_for_post(db : @cloudflare.D1Database, params : ApproveAllCommentsForPostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(approve_all_comments_for_post_sql).bind([@core.any(params.post_id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| DeleteAllCommentsForPost
 /// DELETE FROM comments WHERE post_id = ?
-pub async fn delete_all_comments_for_post(db : @cloudflare.D1Database, params : DeleteAllCommentsForPostParams) -> Unit {
+pub async fn delete_all_comments_for_post(db : @cloudflare.D1Database, params : DeleteAllCommentsForPostParams) -> Unit raise @cloudflare.D1Error {
   let stmt = db.prepare(delete_all_comments_for_post_sql).bind([@core.any(params.post_id.to_int())])
   stmt.run() |> ignore
 }
 
 ///| ListUsersPaginated
 ///  SELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE id > ? ORDER BY id LIMIT ?
-pub async fn list_users_paginated(db : @cloudflare.D1Database, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] {
+pub async fn list_users_paginated(db : @cloudflare.D1Database, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_users_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -556,7 +556,7 @@ pub async fn list_users_paginated(db : @cloudflare.D1Database, params : ListUser
 
 ///| ListPostsPaginated
 /// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE id > ? ORDER BY id LIMIT ?
-pub async fn list_posts_paginated(db : @cloudflare.D1Database, params : ListPostsPaginatedParams) -> Array[ListPostsPaginatedRow] {
+pub async fn list_posts_paginated(db : @cloudflare.D1Database, params : ListPostsPaginatedParams) -> Array[ListPostsPaginatedRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -581,7 +581,7 @@ pub async fn list_posts_paginated(db : @cloudflare.D1Database, params : ListPost
 
 ///| ListPublishedPostsPaginated
 /// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE status = 'published' AND id > ? ORDER BY id LIMIT ?
-pub async fn list_published_posts_paginated(db : @cloudflare.D1Database, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] {
+pub async fn list_published_posts_paginated(db : @cloudflare.D1Database, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_published_posts_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -606,7 +606,7 @@ pub async fn list_published_posts_paginated(db : @cloudflare.D1Database, params 
 
 ///| ListPostsByAuthorPaginated
 /// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?
-pub async fn list_posts_by_author_paginated(db : @cloudflare.D1Database, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] {
+pub async fn list_posts_by_author_paginated(db : @cloudflare.D1Database, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_by_author_paginated_sql).bind([@core.any(params.author_id.to_int()), @core.any(params.id.to_int()), @core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -631,7 +631,7 @@ pub async fn list_posts_by_author_paginated(db : @cloudflare.D1Database, params 
 
 ///| ListPostsWithAuthorsPaginated
 /// SELECT   p.id, p.title, p.slug, p.excerpt, p.status,   p.published_at, p.created_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.status = 'published' AND p.id > ? ORDER BY p.id LIMIT ?
-pub async fn list_posts_with_authors_paginated(db : @cloudflare.D1Database, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] {
+pub async fn list_posts_with_authors_paginated(db : @cloudflare.D1Database, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_posts_with_authors_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
