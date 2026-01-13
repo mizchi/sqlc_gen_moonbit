@@ -27,7 +27,10 @@ jobs:
       - name: Prepare release assets
         run: |
           cp target/wasm/release/build/cmd/wasm/wasm.wasm sqlc-gen-moonbit.wasm
-          shasum -a 256 sqlc-gen-moonbit.wasm > sqlc-gen-moonbit.wasm.sha256
+          SHA256=$(shasum -a 256 sqlc-gen-moonbit.wasm | cut -d ' ' -f 1)
+          echo "$SHA256  sqlc-gen-moonbit.wasm" > sqlc-gen-moonbit.wasm.sha256
+          echo "SHA256=$SHA256" >> $GITHUB_ENV
+          echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -36,3 +39,30 @@ jobs:
             sqlc-gen-moonbit.wasm
             sqlc-gen-moonbit.wasm.sha256
           generate_release_notes: true
+          body: |
+            ## Installation
+
+            Add to your `sqlc.yaml`:
+
+            ```yaml
+            version: "2"
+            plugins:
+              - name: moonbit
+                wasm:
+                  url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/${{ env.VERSION }}/sqlc-gen-moonbit.wasm"
+                  sha256: "${{ env.SHA256 }}"
+            sql:
+              - engine: sqlite
+                schema: "schema.sql"
+                queries: "query.sql"
+                codegen:
+                  - plugin: moonbit
+                    out: "gen"
+                    options:
+                      backend: "sqlite"  # or "d1" for Cloudflare D1
+            ```
+
+            ## SHA256
+            ```
+            ${{ env.SHA256 }}
+            ```
