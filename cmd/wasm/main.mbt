@@ -9,31 +9,30 @@ extern "wasm" fn wasi_fd_read(fd : Int, iovs : Int, iovs_len : Int, nread : Int)
 extern "wasm" fn wasi_fd_write(fd : Int, iovs : Int, iovs_len : Int, nwritten : Int) -> Int =
   "wasi_snapshot_preview1" "fd_write"
 
-// Memory intrinsics
+// Memory intrinsics - using inline WAT to avoid moonbit.* imports
 ///|
 extern "wasm" fn wasm_memory_size() -> Int =
-  "env" "__memory_size"
+  #|(func (result i32) (memory.size))
 
 ///|
 extern "wasm" fn wasm_memory_grow(pages : Int) -> Int =
-  "env" "__memory_grow"
+  #|(func (param i32) (result i32) (memory.grow (local.get 0)))
 
-// MoonBit memory intrinsics
 ///|
 extern "wasm" fn store32(ptr : Int, value : Int) =
-  "moonbit" "store32"
+  #|(func (param i32) (param i32) (i32.store (local.get 0) (local.get 1)))
 
 ///|
 extern "wasm" fn load32(ptr : Int) -> Int =
-  "moonbit" "load32"
+  #|(func (param i32) (result i32) (i32.load (local.get 0)))
 
 ///|
 extern "wasm" fn store8(ptr : Int, value : Int) =
-  "moonbit" "store8"
+  #|(func (param i32) (param i32) (i32.store8 (local.get 0) (local.get 1)))
 
 ///|
 extern "wasm" fn load8_u(ptr : Int) -> Int =
-  "moonbit" "load8_u"
+  #|(func (param i32) (result i32) (i32.load8_u (local.get 0)))
 
 // Global heap pointer using Ref
 let heap_ptr : Ref[Int] = Ref::new(65536)
