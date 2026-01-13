@@ -6,12 +6,18 @@
 
 [sqlc](https://sqlc.dev/) plugin for generating type-safe MoonBit code from SQL.
 
+## Supported Backends
+
+| Backend | Target | Runtime | Dependencies |
+|---------|--------|---------|--------------|
+| `sqlite` | `native` | Native binary | `mizchi/sqlite` |
+| `d1` | `js` | Cloudflare Workers | `mizchi/cloudflare`, `mizchi/js` |
+
 ## Features
 
 - Generates type-safe MoonBit structs from SQL schemas
 - Generates query functions with proper parameter binding
-- Supports SQLite (native) with `mizchi/sqlite` binding
-- Supports Cloudflare D1 with `mizchi/cloudflare` binding
+- Custom type overrides via `overrides` option
 - Supports `:one`, `:many`, `:exec` query types
 - Optional validators and JSON Schema generation
 
@@ -134,7 +140,7 @@ Add dependencies to `moon.mod.json`:
 ```json
 {
   "deps": {
-    "mizchi/cloudflare": "0.1.5",
+    "mizchi/cloudflare": "0.1.6",
     "mizchi/js": "0.10.10",
     "moonbitlang/async": "0.16.0"
   }
@@ -165,6 +171,7 @@ pub async fn handler(db : @cloudflare.D1Database) -> Unit raise @cloudflare.D1Er
 | `backend` | `"sqlite"` \| `"d1"` | `"sqlite"` | Target backend |
 | `validators` | `bool` | `false` | Generate validation functions |
 | `json_schema` | `bool` | `false` | Generate JSON Schema |
+| `overrides` | `array` | `[]` | Custom type mappings |
 
 Example with all options:
 
@@ -176,7 +183,24 @@ codegen:
       backend: "d1"
       validators: true
       json_schema: true
+      overrides:
+        - column: "users.id"
+          moonbit_type: "UserId"
+        - db_type: "uuid"
+          moonbit_type: "@mypackage.UUID"
 ```
+
+### Type Overrides
+
+Override default type mappings for specific columns or database types:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `column` | `string` | Column name in `table.column` format |
+| `db_type` | `string` | Database type (e.g., `INTEGER`, `TEXT`) |
+| `moonbit_type` | `string` | MoonBit type (supports package paths like `@pkg.Type`) |
+
+Column overrides take precedence over db_type overrides.
 
 ## Generated Code
 
@@ -200,6 +224,7 @@ For each query, sqlc-gen-moonbit generates:
 
 - [`examples/sqlite-native`](./examples/sqlite-native) - SQLite with native binding
 - [`examples/d1`](./examples/d1) - Cloudflare D1 with Atlas migrations
+- [`examples/d1-basic`](./examples/d1-basic) - Cloudflare Worker with D1
 
 ## Development
 
