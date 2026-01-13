@@ -26,8 +26,8 @@ version: "2"
 plugins:
   - name: moonbit
     wasm:
-      url: "https://raw.githubusercontent.com/mizchi/sqlc_gen_moonbit/main/bin/sqlc-gen-moonbit.wasm"
-      sha256: "f141c3b960891788c4fa43dc32b936af610b47f5ba54b2d80a7d6508641d3350"
+      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.1.0/sqlc-gen-moonbit.wasm"
+      sha256: ""  # See release notes for sha256
 sql:
   - engine: sqlite
     schema: "schema.sql"
@@ -39,26 +39,24 @@ sql:
           backend: "sqlite"  # or "d1" for Cloudflare D1
 ```
 
-### Local WASM File
+Check the [releases page](https://github.com/mizchi/sqlc_gen_moonbit/releases) for the latest version and sha256.
 
-Download `bin/sqlc-gen-moonbit.wasm` and use local path:
+### Build from Source
+
+```bash
+moon update
+moon build --target wasm ./cmd/wasm
+# Output: target/wasm/release/build/cmd/wasm/wasm.wasm
+```
+
+Use local file in sqlc.yaml:
 
 ```yaml
 plugins:
   - name: moonbit
     wasm:
-      url: "file://./sqlc-gen-moonbit.wasm"
+      url: "file://./path/to/wasm.wasm"
       sha256: ""  # Optional for local files
-```
-
-### Build from Source
-
-```bash
-# Native plugin
-just build-plugin
-
-# WASM plugin
-just build-plugin-wasm
 ```
 
 ## Usage
