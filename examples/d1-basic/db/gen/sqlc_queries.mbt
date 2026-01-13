@@ -4,7 +4,7 @@
 // Query functions
 ///| GetUser
 /// SELECT id, name, email, created_at FROM users WHERE id = ?
-pub async fn get_user(db : @cloudflare.D1Database, params : GetUserParams) -> GetUserRow? {
+pub async fn get_user(db : @cloudflare.D1Database, params : GetUserParams) -> GetUserRow? raise @cloudflare.D1Error {
   let stmt = db.prepare(get_user_sql).bind([@core.any(params.id.to_int())])
   match stmt.first() {
     None => None
@@ -19,7 +19,7 @@ pub async fn get_user(db : @cloudflare.D1Database, params : GetUserParams) -> Ge
 
 ///| ListUsers
 /// SELECT id, name, email, created_at FROM users ORDER BY name
-pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
+pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_users_sql)
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
@@ -37,7 +37,7 @@ pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
 
 ///| CreateUser
 /// INSERT INTO users (name, email) VALUES (?, ?)
-pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams) -> Int64 {
+pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams) -> Int64 raise @cloudflare.D1Error {
   let stmt = db.prepare(create_user_sql).bind([@core.any(params.name), @core.any(params.email)])
   let result = stmt.run()
   match result.meta() {
@@ -48,7 +48,7 @@ pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams)
 
 ///| UpdateUser
 /// UPDATE users SET name = ?, email = ? WHERE id = ?
-pub async fn update_user(db : @cloudflare.D1Database, params : UpdateUserParams) -> Int {
+pub async fn update_user(db : @cloudflare.D1Database, params : UpdateUserParams) -> Int raise @cloudflare.D1Error {
   let stmt = db.prepare(update_user_sql).bind([@core.any(params.name), @core.any(params.email), @core.any(params.id.to_int())])
   let result = stmt.run()
   match result.meta() {
@@ -59,7 +59,7 @@ pub async fn update_user(db : @cloudflare.D1Database, params : UpdateUserParams)
 
 ///| DeleteUser
 /// DELETE FROM users WHERE id = ?
-pub async fn delete_user(db : @cloudflare.D1Database, params : DeleteUserParams) -> Int {
+pub async fn delete_user(db : @cloudflare.D1Database, params : DeleteUserParams) -> Int raise @cloudflare.D1Error {
   let stmt = db.prepare(delete_user_sql).bind([@core.any(params.id.to_int())])
   let result = stmt.run()
   match result.meta() {
