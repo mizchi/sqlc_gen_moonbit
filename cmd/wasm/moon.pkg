@@ -1,0 +1,6 @@
+import { "sqlc_gen_moonbit/lib/codegen" as @codegen }
+
+options(
+  "is-main": true,
+  "supported-targets": [ "wasm", "wasm-gc" ],
+)

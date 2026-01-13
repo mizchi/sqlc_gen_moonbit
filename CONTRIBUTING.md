@@ -18,8 +18,8 @@ sqlc_gen_moonbit/
 │   ├── native/             # Native plugin entry point
 │   └── wasm/               # WASM plugin entry point
 ├── lib/
-│   └── codegen/            # Code generation logic
-├── gen/                    # Generated protobuf MoonBit code
+│   ├── codegen/            # Code generation logic
+│   └── proto/              # Generated protobuf MoonBit code
 ├── examples/
 │   ├── sqlite-native/      # SQLite native example
 │   └── d1/                 # Cloudflare D1 example
@@ -73,7 +73,11 @@ cd ../..
 buf generate --template buf.gen.yaml vendor/sqlc/protos
 ```
 
-This regenerates `gen/` directory with updated MoonBit types.
+This regenerates `lib/proto/` directory with updated MoonBit types.
+
+**Note**: After regeneration, you may need to:
+- Remove generated `moon.mod.json` in `lib/proto/` (we use the root module)
+- Move `lib/proto/proto/src/*` to `lib/proto/` if nested incorrectly
 
 ## Testing
 

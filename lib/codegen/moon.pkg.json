@@ -1,6 +1,0 @@
-{
-  "import": [
-    "moonbitlang/protobuf",
-    { "path": "sqlc_gen_moonbit/gen/plugin", "alias": "plugin" }
-  ]
-}

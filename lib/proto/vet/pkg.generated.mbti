@@ -1,0 +1,342 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sqlc_gen_moonbit/gen/vet"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/protobuf"
+)
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Config {
+  mut version : String
+  mut engine : String
+  mut schema : Array[String]
+  mut queries : Array[String]
+}
+pub fn Config::new(String, String, Array[String], Array[String]) -> Self
+pub impl Default for Config
+pub impl Eq for Config
+pub impl Show for Config
+pub impl ToJson for Config
+pub impl @json.FromJson for Config
+pub impl @protobuf.AsyncRead for Config
+pub impl @protobuf.AsyncWrite for Config
+pub impl @protobuf.Read for Config
+pub impl @protobuf.Sized for Config
+pub impl @protobuf.Write for Config
+
+pub(all) struct MySQL {
+  mut explain : MySQLExplain
+}
+pub fn MySQL::new(MySQLExplain) -> Self
+pub impl Default for MySQL
+pub impl Eq for MySQL
+pub impl Show for MySQL
+pub impl ToJson for MySQL
+pub impl @json.FromJson for MySQL
+pub impl @protobuf.AsyncRead for MySQL
+pub impl @protobuf.AsyncWrite for MySQL
+pub impl @protobuf.Read for MySQL
+pub impl @protobuf.Sized for MySQL
+pub impl @protobuf.Write for MySQL
+
+pub(all) struct MySQLExplain {
+  mut query_block : MySQLExplain_QueryBlock
+}
+pub fn MySQLExplain::new(MySQLExplain_QueryBlock) -> Self
+pub impl Default for MySQLExplain
+pub impl Eq for MySQLExplain
+pub impl Show for MySQLExplain
+pub impl ToJson for MySQLExplain
+pub impl @json.FromJson for MySQLExplain
+pub impl @protobuf.AsyncRead for MySQLExplain
+pub impl @protobuf.AsyncWrite for MySQLExplain
+pub impl @protobuf.Read for MySQLExplain
+pub impl @protobuf.Sized for MySQLExplain
+pub impl @protobuf.Write for MySQLExplain
+
+pub(all) struct MySQLExplain_NestedLoopObj {
+  mut table : MySQLExplain_Table
+}
+pub fn MySQLExplain_NestedLoopObj::new(MySQLExplain_Table) -> Self
+pub impl Default for MySQLExplain_NestedLoopObj
+pub impl Eq for MySQLExplain_NestedLoopObj
+pub impl Show for MySQLExplain_NestedLoopObj
+pub impl ToJson for MySQLExplain_NestedLoopObj
+pub impl @json.FromJson for MySQLExplain_NestedLoopObj
+pub impl @protobuf.AsyncRead for MySQLExplain_NestedLoopObj
+pub impl @protobuf.AsyncWrite for MySQLExplain_NestedLoopObj
+pub impl @protobuf.Read for MySQLExplain_NestedLoopObj
+pub impl @protobuf.Sized for MySQLExplain_NestedLoopObj
+pub impl @protobuf.Write for MySQLExplain_NestedLoopObj
+
+pub(all) struct MySQLExplain_OrderingOperation {
+  mut using_filesort : Bool
+  mut cost_info : Map[String, String]
+  mut table : MySQLExplain_Table
+  mut nested_loop : Array[MySQLExplain_NestedLoopObj]
+}
+pub fn MySQLExplain_OrderingOperation::new(Bool, Map[String, String], MySQLExplain_Table, Array[MySQLExplain_NestedLoopObj]) -> Self
+pub impl Default for MySQLExplain_OrderingOperation
+pub impl Eq for MySQLExplain_OrderingOperation
+pub impl Show for MySQLExplain_OrderingOperation
+pub impl ToJson for MySQLExplain_OrderingOperation
+pub impl @json.FromJson for MySQLExplain_OrderingOperation
+pub impl @protobuf.AsyncRead for MySQLExplain_OrderingOperation
+pub impl @protobuf.AsyncWrite for MySQLExplain_OrderingOperation
+pub impl @protobuf.Read for MySQLExplain_OrderingOperation
+pub impl @protobuf.Sized for MySQLExplain_OrderingOperation
+pub impl @protobuf.Write for MySQLExplain_OrderingOperation
+
+pub(all) struct MySQLExplain_OrderingOperation_CostInfoEntry {
+  mut key : String
+  mut value : String
+}
+pub fn MySQLExplain_OrderingOperation_CostInfoEntry::new(String, String) -> Self
+pub impl Default for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl Eq for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl Show for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl ToJson for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl @json.FromJson for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl @protobuf.AsyncRead for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl @protobuf.AsyncWrite for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl @protobuf.Read for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl @protobuf.Sized for MySQLExplain_OrderingOperation_CostInfoEntry
+pub impl @protobuf.Write for MySQLExplain_OrderingOperation_CostInfoEntry
+
+pub(all) struct MySQLExplain_QueryBlock {
+  mut select_id : UInt64
+  mut message : String
+  mut cost_info : Map[String, String]
+  mut table : MySQLExplain_Table
+  mut ordering_operation : MySQLExplain_OrderingOperation
+  mut nested_loop : Array[MySQLExplain_NestedLoopObj]
+}
+pub fn MySQLExplain_QueryBlock::new(UInt64, String, Map[String, String], MySQLExplain_Table, MySQLExplain_OrderingOperation, Array[MySQLExplain_NestedLoopObj]) -> Self
+pub impl Default for MySQLExplain_QueryBlock
+pub impl Eq for MySQLExplain_QueryBlock
+pub impl Show for MySQLExplain_QueryBlock
+pub impl ToJson for MySQLExplain_QueryBlock
+pub impl @json.FromJson for MySQLExplain_QueryBlock
+pub impl @protobuf.AsyncRead for MySQLExplain_QueryBlock
+pub impl @protobuf.AsyncWrite for MySQLExplain_QueryBlock
+pub impl @protobuf.Read for MySQLExplain_QueryBlock
+pub impl @protobuf.Sized for MySQLExplain_QueryBlock
+pub impl @protobuf.Write for MySQLExplain_QueryBlock
+
+pub(all) struct MySQLExplain_QueryBlock_CostInfoEntry {
+  mut key : String
+  mut value : String
+}
+pub fn MySQLExplain_QueryBlock_CostInfoEntry::new(String, String) -> Self
+pub impl Default for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl Eq for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl Show for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl ToJson for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl @json.FromJson for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl @protobuf.AsyncRead for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl @protobuf.AsyncWrite for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl @protobuf.Read for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl @protobuf.Sized for MySQLExplain_QueryBlock_CostInfoEntry
+pub impl @protobuf.Write for MySQLExplain_QueryBlock_CostInfoEntry
+
+pub(all) struct MySQLExplain_Table {
+  mut table_name : String
+  mut access_type : String
+  mut rows_examined_per_scan : UInt64
+  mut rows_produced_per_join : UInt64
+  mut filtered : String
+  mut cost_info : Map[String, String]
+  mut used_columns : Array[String]
+  mut insert : Bool
+  mut possible_keys : Array[String]
+  mut key : String
+  mut used_key_parts : Array[String]
+  mut key_length : String
+  mut ref_ : Array[String]
+}
+pub fn MySQLExplain_Table::new(String, String, UInt64, UInt64, String, Map[String, String], Array[String], Bool, Array[String], String, Array[String], String, Array[String]) -> Self
+pub impl Default for MySQLExplain_Table
+pub impl Eq for MySQLExplain_Table
+pub impl Show for MySQLExplain_Table
+pub impl ToJson for MySQLExplain_Table
+pub impl @json.FromJson for MySQLExplain_Table
+pub impl @protobuf.AsyncRead for MySQLExplain_Table
+pub impl @protobuf.AsyncWrite for MySQLExplain_Table
+pub impl @protobuf.Read for MySQLExplain_Table
+pub impl @protobuf.Sized for MySQLExplain_Table
+pub impl @protobuf.Write for MySQLExplain_Table
+
+pub(all) struct MySQLExplain_Table_CostInfoEntry {
+  mut key : String
+  mut value : String
+}
+pub fn MySQLExplain_Table_CostInfoEntry::new(String, String) -> Self
+pub impl Default for MySQLExplain_Table_CostInfoEntry
+pub impl Eq for MySQLExplain_Table_CostInfoEntry
+pub impl Show for MySQLExplain_Table_CostInfoEntry
+pub impl ToJson for MySQLExplain_Table_CostInfoEntry
+pub impl @json.FromJson for MySQLExplain_Table_CostInfoEntry
+pub impl @protobuf.AsyncRead for MySQLExplain_Table_CostInfoEntry
+pub impl @protobuf.AsyncWrite for MySQLExplain_Table_CostInfoEntry
+pub impl @protobuf.Read for MySQLExplain_Table_CostInfoEntry
+pub impl @protobuf.Sized for MySQLExplain_Table_CostInfoEntry
+pub impl @protobuf.Write for MySQLExplain_Table_CostInfoEntry
+
+pub(all) struct Parameter {
+  mut number : Int
+}
+pub fn Parameter::new(Int) -> Self
+pub impl Default for Parameter
+pub impl Eq for Parameter
+pub impl Show for Parameter
+pub impl ToJson for Parameter
+pub impl @json.FromJson for Parameter
+pub impl @protobuf.AsyncRead for Parameter
+pub impl @protobuf.AsyncWrite for Parameter
+pub impl @protobuf.Read for Parameter
+pub impl @protobuf.Sized for Parameter
+pub impl @protobuf.Write for Parameter
+
+pub(all) struct PostgreSQL {
+  mut explain : PostgreSQLExplain
+}
+pub fn PostgreSQL::new(PostgreSQLExplain) -> Self
+pub impl Default for PostgreSQL
+pub impl Eq for PostgreSQL
+pub impl Show for PostgreSQL
+pub impl ToJson for PostgreSQL
+pub impl @json.FromJson for PostgreSQL
+pub impl @protobuf.AsyncRead for PostgreSQL
+pub impl @protobuf.AsyncWrite for PostgreSQL
+pub impl @protobuf.Read for PostgreSQL
+pub impl @protobuf.Sized for PostgreSQL
+pub impl @protobuf.Write for PostgreSQL
+
+pub(all) struct PostgreSQLExplain {
+  mut plan : PostgreSQLExplain_Plan
+  mut settings : Map[String, String]
+  mut planning : PostgreSQLExplain_Planning
+}
+pub fn PostgreSQLExplain::new(PostgreSQLExplain_Plan, Map[String, String], PostgreSQLExplain_Planning) -> Self
+pub impl Default for PostgreSQLExplain
+pub impl Eq for PostgreSQLExplain
+pub impl Show for PostgreSQLExplain
+pub impl ToJson for PostgreSQLExplain
+pub impl @json.FromJson for PostgreSQLExplain
+pub impl @protobuf.AsyncRead for PostgreSQLExplain
+pub impl @protobuf.AsyncWrite for PostgreSQLExplain
+pub impl @protobuf.Read for PostgreSQLExplain
+pub impl @protobuf.Sized for PostgreSQLExplain
+pub impl @protobuf.Write for PostgreSQLExplain
+
+pub(all) struct PostgreSQLExplain_Plan {
+  mut node_type : String
+  mut parent_relationship : String
+  mut relation_name : String
+  mut schema : String
+  mut alias_ : String
+  mut parallel_aware : Bool
+  mut async_capable : Bool
+  mut startup_cost : Float
+  mut total_cost : Float
+  mut plan_rows : UInt64
+  mut plan_width : UInt64
+  mut output : Array[String]
+  mut plans : Array[PostgreSQLExplain_Plan]
+  mut shared_hit_blocks : UInt64
+  mut shared_read_blocks : UInt64
+  mut shared_dirtied_blocks : UInt64
+  mut shared_written_blocks : UInt64
+  mut local_hit_blocks : UInt64
+  mut local_read_blocks : UInt64
+  mut local_dirtied_blocks : UInt64
+  mut local_written_blocks : UInt64
+  mut temp_read_blocks : UInt64
+  mut temp_written_blocks : UInt64
+  mut sort_key : Array[String]
+  mut join_type : String
+  mut inner_unique : Bool
+  mut hash_cond : String
+  mut index_name : String
+  mut scan_direction : String
+  mut index_cond : String
+}
+pub fn PostgreSQLExplain_Plan::new(String, String, String, String, String, Bool, Bool, Float, Float, UInt64, UInt64, Array[String], Array[Self], UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, Array[String], String, Bool, String, String, String, String) -> Self
+pub impl Default for PostgreSQLExplain_Plan
+pub impl Eq for PostgreSQLExplain_Plan
+pub impl Show for PostgreSQLExplain_Plan
+pub impl ToJson for PostgreSQLExplain_Plan
+pub impl @json.FromJson for PostgreSQLExplain_Plan
+pub impl @protobuf.AsyncRead for PostgreSQLExplain_Plan
+pub impl @protobuf.AsyncWrite for PostgreSQLExplain_Plan
+pub impl @protobuf.Read for PostgreSQLExplain_Plan
+pub impl @protobuf.Sized for PostgreSQLExplain_Plan
+pub impl @protobuf.Write for PostgreSQLExplain_Plan
+
+pub(all) struct PostgreSQLExplain_Planning {
+  mut shared_hit_blocks : UInt64
+  mut shared_read_blocks : UInt64
+  mut shared_dirtied_blocks : UInt64
+  mut shared_written_blocks : UInt64
+  mut local_hit_blocks : UInt64
+  mut local_read_blocks : UInt64
+  mut local_dirtied_blocks : UInt64
+  mut local_written_blocks : UInt64
+  mut temp_read_blocks : UInt64
+  mut temp_written_blocks : UInt64
+}
+pub fn PostgreSQLExplain_Planning::new(UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, UInt64) -> Self
+pub impl Default for PostgreSQLExplain_Planning
+pub impl Eq for PostgreSQLExplain_Planning
+pub impl Show for PostgreSQLExplain_Planning
+pub impl ToJson for PostgreSQLExplain_Planning
+pub impl @json.FromJson for PostgreSQLExplain_Planning
+pub impl @protobuf.AsyncRead for PostgreSQLExplain_Planning
+pub impl @protobuf.AsyncWrite for PostgreSQLExplain_Planning
+pub impl @protobuf.Read for PostgreSQLExplain_Planning
+pub impl @protobuf.Sized for PostgreSQLExplain_Planning
+pub impl @protobuf.Write for PostgreSQLExplain_Planning
+
+pub(all) struct PostgreSQLExplain_SettingsEntry {
+  mut key : String
+  mut value : String
+}
+pub fn PostgreSQLExplain_SettingsEntry::new(String, String) -> Self
+pub impl Default for PostgreSQLExplain_SettingsEntry
+pub impl Eq for PostgreSQLExplain_SettingsEntry
+pub impl Show for PostgreSQLExplain_SettingsEntry
+pub impl ToJson for PostgreSQLExplain_SettingsEntry
+pub impl @json.FromJson for PostgreSQLExplain_SettingsEntry
+pub impl @protobuf.AsyncRead for PostgreSQLExplain_SettingsEntry
+pub impl @protobuf.AsyncWrite for PostgreSQLExplain_SettingsEntry
+pub impl @protobuf.Read for PostgreSQLExplain_SettingsEntry
+pub impl @protobuf.Sized for PostgreSQLExplain_SettingsEntry
+pub impl @protobuf.Write for PostgreSQLExplain_SettingsEntry
+
+pub(all) struct Query {
+  mut sql : String
+  mut name : String
+  mut cmd : String
+  mut params : Array[Parameter]
+}
+pub fn Query::new(String, String, String, Array[Parameter]) -> Self
+pub impl Default for Query
+pub impl Eq for Query
+pub impl Show for Query
+pub impl ToJson for Query
+pub impl @json.FromJson for Query
+pub impl @protobuf.AsyncRead for Query
+pub impl @protobuf.AsyncWrite for Query
+pub impl @protobuf.Read for Query
+pub impl @protobuf.Sized for Query
+pub impl @protobuf.Write for Query
+
+// Type aliases
+
+// Traits
+

@@ -144,6 +144,7 @@ Add dependencies to `moon.mod.json`:
 ```
 
 ```moonbit
+///|
 pub async fn handler(db : @cloudflare.D1Database) -> Unit {
   // Create user
   @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com"))

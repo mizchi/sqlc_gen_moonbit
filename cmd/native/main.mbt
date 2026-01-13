@@ -1,6 +1,7 @@
 // Native entry point for sqlc-gen-moonbit
 
 // FFI declarations for native stdin/stdout handling
+
 ///|
 extern "C" fn moonbit_read_stdin_size() -> Int64 = "moonbit_read_stdin_size"
 
@@ -40,4 +41,5 @@ fn read_all_stdin() -> Bytes {
 ///|
 fn write_all_stdout(data : Bytes) -> Unit {
   let _ = moonbit_write_all_stdout(data, data.length().to_int64())
+
 }

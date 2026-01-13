@@ -1,0 +1,7 @@
+import { "sqlc_gen_moonbit/lib/codegen" as @codegen }
+
+options(
+  "is-main": true,
+  "native-stub": [ "stub.c" ],
+  "supported-targets": [ "native" ],
+)

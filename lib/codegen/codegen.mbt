@@ -1,4 +1,5 @@
 // Backend types
+
 ///|
 pub enum Backend {
   Sqlite
@@ -14,6 +15,7 @@ pub fn Backend::to_string(self : Backend) -> String {
 }
 
 // Plugin options
+
 ///|
 pub struct Options {
   backend : Backend
@@ -33,13 +35,11 @@ pub fn parse_plugin_options(data : Bytes) -> Options {
   }
   // Parse JSON-like format: {"backend":"d1","validators":true,"json_schema":true}
   let json_str = bytes_to_string_simple(data)
-  let backend = if json_str.contains("\"d1\"") {
-    D1
-  } else {
-    Sqlite
-  }
-  let validators = json_str.contains("\"validators\":true") || json_str.contains("\"validators\": true")
-  let json_schema = json_str.contains("\"json_schema\":true") || json_str.contains("\"json_schema\": true")
+  let backend = if json_str.contains("\"d1\"") { D1 } else { Sqlite }
+  let validators = json_str.contains("\"validators\":true") ||
+    json_str.contains("\"validators\": true")
+  let json_schema = json_str.contains("\"json_schema\":true") ||
+    json_str.contains("\"json_schema\": true")
   { backend, validators, json_schema }
 }
 
@@ -56,13 +56,12 @@ fn bytes_to_string_simple(b : Bytes) -> String {
 }
 
 // Process request and generate response
+
 ///|
 pub fn process_request(input : Bytes) -> Bytes {
   // Parse GenerateRequest from protobuf
   let reader = @protobuf.BytesReader::from_bytes(input)
-  let request : @plugin.GenerateRequest = try {
-    @protobuf.Read::read(reader)
-  } catch {
+  let request : @plugin.GenerateRequest = @protobuf.Read::read(reader) catch {
     _ => @plugin.GenerateRequest::default()
   }
 
@@ -85,20 +84,28 @@ pub fn process_request(input : Bytes) -> Bytes {
     Sqlite => generate_queries_sqlite(request)
     D1 => generate_queries_d1(request)
   }
-  files.push(@plugin.File::new("sqlc_queries.mbt", string_to_utf8(queries_content)))
+  files.push(
+    @plugin.File::new("sqlc_queries.mbt", string_to_utf8(queries_content)),
+  )
 
   // Generate validators (optional)
   if options.validators {
     let validators_content = generate_validators(request)
-    files.push(@plugin.File::new("sqlc_validators.mbt", string_to_utf8(validators_content)))
+    files.push(
+      @plugin.File::new(
+        "sqlc_validators.mbt",
+        string_to_utf8(validators_content),
+      ),
+    )
   }
 
   // Generate JSON Schema (optional)
   if options.json_schema {
     let schema_content = generate_json_schema(request)
-    files.push(@plugin.File::new("sqlc_schema.json", string_to_utf8(schema_content)))
+    files.push(
+      @plugin.File::new("sqlc_schema.json", string_to_utf8(schema_content)),
+    )
   }
-
   let response = @plugin.GenerateResponse::new(files)
 
   // Serialize response to protobuf
@@ -147,7 +154,8 @@ fn generate_types(request : @plugin.GenerateRequest) -> String {
   for query in request.queries {
     if query.cmd == ":one" || query.cmd == ":many" {
       let struct_name = to_pascal_case(query.name) + "Row"
-      if not(generated_structs.contains(struct_name)) && query.columns.length() > 0 {
+      if not(generated_structs.contains(struct_name)) &&
+        query.columns.length() > 0 {
         generated_structs[struct_name] = true
         generate_result_struct(buf, struct_name, query.columns)
       }
@@ -172,7 +180,6 @@ fn generate_types(request : @plugin.GenerateRequest) -> String {
     buf.write_string(escape_string(query.text))
     buf.write_string("\n\n")
   }
-
   buf.to_string()
 }
 
@@ -195,7 +202,6 @@ fn generate_queries_sqlite(request : @plugin.GenerateRequest) -> String {
   for query in request.queries {
     generate_query_function_sqlite(buf, query)
   }
-
   buf.to_string()
 }
 
@@ -210,7 +216,6 @@ fn generate_queries_d1(request : @plugin.GenerateRequest) -> String {
   for query in request.queries {
     generate_query_function_d1(buf, query)
   }
-
   buf.to_string()
 }
 
@@ -218,7 +223,7 @@ fn generate_queries_d1(request : @plugin.GenerateRequest) -> String {
 fn generate_result_struct(
   buf : StringBuilder,
   name : String,
-  columns : Array[@plugin.Column]
+  columns : Array[@plugin.Column],
 ) -> Unit {
   buf.write_string("///|\npub struct ")
   buf.write_string(name)
@@ -237,7 +242,7 @@ fn generate_result_struct(
 fn generate_params_struct(
   buf : StringBuilder,
   name : String,
-  params : Array[@plugin.Parameter]
+  params : Array[@plugin.Parameter],
 ) -> Unit {
   buf.write_string("///|\npub struct ")
   buf.write_string(name)
@@ -296,7 +301,10 @@ fn generate_params_struct(
 }
 
 ///|
-fn generate_query_function_sqlite(buf : StringBuilder, query : @plugin.Query) -> Unit {
+fn generate_query_function_sqlite(
+  buf : StringBuilder,
+  query : @plugin.Query,
+) -> Unit {
   let func_name = to_snake_case(query.name)
   let sql_const = to_snake_case(query.name) + "_sql"
   let row_type = to_pascal_case(query.name) + "Row"
@@ -352,7 +360,9 @@ fn generate_query_function_sqlite(buf : StringBuilder, query : @plugin.Query) ->
   // Execute based on command type using low-level API
   match query.cmd {
     ":one" => {
-      buf.write_string("  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n")
+      buf.write_string(
+        "  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n",
+      )
       buf.write_string("    let row : ")
       buf.write_string(row_type)
       buf.write_string(" = {\n")
@@ -375,7 +385,9 @@ fn generate_query_function_sqlite(buf : StringBuilder, query : @plugin.Query) ->
       buf.write_string("  let results : Array[")
       buf.write_string(row_type)
       buf.write_string("] = []\n")
-      buf.write_string("  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n")
+      buf.write_string(
+        "  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n",
+      )
       buf.write_string("    let row : ")
       buf.write_string(row_type)
       buf.write_string(" = {\n")
@@ -398,12 +410,14 @@ fn generate_query_function_sqlite(buf : StringBuilder, query : @plugin.Query) ->
       buf.write_string("  @sqlite.sqlite_finalize(stmt)\n")
     }
   }
-
   buf.write_string("}\n\n")
 }
 
 ///|
-fn generate_query_function_d1(buf : StringBuilder, query : @plugin.Query) -> Unit {
+fn generate_query_function_d1(
+  buf : StringBuilder,
+  query : @plugin.Query,
+) -> Unit {
   let func_name = to_snake_case(query.name)
   let sql_const = to_snake_case(query.name) + "_sql"
   let row_type = to_pascal_case(query.name) + "Row"
@@ -494,12 +508,10 @@ fn generate_query_function_d1(buf : StringBuilder, query : @plugin.Query) -> Uni
       buf.write_string("  }\n")
       buf.write_string("  results\n")
     }
-    _ => {
+    _ =>
       // :exec
       buf.write_string("  stmt.run() |> ignore\n")
-    }
   }
-
   buf.write_string("}\n\n")
 }
 
@@ -516,7 +528,6 @@ fn generate_validators(request : @plugin.GenerateRequest) -> String {
       generate_validator_function(buf, struct_name, query.params)
     }
   }
-
   buf.to_string()
 }
 
@@ -526,11 +537,10 @@ fn has_string_validations(params : Array[@plugin.Parameter]) -> Bool {
     let col = param.column
     let type_name = col.type_.name.to_upper()
     match type_name {
-      "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" => {
+      "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
         if col.not_null || col.length > 0 {
           return true
         }
-      }
       _ => ()
     }
   }
@@ -541,7 +551,7 @@ fn has_string_validations(params : Array[@plugin.Parameter]) -> Bool {
 fn generate_validator_function(
   buf : StringBuilder,
   struct_name : String,
-  params : Array[@plugin.Parameter]
+  params : Array[@plugin.Parameter],
 ) -> Unit {
   let has_validations = has_string_validations(params)
   buf.write_string("///| Validate ")
@@ -556,7 +566,6 @@ fn generate_validator_function(
   }
   buf.write_string(struct_name)
   buf.write_string(") -> Result[Unit, String] {\n")
-
   for param in params {
     let col = param.column
     let param_name = if col.name.length() > 0 {
@@ -629,7 +638,7 @@ fn generate_validator_function(
     // Unsigned validation for numeric types
     if col.unsigned {
       match type_name {
-        "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" => {
+        "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
           if col.not_null {
             buf.write_string("  if self.")
             buf.write_string(param_name)
@@ -650,12 +659,10 @@ fn generate_validator_function(
             buf.write_string("    None => ()\n")
             buf.write_string("  }\n")
           }
-        }
         _ => ()
       }
     }
   }
-
   buf.write_string("  Ok(())\n")
   buf.write_string("}\n\n")
 }
@@ -664,9 +671,10 @@ fn generate_validator_function(
 fn generate_json_schema(request : @plugin.GenerateRequest) -> String {
   let buf = StringBuilder::new()
   buf.write_string("{\n")
-  buf.write_string("  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n")
+  buf.write_string(
+    "  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n",
+  )
   buf.write_string("  \"definitions\": {\n")
-
   let mut first_def = true
 
   // Generate schema for each Params struct
@@ -694,7 +702,6 @@ fn generate_json_schema(request : @plugin.GenerateRequest) -> String {
       }
     }
   }
-
   buf.write_string("\n  }\n")
   buf.write_string("}\n")
   buf.to_string()
@@ -705,7 +712,7 @@ fn generate_json_schema_object(
   buf : StringBuilder,
   name : String,
   params : Array[@plugin.Parameter],
-  indent : String
+  indent : String,
 ) -> Unit {
   buf.write_string(indent)
   buf.write_string("\"")
@@ -726,7 +733,6 @@ fn generate_json_schema_object(
       required.push(param_name)
     }
   }
-
   if required.length() > 0 {
     buf.write_string(indent)
     buf.write_string("  \"required\": [")
@@ -768,7 +774,7 @@ fn generate_json_schema_row(
   buf : StringBuilder,
   name : String,
   columns : Array[@plugin.Column],
-  indent : String
+  indent : String,
 ) -> Unit {
   buf.write_string(indent)
   buf.write_string("\"")
@@ -784,7 +790,6 @@ fn generate_json_schema_row(
       required.push(to_snake_case(col.name))
     }
   }
-
   if required.length() > 0 {
     buf.write_string(indent)
     buf.write_string("  \"required\": [")
@@ -806,7 +811,12 @@ fn generate_json_schema_row(
     if i > 0 {
       buf.write_string(",\n")
     }
-    generate_json_schema_property(buf, to_snake_case(col.name), col, indent + "    ")
+    generate_json_schema_property(
+      buf,
+      to_snake_case(col.name),
+      col,
+      indent + "    ",
+    )
   }
   buf.write_string("\n")
   buf.write_string(indent)
@@ -820,13 +830,12 @@ fn generate_json_schema_property(
   buf : StringBuilder,
   name : String,
   col : @plugin.Column,
-  indent : String
+  indent : String,
 ) -> Unit {
   buf.write_string(indent)
   buf.write_string("\"")
   buf.write_string(name)
   buf.write_string("\": {")
-
   let type_name = col.type_.name.to_upper()
   let json_type = match type_name {
     "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" => "integer"
@@ -851,15 +860,12 @@ fn generate_json_schema_property(
     buf.write_string(", \"maxLength\": ")
     buf.write_string(col.length.to_string())
   }
-
   if col.not_null && json_type == "string" {
     buf.write_string(", \"minLength\": 1")
   }
-
   if col.unsigned && (json_type == "integer" || json_type == "number") {
     buf.write_string(", \"minimum\": 0")
   }
-
   buf.write_string(" }")
 }
 
@@ -872,7 +878,9 @@ fn param_to_core_any(col : @plugin.Column, expr : String) -> String {
     // For nullable params, use match to handle None - @core.null() for null value
     match type_name {
       "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-        "(match " + expr + " { Some(v) => @core.any(v.to_int()); None => @core.null() })"
+        "(match " +
+        expr +
+        " { Some(v) => @core.any(v.to_int()); None => @core.null() })"
       _ =>
         "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
     }
@@ -880,16 +888,13 @@ fn param_to_core_any(col : @plugin.Column, expr : String) -> String {
     match type_name {
       "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
         "@core.any(" + expr + ".to_int())"
-      "INT8" | "BIGINT" =>
-        "@core.any(" + expr + ")"
+      "INT8" | "BIGINT" => "@core.any(" + expr + ")"
       "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
         "@core.any(" + expr + ")"
       "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
         "@core.any(" + expr + ")"
-      "BOOLEAN" | "BOOL" =>
-        "@core.any(" + expr + ")"
-      _ =>
-        "@core.any(" + expr + ".to_string())"
+      "BOOLEAN" | "BOOL" => "@core.any(" + expr + ")"
+      _ => "@core.any(" + expr + ".to_string())"
     }
   }
 }
@@ -905,9 +910,21 @@ fn column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
     // For nullable columns, check for null/undefined first
     match type_name {
       "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
-        "(if @core.is_null(" + field_access + ") || @core.typeof_(" + field_access + ") == \"undefined\" { None } else { Some(@cloudflare.js_number_to_int64(" + field_access + ")) })"
+        "(if @core.is_null(" +
+        field_access +
+        ") || @core.typeof_(" +
+        field_access +
+        ") == \"undefined\" { None } else { Some(@cloudflare.js_number_to_int64(" +
+        field_access +
+        ")) })"
       _ =>
-        "(if @core.is_null(" + field_access + ") || @core.typeof_(" + field_access + ") == \"undefined\" { None } else { Some(" + field_access + ".cast()) })"
+        "(if @core.is_null(" +
+        field_access +
+        ") || @core.typeof_(" +
+        field_access +
+        ") == \"undefined\" { None } else { Some(" +
+        field_access +
+        ".cast()) })"
     }
   } else {
     // Non-nullable columns
@@ -920,10 +937,8 @@ fn column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
         field_access + ".cast()"
       "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
         field_access + ".cast()"
-      "BOOLEAN" | "BOOL" =>
-        field_access + ".cast()"
-      _ =>
-        field_access + ".cast()"
+      "BOOLEAN" | "BOOL" => field_access + ".cast()"
+      _ => field_access + ".cast()"
     }
   }
 }
@@ -944,7 +959,11 @@ fn param_to_bind_call(col : @plugin.Column, idx : Int, expr : String) -> String 
     "BLOB" | "BYTEA" =>
       "@sqlite.sqlite_bind_blob(stmt, " + idx_str + ", " + expr + ")"
     "BOOLEAN" | "BOOL" =>
-      "@sqlite.sqlite_bind_int(stmt, " + idx_str + ", if " + expr + " { 1 } else { 0 })"
+      "@sqlite.sqlite_bind_int(stmt, " +
+      idx_str +
+      ", if " +
+      expr +
+      " { 1 } else { 0 })"
     _ =>
       "@sqlite.sqlite_bind_text(stmt, " + idx_str + ", cstring(" + expr + "))"
   }
@@ -961,12 +980,10 @@ fn column_to_moonbit(col : @plugin.Column, idx : Int) -> String {
       "@sqlite.sqlite_column_double(stmt, " + idx_str + ")"
     "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
       "bytes_to_string(@sqlite.sqlite_column_text(stmt, " + idx_str + "))"
-    "BLOB" | "BYTEA" =>
-      "@sqlite.sqlite_column_blob(stmt, " + idx_str + ")"
+    "BLOB" | "BYTEA" => "@sqlite.sqlite_column_blob(stmt, " + idx_str + ")"
     "BOOLEAN" | "BOOL" =>
       "@sqlite.sqlite_column_int(stmt, " + idx_str + ") != 0"
-    _ =>
-      "bytes_to_string(@sqlite.sqlite_column_text(stmt, " + idx_str + "))"
+    _ => "bytes_to_string(@sqlite.sqlite_column_text(stmt, " + idx_str + "))"
   }
 }
 
@@ -979,21 +996,18 @@ fn sql_type_to_moonbit(col : @plugin.Column) -> String {
     "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" => "String"
     "BLOB" | "BYTEA" => "Bytes"
     "BOOLEAN" | "BOOL" => "Bool"
-    _ => "String"  // Default to String for unknown types
+    _ => "String" // Default to String for unknown types
   }
-
   if col.not_null {
     if col.is_array {
       "Array[" + base_type + "]"
     } else {
       base_type
     }
+  } else if col.is_array {
+    "Array[" + base_type + "]?"
   } else {
-    if col.is_array {
-      "Array[" + base_type + "]?"
-    } else {
-      base_type + "?"
-    }
+    base_type + "?"
   }
 }
 
@@ -1107,7 +1121,7 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     // Write file size as varint
     let mut sz = file_size
     while sz >= 0x80U {
-      bytes.push((sz & 0x7FU | 0x80U).to_byte())
+      bytes.push(((sz & 0x7FU) | 0x80U).to_byte())
       sz = sz >> 7
     }
     bytes.push(sz.to_byte())
@@ -1118,7 +1132,7 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     let name_len = name_bytes.length()
     let mut nl = name_len.reinterpret_as_uint()
     while nl >= 0x80U {
-      bytes.push((nl & 0x7FU | 0x80U).to_byte())
+      bytes.push(((nl & 0x7FU) | 0x80U).to_byte())
       nl = nl >> 7
     }
     bytes.push(nl.to_byte())
@@ -1132,7 +1146,7 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     let contents_len = contents.length()
     let mut cl = contents_len.reinterpret_as_uint()
     while cl >= 0x80U {
-      bytes.push((cl & 0x7FU | 0x80U).to_byte())
+      bytes.push(((cl & 0x7FU) | 0x80U).to_byte())
       cl = cl >> 7
     }
     bytes.push(cl.to_byte())
@@ -1140,7 +1154,6 @@ fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
       bytes.push(contents[i])
     }
   }
-
   Bytes::from_array(bytes)
 }
 

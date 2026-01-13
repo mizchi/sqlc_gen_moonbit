@@ -1,15 +1,25 @@
 // WASM entry point for sqlc-gen-moonbit (WASI Preview 1)
 
 // WASI Preview 1 FFI declarations
-///|
-extern "wasm" fn wasi_fd_read(fd : Int, iovs : Int, iovs_len : Int, nread : Int) -> Int =
-  "wasi_snapshot_preview1" "fd_read"
 
 ///|
-extern "wasm" fn wasi_fd_write(fd : Int, iovs : Int, iovs_len : Int, nwritten : Int) -> Int =
-  "wasi_snapshot_preview1" "fd_write"
+extern "wasm" fn wasi_fd_read(
+  fd : Int,
+  iovs : Int,
+  iovs_len : Int,
+  nread : Int,
+) -> Int = "wasi_snapshot_preview1" "fd_read"
+
+///|
+extern "wasm" fn wasi_fd_write(
+  fd : Int,
+  iovs : Int,
+  iovs_len : Int,
+  nwritten : Int,
+) -> Int = "wasi_snapshot_preview1" "fd_write"
 
 // Memory intrinsics - using inline WAT to avoid moonbit.* imports
+
 ///|
 extern "wasm" fn wasm_memory_size() -> Int =
   #|(func (result i32) (memory.size))
@@ -36,6 +46,8 @@ extern "wasm" fn load8_u(ptr : Int) -> Int =
 
 // Global heap pointer using Ref
 // Start at 16MB to avoid collision with MoonBit runtime
+
+///|
 let heap_ptr : Ref[Int] = Ref::new(16 * 1024 * 1024)
 
 ///|
@@ -48,6 +60,7 @@ fn alloc(size : Int) -> Int {
   let current_pages = wasm_memory_size()
   if pages_needed > current_pages {
     let _ = wasm_memory_grow(pages_needed - current_pages)
+
   }
   ptr
 }
@@ -62,7 +75,6 @@ fn read_all_stdin() -> Bytes {
   let iovec_ptr = alloc(8)
   let nread_ptr = alloc(4)
   let buffer_ptr = alloc(chunk_size)
-
   while true {
     // Set up iovec
     store32(iovec_ptr, buffer_ptr)
@@ -73,7 +85,6 @@ fn read_all_stdin() -> Bytes {
     if errno != 0 {
       break // Error
     }
-
     let bytes_read = load32(nread_ptr)
     if bytes_read == 0 {
       break // EOF
@@ -116,7 +127,6 @@ fn write_all_stdout(data : Bytes) -> Unit {
   // Allocate iovec and nwritten
   let iovec_ptr = alloc(8)
   let nwritten_ptr = alloc(4)
-
   let mut written = 0
   while written < len {
     store32(iovec_ptr, buffer_ptr + written)
@@ -127,7 +137,6 @@ fn write_all_stdout(data : Bytes) -> Unit {
     if errno != 0 {
       break // Error
     }
-
     let bytes_written = load32(nwritten_ptr)
     if bytes_written == 0 {
       break
