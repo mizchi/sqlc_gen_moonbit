@@ -16,6 +16,12 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
+      - name: Install dependencies
+        run: |
+          moon update
+          cd examples/sqlite-native && moon update
+          cd ../d1 && moon update
+
       - name: Check code
         run: |
           moon check --target native ./cmd/native
@@ -32,6 +38,9 @@ jobs:
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: moon update
 
       - name: Build native plugin
         run: moon build --target native ./cmd/native
@@ -53,6 +62,9 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
+      - name: Install dependencies
+        run: cd examples/d1 && moon update
+
       - name: Run D1 tests
         run: cd examples/d1 && moon test --target js
 
@@ -64,8 +76,12 @@ jobs:
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
       - name: Install SQLite
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Install dependencies
+        run: cd examples/sqlite-native && moon update
 
       - name: Run SQLite native tests
         run: cd examples/sqlite-native && moon test --target native
