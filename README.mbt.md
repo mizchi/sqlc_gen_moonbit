@@ -204,13 +204,7 @@ For each query, sqlc-gen-moonbit generates:
 
 ## Development
 
-```bash
-just --list              # Show available commands
-just build-plugin        # Build native plugin
-just build-plugin-wasm   # Build WASM plugin
-just generate            # Generate code for examples
-just test                # Run all tests
-```
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow.
 
 ## License
 
