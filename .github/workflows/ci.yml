@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbitlang/setup-moonbit@v1
+
+      - name: Check code
+        run: |
+          moon check --target native ./cmd/native
+          moon check --target wasm ./cmd/wasm
+          cd examples/sqlite-native && moon check
+          cd ../d1 && moon check
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbitlang/setup-moonbit@v1
+
+      - name: Build native plugin
+        run: moon build --target native ./cmd/native
+
+      - name: Build WASM plugin
+        run: moon build --target wasm ./cmd/wasm
+
+      - name: Verify WASM exists
+        run: |
+          ls -la target/wasm/release/build/cmd/wasm/wasm.wasm
+          shasum -a 256 target/wasm/release/build/cmd/wasm/wasm.wasm
+
+  test-d1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbitlang/setup-moonbit@v1
+
+      - name: Run D1 tests
+        run: cd examples/d1 && moon test --target js
+
+  test-sqlite-native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbitlang/setup-moonbit@v1
+
+      - name: Install SQLite
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Run SQLite native tests
+        run: cd examples/sqlite-native && moon test --target native

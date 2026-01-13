@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbitlang/setup-moonbit@v1
+
+      - name: Build WASM plugin
+        run: moon build --target wasm ./cmd/wasm
+
+      - name: Prepare release assets
+        run: |
+          cp target/wasm/release/build/cmd/wasm/wasm.wasm sqlc-gen-moonbit.wasm
+          shasum -a 256 sqlc-gen-moonbit.wasm > sqlc-gen-moonbit.wasm.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            sqlc-gen-moonbit.wasm
+            sqlc-gen-moonbit.wasm.sha256
+          generate_release_notes: true
