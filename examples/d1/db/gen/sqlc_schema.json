@@ -365,7 +365,7 @@
       "required": ["id", "name", "slug"],
       "properties": {
         "id": { "type": "integer" },
-        "name": { "type": "string", "minLength": 1 },
+        "name": { "type!: "string", "minLength": 1 },
         "slug": { "type": "string", "minLength": 1 }
       }
     },

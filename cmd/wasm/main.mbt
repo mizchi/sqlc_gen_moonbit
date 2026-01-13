@@ -35,7 +35,8 @@ extern "wasm" fn load8_u(ptr : Int) -> Int =
   #|(func (param i32) (result i32) (i32.load8_u (local.get 0)))
 
 // Global heap pointer using Ref
-let heap_ptr : Ref[Int] = Ref::new(65536)
+// Start at 16MB to avoid collision with MoonBit runtime
+let heap_ptr : Ref[Int] = Ref::new(16 * 1024 * 1024)
 
 ///|
 fn alloc(size : Int) -> Int {

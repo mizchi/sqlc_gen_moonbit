@@ -1,8 +1,9 @@
 version: "2"
 plugins:
   - name: moonbit
-    process:
-      cmd: "/Users/mz/ghq/github.com/mizchi/sqlc_gen_moonbit/_build/native/release/build/cmd/native/native.exe"
+    wasm:
+      url: "file://../../bin/sqlc-gen-moonbit.wasm"
+      sha256: ""
 sql:
   - engine: sqlite
     schema: "db/schema.sql"
