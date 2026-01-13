@@ -15,6 +15,16 @@ SELECT * FROM users ORDER BY created_at DESC;
 INSERT INTO users (username, email, display_name, bio, avatar_url)
 VALUES (?, ?, ?, ?, ?);
 
+-- name: CreateUserReturningId :execlastid
+INSERT INTO users (username, email, display_name, bio, avatar_url)
+VALUES (?, ?, ?, ?, ?);
+
+-- name: DeleteUserById :execrows
+DELETE FROM users WHERE id = ?;
+
+-- name: UpdateUserDisplayName :execrows
+UPDATE users SET display_name = ? WHERE id = ?;
+
 -- ============================================
 -- Category Queries
 -- ============================================

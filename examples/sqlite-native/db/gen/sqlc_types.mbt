@@ -2,10 +2,27 @@
 // sqlc version: v1.30.0
 
 ///|
-pub struct GetUserRow {
+pub struct GetUserByIdRow {
   id : Int64
   name : String
   email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct GetUserByEmailRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
 } derive(Show, Eq)
 
 ///|
@@ -13,33 +30,575 @@ pub struct ListUsersRow {
   id : Int64
   name : String
   email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
 } derive(Show, Eq)
 
 ///|
-pub struct GetUserParams {
+pub struct ListActiveUsersRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct GetUsersWithBioRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct GetUsersWithoutBioRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct GetUsersWithPositiveBalanceRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct CountActiveUsersRow {
+  count : Int64
+} derive(Show, Eq)
+
+///|
+pub struct SearchUsersByNameRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListUsersWithLimitRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct GetUserCountRow {
+  count : Int64
+} derive(Show, Eq)
+
+///|
+pub struct GetPostByIdRow {
+  id : Int64
+  author_id : Int64
+  title : String
+  content : String
+  view_count : Int64
+  is_published : Int64
+  published_at : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsByAuthorRow {
+  id : Int64
+  author_id : Int64
+  title : String
+  content : String
+  view_count : Int64
+  is_published : Int64
+  published_at : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct GetPostWithAuthorRow {
+  id : Int64
+  title : String
+  content : String
+  view_count : Int64
+  is_published : Int64
+  published_at : String?
+  created_at : String
+  author_id : Int64
+  author_name : String
+  author_email : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsWithAuthorsRow {
+  id : Int64
+  title : String
+  view_count : Int64
+  is_published : Int64
+  created_at : String
+  author_id : Int64
+  author_name : String
+} derive(Show, Eq)
+
+///|
+pub struct GetPostCountByAuthorRow {
+  post_count : Int64
+} derive(Show, Eq)
+
+///|
+pub struct GetAuthorStatsRow {
+  post_count : Int64
+  total_views : String?
+} derive(Show, Eq)
+
+///|
+pub struct GetTagByNameRow {
+  id : Int64
+  name : String
+} derive(Show, Eq)
+
+///|
+pub struct ListTagsRow {
+  id : Int64
+  name : String
+} derive(Show, Eq)
+
+///|
+pub struct ListTagsForPostRow {
+  id : Int64
+  name : String
+} derive(Show, Eq)
+
+///|
+pub struct GetTagCountForPostRow {
+  tag_count : Int64
+} derive(Show, Eq)
+
+///|
+pub struct GetUserByIdParams {
   id : Int64
 } derive(Show, Eq)
 
 ///|
-pub fn GetUserParams::new(id : Int64) -> GetUserParams {
+pub fn GetUserByIdParams::new(id : Int64) -> GetUserByIdParams {
   { id, }
+}
+
+///|
+pub struct GetUserByEmailParams {
+  email : String
+} derive(Show, Eq)
+
+///|
+pub fn GetUserByEmailParams::new(email : String) -> GetUserByEmailParams {
+  { email, }
 }
 
 ///|
 pub struct CreateUserParams {
   name : String
   email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
 } derive(Show, Eq)
 
 ///|
-pub fn CreateUserParams::new(name : String, email : String) -> CreateUserParams {
-  { name, email, }
+pub fn CreateUserParams::new(name : String, email : String, age : Int64?, balance : Double?, is_active : Int64, bio : String?) -> CreateUserParams {
+  { name, email, age, balance, is_active, bio, }
+}
+
+///|
+pub struct CreateUserReturningIdParams {
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+} derive(Show, Eq)
+
+///|
+pub fn CreateUserReturningIdParams::new(name : String, email : String, age : Int64?, balance : Double?, is_active : Int64, bio : String?) -> CreateUserReturningIdParams {
+  { name, email, age, balance, is_active, bio, }
+}
+
+///|
+pub struct DeleteUserByIdParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn DeleteUserByIdParams::new(id : Int64) -> DeleteUserByIdParams {
+  { id, }
+}
+
+///|
+pub struct UpdateUserNameParams {
+  name : String
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn UpdateUserNameParams::new(name : String, id : Int64) -> UpdateUserNameParams {
+  { name, id, }
+}
+
+///|
+pub struct UpdateUserBioParams {
+  bio : String?
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn UpdateUserBioParams::new(bio : String?, id : Int64) -> UpdateUserBioParams {
+  { bio, id, }
+}
+
+///|
+pub struct UpdateUserBalanceParams {
+  balance : Double?
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn UpdateUserBalanceParams::new(balance : Double?, id : Int64) -> UpdateUserBalanceParams {
+  { balance, id, }
+}
+
+///|
+pub struct ActivateUserParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ActivateUserParams::new(id : Int64) -> ActivateUserParams {
+  { id, }
+}
+
+///|
+pub struct DeactivateUserParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn DeactivateUserParams::new(id : Int64) -> DeactivateUserParams {
+  { id, }
+}
+
+///|
+pub struct SearchUsersByNameParams {
+  name : String
+} derive(Show, Eq)
+
+///|
+pub fn SearchUsersByNameParams::new(name : String) -> SearchUsersByNameParams {
+  { name, }
+}
+
+///|
+pub struct ListUsersWithLimitParams {
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListUsersWithLimitParams::new(limit : Int64) -> ListUsersWithLimitParams {
+  { limit, }
+}
+
+///|
+pub struct CreatePostParams {
+  author_id : Int64
+  title : String
+  content : String
+  is_published : Int64
+} derive(Show, Eq)
+
+///|
+pub fn CreatePostParams::new(author_id : Int64, title : String, content : String, is_published : Int64) -> CreatePostParams {
+  { author_id, title, content, is_published, }
+}
+
+///|
+pub struct CreatePostReturningIdParams {
+  author_id : Int64
+  title : String
+  content : String
+  is_published : Int64
+} derive(Show, Eq)
+
+///|
+pub fn CreatePostReturningIdParams::new(author_id : Int64, title : String, content : String, is_published : Int64) -> CreatePostReturningIdParams {
+  { author_id, title, content, is_published, }
+}
+
+///|
+pub struct GetPostByIdParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetPostByIdParams::new(id : Int64) -> GetPostByIdParams {
+  { id, }
+}
+
+///|
+pub struct ListPostsByAuthorParams {
+  author_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsByAuthorParams::new(author_id : Int64) -> ListPostsByAuthorParams {
+  { author_id, }
+}
+
+///|
+pub struct PublishPostParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn PublishPostParams::new(id : Int64) -> PublishPostParams {
+  { id, }
+}
+
+///|
+pub struct DeletePostParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn DeletePostParams::new(id : Int64) -> DeletePostParams {
+  { id, }
+}
+
+///|
+pub struct IncrementViewCountParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn IncrementViewCountParams::new(id : Int64) -> IncrementViewCountParams {
+  { id, }
+}
+
+///|
+pub struct GetPostWithAuthorParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetPostWithAuthorParams::new(id : Int64) -> GetPostWithAuthorParams {
+  { id, }
+}
+
+///|
+pub struct GetPostCountByAuthorParams {
+  author_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetPostCountByAuthorParams::new(author_id : Int64) -> GetPostCountByAuthorParams {
+  { author_id, }
+}
+
+///|
+pub struct GetAuthorStatsParams {
+  author_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetAuthorStatsParams::new(author_id : Int64) -> GetAuthorStatsParams {
+  { author_id, }
+}
+
+///|
+pub struct CreateTagParams {
+  name : String
+} derive(Show, Eq)
+
+///|
+pub fn CreateTagParams::new(name : String) -> CreateTagParams {
+  { name, }
+}
+
+///|
+pub struct CreateTagReturningIdParams {
+  name : String
+} derive(Show, Eq)
+
+///|
+pub fn CreateTagReturningIdParams::new(name : String) -> CreateTagReturningIdParams {
+  { name, }
+}
+
+///|
+pub struct GetTagByNameParams {
+  name : String
+} derive(Show, Eq)
+
+///|
+pub fn GetTagByNameParams::new(name : String) -> GetTagByNameParams {
+  { name, }
+}
+
+///|
+pub struct DeleteTagParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn DeleteTagParams::new(id : Int64) -> DeleteTagParams {
+  { id, }
+}
+
+///|
+pub struct AddTagToPostParams {
+  post_id : Int64
+  tag_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn AddTagToPostParams::new(post_id : Int64, tag_id : Int64) -> AddTagToPostParams {
+  { post_id, tag_id, }
+}
+
+///|
+pub struct RemoveTagFromPostParams {
+  post_id : Int64
+  tag_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn RemoveTagFromPostParams::new(post_id : Int64, tag_id : Int64) -> RemoveTagFromPostParams {
+  { post_id, tag_id, }
+}
+
+///|
+pub struct ListTagsForPostParams {
+  post_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListTagsForPostParams::new(post_id : Int64) -> ListTagsForPostParams {
+  { post_id, }
+}
+
+///|
+pub struct GetTagCountForPostParams {
+  post_id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn GetTagCountForPostParams::new(post_id : Int64) -> GetTagCountForPostParams {
+  { post_id, }
 }
 
 // SQL queries
-pub let get_user_sql : String = "SELECT id, name, email FROM users WHERE id = ?"
+pub let get_user_by_id_sql : String = "\nSELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id = ?"
 
-pub let list_users_sql : String = "SELECT id, name, email FROM users ORDER BY name"
+pub let get_user_by_email_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE email = ?"
 
-pub let create_user_sql : String = "INSERT INTO users (name, email) VALUES (?, ?)"
+pub let list_users_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users ORDER BY name"
+
+pub let list_active_users_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE is_active = 1 ORDER BY name"
+
+pub let create_user_sql : String = "INSERT INTO users (name, email, age, balance, is_active, bio)\nVALUES (?, ?, ?, ?, ?, ?)"
+
+pub let create_user_returning_id_sql : String = "INSERT INTO users (name, email, age, balance, is_active, bio)\nVALUES (?, ?, ?, ?, ?, ?)"
+
+pub let delete_user_by_id_sql : String = "DELETE FROM users WHERE id = ?"
+
+pub let update_user_name_sql : String = "UPDATE users SET name = ? WHERE id = ?"
+
+pub let update_user_bio_sql : String = "\nUPDATE users SET bio = ? WHERE id = ?"
+
+pub let get_users_with_bio_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE bio IS NOT NULL ORDER BY name"
+
+pub let get_users_without_bio_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE bio IS NULL ORDER BY name"
+
+pub let update_user_balance_sql : String = "\nUPDATE users SET balance = ? WHERE id = ?"
+
+pub let get_users_with_positive_balance_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE balance > 0.0 ORDER BY balance DESC"
+
+pub let activate_user_sql : String = "\nUPDATE users SET is_active = 1 WHERE id = ?"
+
+pub let deactivate_user_sql : String = "UPDATE users SET is_active = 0 WHERE id = ?"
+
+pub let count_active_users_sql : String = "SELECT COUNT(*) as count FROM users WHERE is_active = 1"
+
+pub let search_users_by_name_sql : String = "\nSELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE name LIKE ? ORDER BY name"
+
+pub let list_users_with_limit_sql : String = "SELECT id, name, email, age, balance, is_active, bio, created_at FROM users ORDER BY id LIMIT ?"
+
+pub let get_user_count_sql : String = "SELECT COUNT(*) as count FROM users"
+
+pub let create_post_sql : String = "\nINSERT INTO posts (author_id, title, content, is_published)\nVALUES (?, ?, ?, ?)"
+
+pub let create_post_returning_id_sql : String = "INSERT INTO posts (author_id, title, content, is_published)\nVALUES (?, ?, ?, ?)"
+
+pub let get_post_by_id_sql : String = "SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE id = ?"
+
+pub let list_posts_by_author_sql : String = "SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? ORDER BY created_at DESC"
+
+pub let publish_post_sql : String = "UPDATE posts SET is_published = 1, published_at = datetime('now') WHERE id = ?"
+
+pub let delete_post_sql : String = "DELETE FROM posts WHERE id = ?"
+
+pub let increment_view_count_sql : String = "UPDATE posts SET view_count = view_count + 1 WHERE id = ?"
+
+pub let get_post_with_author_sql : String = "\nSELECT\n  p.id, p.title, p.content, p.view_count, p.is_published,\n  p.published_at, p.created_at,\n  u.id as author_id, u.name as author_name, u.email as author_email\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nWHERE p.id = ?"
+
+pub let list_posts_with_authors_sql : String = "SELECT\n  p.id, p.title, p.view_count, p.is_published, p.created_at,\n  u.id as author_id, u.name as author_name\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nORDER BY p.created_at DESC"
+
+pub let get_post_count_by_author_sql : String = "\nSELECT COUNT(*) as post_count FROM posts WHERE author_id = ?"
+
+pub let get_author_stats_sql : String = "SELECT\n  COUNT(*) as post_count,\n  COALESCE(SUM(view_count), 0) as total_views\nFROM posts WHERE author_id = ?"
+
+pub let create_tag_sql : String = "\nINSERT INTO tags (name) VALUES (?)"
+
+pub let create_tag_returning_id_sql : String = "INSERT INTO tags (name) VALUES (?)"
+
+pub let get_tag_by_name_sql : String = "SELECT id, name FROM tags WHERE name = ?"
+
+pub let list_tags_sql : String = "SELECT id, name FROM tags ORDER BY name"
+
+pub let delete_tag_sql : String = "DELETE FROM tags WHERE id = ?"
+
+pub let add_tag_to_post_sql : String = "\nINSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)"
+
+pub let remove_tag_from_post_sql : String = "DELETE FROM post_tags WHERE post_id = ? AND tag_id = ?"
+
+pub let list_tags_for_post_sql : String = "SELECT t.id, t.name\nFROM tags t\nINNER JOIN post_tags pt ON t.id = pt.tag_id\nWHERE pt.post_id = ?\nORDER BY t.name"
+
+pub let get_tag_count_for_post_sql : String = "SELECT COUNT(*) as tag_count FROM post_tags WHERE post_id = ?"
 

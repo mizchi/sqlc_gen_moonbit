@@ -4,6 +4,13 @@ fn cstring(s : String) -> Bytes {
 }
 
 ///|
+fn exec_sql(db : @sqlite.Sqlite3, sql : String) -> Unit {
+  let stmt = @sqlite.sqlite_prepare(db, cstring(sql))
+  @sqlite.sqlite_step(stmt) |> ignore
+  @sqlite.sqlite_finalize(stmt)
+}
+
+///|
 fn main {
   // Open database using low-level API
   let db = @sqlite.sqlite_open_v2(
@@ -12,19 +19,16 @@ fn main {
     Bytes::new(0)
   )
 
-  // Create table
-  let create_table_sql = "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL)"
-  let stmt = @sqlite.sqlite_prepare(db, cstring(create_table_sql))
-  @sqlite.sqlite_step(stmt) |> ignore
-  @sqlite.sqlite_finalize(stmt)
+  // Create table with full schema
+  exec_sql(db, "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, age INTEGER, balance REAL DEFAULT 0.0, is_active INTEGER NOT NULL DEFAULT 1, bio TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')))")
   println("Created users table")
 
-  // Insert a user
-  let params1 = @gen.CreateUserParams::new("Alice", "alice@example.com")
+  // Insert users using generated function
+  let params1 = @gen.CreateUserParams::new("Alice", "alice@example.com", Some(25L), Some(100.5), 1L, Some("Developer"))
   @gen.create_user(db, params1)
   println("Created user: Alice")
 
-  let params2 = @gen.CreateUserParams::new("Bob", "bob@example.com")
+  let params2 = @gen.CreateUserParams::new("Bob", "bob@example.com", None, None, 1L, None)
   @gen.create_user(db, params2)
   println("Created user: Bob")
 
@@ -36,9 +40,14 @@ fn main {
   }
 
   // Get user by ID
-  let get_params = @gen.GetUserParams::new(1L)
-  match @gen.get_user(db, get_params) {
-    Some(user) => println("Found user: " + user.name)
+  let get_params = @gen.GetUserByIdParams::new(1L)
+  match @gen.get_user_by_id(db, get_params) {
+    Some(user) => {
+      println("Found user: " + user.name)
+      println("  age: " + user.age.to_string())
+      println("  balance: " + user.balance.to_string())
+      println("  bio: " + user.bio.to_string())
+    }
     None => println("User not found")
   }
 

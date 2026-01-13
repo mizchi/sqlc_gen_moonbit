@@ -26,6 +26,32 @@
         "avatar_url": { "type": ["string", "null"] }
       }
     },
+    "CreateUserReturningIdParams": {
+      "type": "object",
+      "required": ["username", "email", "display_name"],
+      "properties": {
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "bio": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] }
+      }
+    },
+    "DeleteUserByIdParams": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "integer" }
+      }
+    },
+    "UpdateUserDisplayNameParams": {
+      "type": "object",
+      "required": ["display_name", "id"],
+      "properties": {
+        "display_name": { "type": "string", "minLength": 1 },
+        "id": { "type": "integer" }
+      }
+    },
     "GetCategoryByIdParams": {
       "type": "object",
       "required": ["id"],
@@ -266,7 +292,7 @@
         "username": { "type": "string", "minLength": 1 },
         "email": { "type": "string", "minLength": 1 },
         "display_name": { "type": "string", "minLength": 1 },
-        "bio": { "type": ["string", "null"] },
+        "bio": { "tyoe": ["string", "null"] },
         "avatar_url": { "type": ["string", "null"] },
         "created_at": { "type": "string", "minLength": 1 },
         "updated_at": { "type": "string", "minLength": 1 }
@@ -365,7 +391,7 @@
       "required": ["id", "name", "slug"],
       "properties": {
         "id": { "type": "integer" },
-        "name": { "type!: "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
         "slug": { "type": "string", "minLength": 1 }
       }
     },

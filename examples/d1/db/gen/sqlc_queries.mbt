@@ -69,6 +69,39 @@ pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams)
   stmt.run() |> ignore
 }
 
+///| CreateUserReturningId
+/// INSERT INTO users (username, email, display_name, bio, avatar_url) VALUES (?, ?, ?, ?, ?)
+pub async fn create_user_returning_id(db : @cloudflare.D1Database, params : CreateUserReturningIdParams) -> Int64 {
+  let stmt = db.prepare(create_user_returning_id_sql).bind([@core.any(params.username), @core.any(params.email), @core.any(params.display_name), (match params.bio { Some(v) => @core.any(v); None => @core.null() }), (match params.avatar_url { Some(v) => @core.any(v); None => @core.null() })])
+  let result = stmt.run()
+  match result.meta() {
+    Some(m) => m.last_row_id().unwrap_or(0).to_int64()
+    None => 0L
+  }
+}
+
+///| DeleteUserById
+/// DELETE FROM users WHERE id = ?
+pub async fn delete_user_by_id(db : @cloudflare.D1Database, params : DeleteUserByIdParams) -> Int {
+  let stmt = db.prepare(delete_user_by_id_sql).bind([@core.any(params.id.to_int())])
+  let result = stmt.run()
+  match result.meta() {
+    Some(m) => m.changes().unwrap_or(0)
+    None => 0
+  }
+}
+
+///| UpdateUserDisplayName
+/// UPDATE users SET display_name = ? WHERE id = ?
+pub async fn update_user_display_name(db : @cloudflare.D1Database, params : UpdateUserDisplayNameParams) -> Int {
+  let stmt = db.prepare(update_user_display_name_sql).bind([@core.any(params.display_name), @core.any(params.id.to_int())])
+  let result = stmt.run()
+  match result.meta() {
+    Some(m) => m.changes().unwrap_or(0)
+    None => 0
+  }
+}
+
 ///| GetCategoryById
 ///  SELECT id, name, slug, description FROM categories WHERE id = ?
 pub async fn get_category_by_id(db : @cloudflare.D1Database, params : GetCategoryByIdParams) -> GetCategoryByIdRow? {

@@ -471,3 +471,137 @@ async test "D1: list published posts" {
   assert_eq(published.length(), 2)
   mf.dispose()
 }
+
+///|
+async test "D1: create user returning id (:execlastid)" {
+  let mf = @cloudflare.Miniflare::new({
+    ..@cloudflare.MiniflareOptions::default(),
+    d1Databases: Some(["TEST_DB"]),
+  })
+  mf.ready()
+  let db = mf.get_d1_database("TEST_DB")
+  let _ = db.exec(get_schema_sql())
+
+  // Create first user and get ID
+  let id1 = @gen.create_user_returning_id(
+    db,
+    @gen.CreateUserReturningIdParams::new(
+      "alice_execlastid",
+      "alice_exec@example.com",
+      "Alice Exec",
+      None,
+      None,
+    ),
+  )
+  assert_eq(id1, 1L)
+
+  // Create second user and get ID
+  let id2 = @gen.create_user_returning_id(
+    db,
+    @gen.CreateUserReturningIdParams::new(
+      "bob_execlastid",
+      "bob_exec@example.com",
+      "Bob Exec",
+      None,
+      None,
+    ),
+  )
+  assert_eq(id2, 2L)
+
+  // Verify users exist
+  let user1 = @gen.get_user_by_id(db, @gen.GetUserByIdParams::new(id1))
+  assert_true(user1 is Some(_))
+  assert_eq(user1.unwrap().username, "alice_execlastid")
+
+  mf.dispose()
+}
+
+///|
+async test "D1: delete user by id (:execrows)" {
+  let mf = @cloudflare.Miniflare::new({
+    ..@cloudflare.MiniflareOptions::default(),
+    d1Databases: Some(["TEST_DB"]),
+  })
+  mf.ready()
+  let db = mf.get_d1_database("TEST_DB")
+  let _ = db.exec(get_schema_sql())
+
+  // Create users
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "to_delete_1",
+      "delete1@example.com",
+      "Delete One",
+      None,
+      None,
+    ),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "to_delete_2",
+      "delete2@example.com",
+      "Delete Two",
+      None,
+      None,
+    ),
+  )
+
+  // Delete user and check rows affected
+  let deleted = @gen.delete_user_by_id(db, @gen.DeleteUserByIdParams::new(1L))
+  assert_eq(deleted, 1)
+
+  // Verify user is deleted
+  let user = @gen.get_user_by_id(db, @gen.GetUserByIdParams::new(1L))
+  assert_true(user is None)
+
+  // Delete non-existent user
+  let deleted2 = @gen.delete_user_by_id(db, @gen.DeleteUserByIdParams::new(999L))
+  assert_eq(deleted2, 0)
+
+  mf.dispose()
+}
+
+///|
+async test "D1: update user display name (:execrows)" {
+  let mf = @cloudflare.Miniflare::new({
+    ..@cloudflare.MiniflareOptions::default(),
+    d1Databases: Some(["TEST_DB"]),
+  })
+  mf.ready()
+  let db = mf.get_d1_database("TEST_DB")
+  let _ = db.exec(get_schema_sql())
+
+  // Create user
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "to_update",
+      "update@example.com",
+      "Original Name",
+      None,
+      None,
+    ),
+  )
+
+  // Update user display name
+  let updated = @gen.update_user_display_name(
+    db,
+    @gen.UpdateUserDisplayNameParams::new("Updated Name", 1L),
+  )
+  assert_eq(updated, 1)
+
+  // Verify update
+  let user = @gen.get_user_by_id(db, @gen.GetUserByIdParams::new(1L))
+  assert_eq(user.unwrap().display_name, "Updated Name")
+
+  // Update non-existent user
+  let updated2 = @gen.update_user_display_name(
+    db,
+    @gen.UpdateUserDisplayNameParams::new("Nobody", 999L),
+  )
+  assert_eq(updated2, 0)
+
+  mf.dispose()
+}

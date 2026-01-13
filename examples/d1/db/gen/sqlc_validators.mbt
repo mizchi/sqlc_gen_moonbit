@@ -28,6 +28,33 @@ pub fn CreateUserParams::validate(self : CreateUserParams) -> Result[Unit, Strin
   Ok(())
 }
 
+///| Validate CreateUserReturningIdParams
+pub fn CreateUserReturningIdParams::validate(self : CreateUserReturningIdParams) -> Result[Unit, String] {
+  if self.username.length() == 0 {
+    return Err("username is required")
+  }
+  if self.email.length() == 0 {
+    return Err("email is required")
+  }
+  if self.display_name.length() == 0 {
+    return Err("display_name is required")
+  }
+  Ok(())
+}
+
+///| Validate DeleteUserByIdParams
+pub fn DeleteUserByIdParams::validate(_self : DeleteUserByIdParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate UpdateUserDisplayNameParams
+pub fn UpdateUserDisplayNameParams::validate(self : UpdateUserDisplayNameParams) -> Result[Unit, String] {
+  if self.display_name.length() == 0 {
+    return Err("display_name is required")
+  }
+  Ok(())
+}
+
 ///| Validate GetCategoryByIdParams
 pub fn GetCategoryByIdParams::validate(_self : GetCategoryByIdParams) -> Result[Unit, String] {
   Ok(())

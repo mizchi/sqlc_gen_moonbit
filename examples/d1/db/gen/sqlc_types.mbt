@@ -272,6 +272,41 @@ pub fn CreateUserParams::new(username : String, email : String, display_name : S
 }
 
 ///|
+pub struct CreateUserReturningIdParams {
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+} derive(Show, Eq)
+
+///|
+pub fn CreateUserReturningIdParams::new(username : String, email : String, display_name : String, bio : String?, avatar_url : String?) -> CreateUserReturningIdParams {
+  { username, email, display_name, bio, avatar_url, }
+}
+
+///|
+pub struct DeleteUserByIdParams {
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn DeleteUserByIdParams::new(id : Int64) -> DeleteUserByIdParams {
+  { id, }
+}
+
+///|
+pub struct UpdateUserDisplayNameParams {
+  display_name : String
+  id : Int64
+} derive(Show, Eq)
+
+///|
+pub fn UpdateUserDisplayNameParams::new(display_name : String, id : Int64) -> UpdateUserDisplayNameParams {
+  { display_name, id, }
+}
+
+///|
 pub struct GetCategoryByIdParams {
   id : Int64
 } derive(Show, Eq)
@@ -564,6 +599,12 @@ pub let get_user_by_username_sql : String = "SELECT id, username, email, display
 pub let list_users_sql : String = "SELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users ORDER BY created_at DESC"
 
 pub let create_user_sql : String = "INSERT INTO users (username, email, display_name, bio, avatar_url)\nVALUES (?, ?, ?, ?, ?)"
+
+pub let create_user_returning_id_sql : String = "INSERT INTO users (username, email, display_name, bio, avatar_url)\nVALUES (?, ?, ?, ?, ?)"
+
+pub let delete_user_by_id_sql : String = "DELETE FROM users WHERE id = ?"
+
+pub let update_user_display_name_sql : String = "UPDATE users SET display_name = ? WHERE id = ?"
 
 pub let get_category_by_id_sql : String = "\nSELECT id, name, slug, description FROM categories WHERE id = ?"
 

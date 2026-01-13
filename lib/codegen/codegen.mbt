@@ -313,6 +313,8 @@ fn generate_query_function_sqlite(
   let return_type = match query.cmd {
     ":one" => row_type + "?"
     ":many" => "Array[" + row_type + "]"
+    ":execrows" => "Int"
+    ":execlastid" => "Int64"
     _ => "Unit"
   }
 
@@ -404,6 +406,16 @@ fn generate_query_function_sqlite(
       buf.write_string("  @sqlite.sqlite_finalize(stmt)\n")
       buf.write_string("  results\n")
     }
+    ":execrows" => {
+      buf.write_string("  @sqlite.sqlite_step(stmt) |> ignore\n")
+      buf.write_string("  @sqlite.sqlite_finalize(stmt)\n")
+      buf.write_string("  @sqlite.sqlite_changes(db)\n")
+    }
+    ":execlastid" => {
+      buf.write_string("  @sqlite.sqlite_step(stmt) |> ignore\n")
+      buf.write_string("  @sqlite.sqlite_finalize(stmt)\n")
+      buf.write_string("  @sqlite.sqlite_last_insert_rowid(db)\n")
+    }
     _ => {
       // :exec
       buf.write_string("  @sqlite.sqlite_step(stmt) |> ignore\n")
@@ -427,6 +439,8 @@ fn generate_query_function_d1(
   let return_type = match query.cmd {
     ":one" => row_type + "?"
     ":many" => "Array[" + row_type + "]"
+    ":execrows" => "Int"
+    ":execlastid" => "Int64"
     _ => "Unit"
   }
 
@@ -507,6 +521,20 @@ fn generate_query_function_d1(
       buf.write_string("    })\n")
       buf.write_string("  }\n")
       buf.write_string("  results\n")
+    }
+    ":execrows" => {
+      buf.write_string("  let result = stmt.run()\n")
+      buf.write_string("  match result.meta() {\n")
+      buf.write_string("    Some(m) => m.changes().unwrap_or(0)\n")
+      buf.write_string("    None => 0\n")
+      buf.write_string("  }\n")
+    }
+    ":execlastid" => {
+      buf.write_string("  let result = stmt.run()\n")
+      buf.write_string("  match result.meta() {\n")
+      buf.write_string("    Some(m) => m.last_row_id().unwrap_or(0).to_int64()\n")
+      buf.write_string("    None => 0L\n")
+      buf.write_string("  }\n")
     }
     _ =>
       // :exec
@@ -947,25 +975,37 @@ fn column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
 fn param_to_bind_call(col : @plugin.Column, idx : Int, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  match type_name {
-    "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-      "@sqlite.sqlite_bind_int(stmt, " + idx_str + ", " + expr + ".to_int())"
-    "INT8" | "BIGINT" =>
-      "@sqlite.sqlite_bind_int64(stmt, " + idx_str + ", " + expr + ")"
-    "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
-      "@sqlite.sqlite_bind_double(stmt, " + idx_str + ", " + expr + ")"
-    "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
-      "@sqlite.sqlite_bind_text(stmt, " + idx_str + ", cstring(" + expr + "))"
-    "BLOB" | "BYTEA" =>
-      "@sqlite.sqlite_bind_blob(stmt, " + idx_str + ", " + expr + ")"
-    "BOOLEAN" | "BOOL" =>
-      "@sqlite.sqlite_bind_int(stmt, " +
-      idx_str +
-      ", if " +
-      expr +
-      " { 1 } else { 0 })"
-    _ =>
-      "@sqlite.sqlite_bind_text(stmt, " + idx_str + ", cstring(" + expr + "))"
+  let is_nullable = not(col.not_null)
+
+  // Get the base bind call expression
+  let base_bind = fn(val_expr : String) -> String {
+    match type_name {
+      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
+        "@sqlite.sqlite_bind_int(stmt, " + idx_str + ", " + val_expr + ".to_int())"
+      "INT8" | "BIGINT" =>
+        "@sqlite.sqlite_bind_int64(stmt, " + idx_str + ", " + val_expr + ")"
+      "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
+        "@sqlite.sqlite_bind_double(stmt, " + idx_str + ", " + val_expr + ")"
+      "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
+        "@sqlite.sqlite_bind_text(stmt, " + idx_str + ", cstring(" + val_expr + "))"
+      "BLOB" | "BYTEA" =>
+        "@sqlite.sqlite_bind_blob(stmt, " + idx_str + ", " + val_expr + ")"
+      "BOOLEAN" | "BOOL" =>
+        "@sqlite.sqlite_bind_int(stmt, " +
+        idx_str +
+        ", if " +
+        val_expr +
+        " { 1 } else { 0 })"
+      _ =>
+        "@sqlite.sqlite_bind_text(stmt, " + idx_str + ", cstring(" + val_expr + "))"
+    }
+  }
+
+  // Handle nullable parameters with match
+  if is_nullable {
+    "(match " + expr + " { None => @sqlite.sqlite_bind_null(stmt, " + idx_str + "); Some(v) => " + base_bind("v") + " })"
+  } else {
+    base_bind(expr)
   }
 }
 
@@ -973,7 +1013,10 @@ fn param_to_bind_call(col : @plugin.Column, idx : Int, expr : String) -> String 
 fn column_to_moonbit(col : @plugin.Column, idx : Int) -> String {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  match type_name {
+  let is_nullable = not(col.not_null)
+
+  // Get the base value expression
+  let base_expr = match type_name {
     "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
       "@sqlite.sqlite_column_int64(stmt, " + idx_str + ")"
     "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
@@ -984,6 +1027,13 @@ fn column_to_moonbit(col : @plugin.Column, idx : Int) -> String {
     "BOOLEAN" | "BOOL" =>
       "@sqlite.sqlite_column_int(stmt, " + idx_str + ") != 0"
     _ => "bytes_to_string(@sqlite.sqlite_column_text(stmt, " + idx_str + "))"
+  }
+
+  // Wrap in Option if nullable
+  if is_nullable {
+    "(if @sqlite.sqlite_column_type(stmt, " + idx_str + ") == @sqlite.SQLITE_NULL { None } else { Some(" + base_expr + ") })"
+  } else {
+    base_expr
   }
 }
 

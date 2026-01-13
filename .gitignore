@@ -1,5 +1,5 @@
 .DS_Store
-target/
+target
 _build/
 .mooncakes/
 .moonagent/
@@ -7,3 +7,4 @@ _build/
 node_modules/gen/
 node_modules
 bin/
+targe
