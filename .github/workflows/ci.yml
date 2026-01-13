@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup MoonBit
-        uses: moonbitlang/setup-moonbit@v1
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Check code
         run: |
@@ -27,8 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup MoonBit
-        uses: moonbitlang/setup-moonbit@v1
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Build native plugin
         run: moon build --target native ./cmd/native
@@ -45,9 +48,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup MoonBit
-        uses: moonbitlang/setup-moonbit@v1
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Run D1 tests
         run: cd examples/d1 && moon test --target js
@@ -56,10 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup MoonBit
-        uses: moonbitlang/setup-moonbit@v1
-
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
       - name: Install SQLite
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
 
