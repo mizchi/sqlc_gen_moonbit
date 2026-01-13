@@ -256,6 +256,47 @@
         "post_id": { "type": "integer" }
       }
     },
+    "ListUsersPaginatedParams": {
+      "type": "object",
+      "required": ["id", "limit"],
+      "properties": {
+        "id": { "type": "integer" },
+        "limit": { "type": "integer" }
+      }
+    },
+    "ListPostsPaginatedParams": {
+      "type": "object",
+      "required": ["id", "limit"],
+      "properties": {
+        "id": { "type": "integer" },
+        "limit": { "type": "integer" }
+      }
+    },
+    "ListPublishedPostsPaginatedParams": {
+      "type": "object",
+      "required": ["id", "limit"],
+      "properties": {
+        "id": { "type": "integer" },
+        "limit": { "type": "integer" }
+      }
+    },
+    "ListPostsByAuthorPaginatedParams": {
+      "type": "object",
+      "required": ["author_id", "id", "limit"],
+      "properties": {
+        "author_id": { "type": "integer" },
+        "id": { "type": "integer" },
+        "limit": { "type": "integer" }
+      }
+    },
+    "ListPostsWithAuthorsPaginatedParams": {
+      "type": "object",
+      "required": ["id", "limit"],
+      "properties": {
+        "id": { "type": "integer" },
+        "limit": { "type": "integer" }
+      }
+    },
     "GetUserByIdRow": {
       "type": "object",
       "required": ["id", "username", "email", "display_name", "created_at", "updated_at"],
@@ -292,7 +333,7 @@
         "username": { "type": "string", "minLength": 1 },
         "email": { "type": "string", "minLength": 1 },
         "display_name": { "type": "string", "minLength": 1 },
-        "bio": { "tyoe": ["string", "null"] },
+        "bio": { "type": ["string", "null"] },
         "avatar_url": { "type": ["string", "null"] },
         "created_at": { "type": "string", "minLength": 1 },
         "updated_at": { "type": "string", "minLength": 1 }
@@ -530,6 +571,87 @@
         "id": { "type": "integer" },
         "name": { "type": "string", "minLength": 1 },
         "slug": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListUsersPaginatedRow": {
+      "type": "object",
+      "required": ["id", "username", "email", "display_name", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "bio": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPostsPaginatedRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPublishedPostsPaginatedRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPostsByAuthorPaginatedRow": {
+      "type": "object",
+      "required": ["id", "author_id", "title", "slug", "content", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "author_id": { "type": "integer" },
+        "category_id": { "type": ["integer", "null"] },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "updated_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ListPostsWithAuthorsPaginatedRow": {
+      "type": "object",
+      "required": ["id", "title", "slug", "status", "created_at", "author_id", "author_username", "author_display_name"],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": ["string", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "minLength": 1 },
+        "author_id": { "type": "integer" },
+        "author_username": { "type": "string", "minLength": 1 },
+        "author_display_name": { "type": "string", "minLength": 1 }
       }
     }
   }

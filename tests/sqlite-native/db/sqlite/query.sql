@@ -176,3 +176,26 @@ ORDER BY t.name;
 
 -- name: GetTagCountForPost :one
 SELECT COUNT(*) as tag_count FROM post_tags WHERE post_id = ?;
+
+-- ============================================
+-- Cursor-based pagination
+-- ============================================
+
+-- name: ListUsersPaginated :many
+SELECT * FROM users WHERE id > ? ORDER BY id LIMIT ?;
+
+-- name: ListPostsByAuthorPaginated :many
+SELECT * FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?;
+
+-- name: ListPostsWithAuthorsPaginated :many
+SELECT
+  p.id, p.title, p.view_count, p.is_published, p.created_at,
+  u.id as author_id, u.name as author_name
+FROM posts p
+INNER JOIN users u ON p.author_id = u.id
+WHERE p.id > ?
+ORDER BY p.id
+LIMIT ?;
+
+-- name: ListPublishedPostsPaginated :many
+SELECT * FROM posts WHERE is_published = 1 AND id > ? ORDER BY id LIMIT ?;

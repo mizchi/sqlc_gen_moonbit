@@ -156,7 +156,7 @@ pub fn GetPostWithAuthorParams::validate(_self : GetPostWithAuthorParams) -> Res
   Ok(())
 }
 
-///| Validate GetPostWithAuthorBySlugParams
+///| Validatd GetPostWithAuthorBySlugParams
 pub fn GetPostWithAuthorBySlugParams::validate(self : GetPostWithAuthorBySlugParams) -> Result[Unit, String] {
   if self.slug.length() == 0 {
     return Err("slug is required")
@@ -232,6 +232,31 @@ pub fn ApproveAllCommentsForPostParams::validate(_self : ApproveAllCommentsForPo
 
 ///| Validate DeleteAllCommentsForPostParams
 pub fn DeleteAllCommentsForPostParams::validate(_self : DeleteAllCommentsForPostParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListUsersPaginatedParams
+pub fn ListUsersPaginatedParams::validate(_self : ListUsersPaginatedParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListPostsPaginatedParams
+pub fn ListPostsPaginatedParams::validate(_self : ListPostsPaginatedParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListPublishedPostsPaginatedParams
+pub fn ListPublishedPostsPaginatedParams::validate(_self : ListPublishedPostsPaginatedParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListPostsByAuthorPaginatedParams
+pub fn ListPostsByAuthorPaginatedParams::validate(_self : ListPostsByAuthorPaginatedParams) -> Result[Unit, String] {
+  Ok(())
+}
+
+///| Validate ListPostsWithAuthorsPaginatedParams
+pub fn ListPostsWithAuthorsPaginatedParams::validate(_self : ListPostsWithAuthorsPaginatedParams) -> Result[Unit, String] {
   Ok(())
 }
 

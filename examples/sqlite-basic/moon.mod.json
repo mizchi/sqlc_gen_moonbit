@@ -1,0 +1,9 @@
+{
+  "name": "example_sqlite_basic",
+  "version": "0.0.1",
+  "deps": {
+    "mizchi/sqlite": "0.1.3",
+    "moonbitlang/x": "0.4.38"
+  },
+  "supported-targets": ["native"]
+}

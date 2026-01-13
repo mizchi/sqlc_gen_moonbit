@@ -203,6 +203,53 @@ pub struct GetTagCountForPostRow {
 } derive(Show, Eq)
 
 ///|
+pub struct ListUsersPaginatedRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int64?
+  balance : Double?
+  is_active : Int64
+  bio : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsByAuthorPaginatedRow {
+  id : Int64
+  author_id : Int64
+  title : String
+  content : String
+  view_count : Int64
+  is_published : Int64
+  published_at : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsWithAuthorsPaginatedRow {
+  id : Int64
+  title : String
+  view_count : Int64
+  is_published : Int64
+  created_at : String
+  author_id : Int64
+  author_name : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPublishedPostsPaginatedRow {
+  id : Int64
+  author_id : Int64
+  title : String
+  content : String
+  view_count : Int64
+  is_published : Int64
+  published_at : String?
+  created_at : String
+} derive(Show, Eq)
+
+///|
 pub struct GetUserByIdParams {
   id : Int64
 } derive(Show, Eq)
@@ -523,6 +570,51 @@ pub fn GetTagCountForPostParams::new(post_id : Int64) -> GetTagCountForPostParam
   { post_id, }
 }
 
+///|
+pub struct ListUsersPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListUsersPaginatedParams::new(id : Int64, limit : Int64) -> ListUsersPaginatedParams {
+  { id, limit, }
+}
+
+///|
+pub struct ListPostsByAuthorPaginatedParams {
+  author_id : Int64
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsByAuthorPaginatedParams::new(author_id : Int64, id : Int64, limit : Int64) -> ListPostsByAuthorPaginatedParams {
+  { author_id, id, limit, }
+}
+
+///|
+pub struct ListPostsWithAuthorsPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsWithAuthorsPaginatedParams::new(id : Int64, limit : Int64) -> ListPostsWithAuthorsPaginatedParams {
+  { id, limit, }
+}
+
+///|
+pub struct ListPublishedPostsPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPublishedPostsPaginatedParams::new(id : Int64, limit : Int64) -> ListPublishedPostsPaginatedParams {
+  { id, limit, }
+}
+
 // SQL queries
 pub let get_user_by_id_sql : String = "\nSELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id = ?"
 
@@ -601,4 +693,12 @@ pub let remove_tag_from_post_sql : String = "DELETE FROM post_tags WHERE post_id
 pub let list_tags_for_post_sql : String = "SELECT t.id, t.name\nFROM tags t\nINNER JOIN post_tags pt ON t.id = pt.tag_id\nWHERE pt.post_id = ?\nORDER BY t.name"
 
 pub let get_tag_count_for_post_sql : String = "SELECT COUNT(*) as tag_count FROM post_tags WHERE post_id = ?"
+
+pub let list_users_paginated_sql : String = "\nSELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id > ? ORDER BY id LIMIT ?"
+
+pub let list_posts_by_author_paginated_sql : String = "SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?"
+
+pub let list_posts_with_authors_paginated_sql : String = "SELECT\n  p.id, p.title, p.view_count, p.is_published, p.created_at,\n  u.id as author_id, u.name as author_name\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nWHERE p.id > ?\nORDER BY p.id\nLIMIT ?"
+
+pub let list_published_posts_paginated_sql : String = "SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE is_published = 1 AND id > ? ORDER BY id LIMIT ?"
 

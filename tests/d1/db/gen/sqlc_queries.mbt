@@ -532,3 +532,124 @@ pub async fn delete_all_comments_for_post(db : @cloudflare.D1Database, params : 
   stmt.run() |> ignore
 }
 
+///| ListUsersPaginated
+///  SELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE id > ? ORDER BY id LIMIT ?
+pub async fn list_users_paginated(db : @cloudflare.D1Database, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] {
+  let stmt = db.prepare(list_users_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListUsersPaginatedRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      username: row["username"].cast(),
+      email: row["email"].cast(),
+      display_name: row["display_name"].cast(),
+      bio: (if @core.is_null(row["bio"]) || @core.typeof_(row["bio"]) == "undefined" { None } else { Some(row["bio"].cast()) }),
+      avatar_url: (if @core.is_null(row["avatar_url"]) || @core.typeof_(row["avatar_url"]) == "undefined" { None } else { Some(row["avatar_url"].cast()) }),
+      created_at: row["created_at"].cast(),
+      updated_at: row["updated_at"].cast(),
+    })
+  }
+  results
+}
+
+///| ListPostsPaginated
+/// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE id > ? ORDER BY id LIMIT ?
+pub async fn list_posts_paginated(db : @cloudflare.D1Database, params : ListPostsPaginatedParams) -> Array[ListPostsPaginatedRow] {
+  let stmt = db.prepare(list_posts_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPostsPaginatedRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      category_id: (if @core.is_null(row["category_id"]) || @core.typeof_(row["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(row["category_id"])) }),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      content: row["content"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
+      status: row["status"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
+      created_at: row["created_at"].cast(),
+      updated_at: row["updated_at"].cast(),
+    })
+  }
+  results
+}
+
+///| ListPublishedPostsPaginated
+/// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE status = 'published' AND id > ? ORDER BY id LIMIT ?
+pub async fn list_published_posts_paginated(db : @cloudflare.D1Database, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] {
+  let stmt = db.prepare(list_published_posts_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPublishedPostsPaginatedRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      category_id: (if @core.is_null(row["category_id"]) || @core.typeof_(row["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(row["category_id"])) }),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      content: row["content"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
+      status: row["status"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
+      created_at: row["created_at"].cast(),
+      updated_at: row["updated_at"].cast(),
+    })
+  }
+  results
+}
+
+///| ListPostsByAuthorPaginated
+/// SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?
+pub async fn list_posts_by_author_paginated(db : @cloudflare.D1Database, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] {
+  let stmt = db.prepare(list_posts_by_author_paginated_sql).bind([@core.any(params.author_id.to_int()), @core.any(params.id.to_int()), @core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPostsByAuthorPaginatedRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      category_id: (if @core.is_null(row["category_id"]) || @core.typeof_(row["category_id"]) == "undefined" { None } else { Some(@cloudflare.js_number_to_int64(row["category_id"])) }),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      content: row["content"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
+      status: row["status"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
+      created_at: row["created_at"].cast(),
+      updated_at: row["updated_at"].cast(),
+    })
+  }
+  results
+}
+
+///| ListPostsWithAuthorsPaginated
+/// SELECT   p.id, p.title, p.slug, p.excerpt, p.status,   p.published_at, p.created_at,   u.id as author_id, u.username as author_username,   u.display_name as author_display_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.status = 'published' AND p.id > ? ORDER BY p.id LIMIT ?
+pub async fn list_posts_with_authors_paginated(db : @cloudflare.D1Database, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] {
+  let stmt = db.prepare(list_posts_with_authors_paginated_sql).bind([@core.any(params.id.to_int()), @core.any(params.limit.to_int())])
+  let d1_result = stmt.all()
+  let results_arr = d1_result.get_results()
+  let results : Array[ListPostsWithAuthorsPaginatedRow] = []
+  for row in results_arr {
+    results.push({
+      id: @cloudflare.js_number_to_int64(row["id"]),
+      title: row["title"].cast(),
+      slug: row["slug"].cast(),
+      excerpt: (if @core.is_null(row["excerpt"]) || @core.typeof_(row["excerpt"]) == "undefined" { None } else { Some(row["excerpt"].cast()) }),
+      status: row["status"].cast(),
+      published_at: (if @core.is_null(row["published_at"]) || @core.typeof_(row["published_at"]) == "undefined" { None } else { Some(row["published_at"].cast()) }),
+      created_at: row["created_at"].cast(),
+      author_id: @cloudflare.js_number_to_int64(row["author_id"]),
+      author_username: row["author_username"].cast(),
+      author_display_name: row["author_display_name"].cast(),
+    })
+  }
+  results
+}
+

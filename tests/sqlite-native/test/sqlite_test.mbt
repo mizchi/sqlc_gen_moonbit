@@ -511,6 +511,109 @@ test "get tag count for post" {
 }
 
 // ============================================
+// Cursor-based Pagination Tests
+// ============================================
+
+///|
+test "list users paginated (cursor-based)" {
+  let db = open_memory_db()
+  create_schema(db)
+  // Create 5 users
+  @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com", None, None, 1L, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("Bob", "bob@example.com", None, None, 1L, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("Charlie", "charlie@example.com", None, None, 1L, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("Diana", "diana@example.com", None, None, 1L, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("Eve", "eve@example.com", None, None, 1L, None))
+  // First page (cursor=0, limit=2)
+  let page1 = @gen.list_users_paginated(db, @gen.ListUsersPaginatedParams::new(0L, 2L))
+  assert_eq(page1.length(), 2)
+  assert_eq(page1[0].id, 1L)
+  assert_eq(page1[1].id, 2L)
+  // Second page (cursor=2, limit=2)
+  let page2 = @gen.list_users_paginated(db, @gen.ListUsersPaginatedParams::new(2L, 2L))
+  assert_eq(page2.length(), 2)
+  assert_eq(page2[0].id, 3L)
+  assert_eq(page2[1].id, 4L)
+  // Third page (cursor=4, limit=2)
+  let page3 = @gen.list_users_paginated(db, @gen.ListUsersPaginatedParams::new(4L, 2L))
+  assert_eq(page3.length(), 1)
+  assert_eq(page3[0].id, 5L)
+  // Beyond last page
+  let page4 = @gen.list_users_paginated(db, @gen.ListUsersPaginatedParams::new(5L, 2L))
+  assert_eq(page4.length(), 0)
+}
+
+///|
+test "list posts by author paginated (cursor-based)" {
+  let db = open_memory_db()
+  create_schema(db)
+  @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com", None, None, 1L, None))
+  // Create 4 posts for Alice
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Post 1", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Post 2", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Post 3", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Post 4", "Content", 0L))
+  // First page
+  let page1 = @gen.list_posts_by_author_paginated(db, @gen.ListPostsByAuthorPaginatedParams::new(1L, 0L, 2L))
+  assert_eq(page1.length(), 2)
+  assert_eq(page1[0].title, "Post 1")
+  assert_eq(page1[1].title, "Post 2")
+  // Second page
+  let page2 = @gen.list_posts_by_author_paginated(db, @gen.ListPostsByAuthorPaginatedParams::new(1L, 2L, 2L))
+  assert_eq(page2.length(), 2)
+  assert_eq(page2[0].title, "Post 3")
+  assert_eq(page2[1].title, "Post 4")
+  // Beyond last page
+  let page3 = @gen.list_posts_by_author_paginated(db, @gen.ListPostsByAuthorPaginatedParams::new(1L, 4L, 2L))
+  assert_eq(page3.length(), 0)
+}
+
+///|
+test "list posts with authors paginated (JOIN + cursor-based)" {
+  let db = open_memory_db()
+  create_schema(db)
+  @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com", None, None, 1L, None))
+  @gen.create_user(db, @gen.CreateUserParams::new("Bob", "bob@example.com", None, None, 1L, None))
+  // Create posts alternating authors
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Alice Post 1", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(2L, "Bob Post 1", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Alice Post 2", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(2L, "Bob Post 2", "Content", 0L))
+  // First page
+  let page1 = @gen.list_posts_with_authors_paginated(db, @gen.ListPostsWithAuthorsPaginatedParams::new(0L, 2L))
+  assert_eq(page1.length(), 2)
+  assert_eq(page1[0].author_name, "Alice")
+  assert_eq(page1[1].author_name, "Bob")
+  // Second page
+  let page2 = @gen.list_posts_with_authors_paginated(db, @gen.ListPostsWithAuthorsPaginatedParams::new(2L, 2L))
+  assert_eq(page2.length(), 2)
+  assert_eq(page2[0].author_name, "Alice")
+  assert_eq(page2[1].author_name, "Bob")
+}
+
+///|
+test "list published posts paginated (cursor-based)" {
+  let db = open_memory_db()
+  create_schema(db)
+  @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com", None, None, 1L, None))
+  // Create posts with mixed published status
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Draft 1", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Published 1", "Content", 1L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Draft 2", "Content", 0L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Published 2", "Content", 1L))
+  @gen.create_post(db, @gen.CreatePostParams::new(1L, "Published 3", "Content", 1L))
+  // First page - only published posts
+  let page1 = @gen.list_published_posts_paginated(db, @gen.ListPublishedPostsPaginatedParams::new(0L, 2L))
+  assert_eq(page1.length(), 2)
+  assert_eq(page1[0].title, "Published 1")
+  assert_eq(page1[1].title, "Published 2")
+  // Second page
+  let page2 = @gen.list_published_posts_paginated(db, @gen.ListPublishedPostsPaginatedParams::new(4L, 2L))
+  assert_eq(page2.length(), 1)
+  assert_eq(page2[0].title, "Published 3")
+}
+
+// ============================================
 // Edge Case Tests
 // ============================================
 

@@ -238,6 +238,77 @@ pub struct GetOrCreateTagRow {
 } derive(Show, Eq)
 
 ///|
+pub struct ListUsersPaginatedRow {
+  id : Int64
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+  created_at : String
+  updated_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsPaginatedRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPublishedPostsPaginatedRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsByAuthorPaginatedRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+} derive(Show, Eq)
+
+///|
+pub struct ListPostsWithAuthorsPaginatedRow {
+  id : Int64
+  title : String
+  slug : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+} derive(Show, Eq)
+
+///|
 pub struct GetUserByIdParams {
   id : Int64
 } derive(Show, Eq)
@@ -591,6 +662,62 @@ pub fn DeleteAllCommentsForPostParams::new(post_id : Int64) -> DeleteAllComments
   { post_id, }
 }
 
+///|
+pub struct ListUsersPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListUsersPaginatedParams::new(id : Int64, limit : Int64) -> ListUsersPaginatedParams {
+  { id, limit, }
+}
+
+///|
+pub struct ListPostsPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsPaginatedParams::new(id : Int64, limit : Int64) -> ListPostsPaginatedParams {
+  { id, limit, }
+}
+
+///|
+pub struct ListPublishedPostsPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPublishedPostsPaginatedParams::new(id : Int64, limit : Int64) -> ListPublishedPostsPaginatedParams {
+  { id, limit, }
+}
+
+///|
+pub struct ListPostsByAuthorPaginatedParams {
+  author_id : Int64
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsByAuthorPaginatedParams::new(author_id : Int64, id : Int64, limit : Int64) -> ListPostsByAuthorPaginatedParams {
+  { author_id, id, limit, }
+}
+
+///|
+pub struct ListPostsWithAuthorsPaginatedParams {
+  id : Int64
+  limit : Int64
+} derive(Show, Eq)
+
+///|
+pub fn ListPostsWithAuthorsPaginatedParams::new(id : Int64, limit : Int64) -> ListPostsWithAuthorsPaginatedParams {
+  { id, limit, }
+}
+
 // SQL queries
 pub let get_user_by_id_sql : String = "\nSELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE id = ?"
 
@@ -663,4 +790,14 @@ pub let approve_comment_sql : String = "UPDATE comments SET is_approved = 1 WHER
 pub let approve_all_comments_for_post_sql : String = "UPDATE comments SET is_approved = 1 WHERE post_id = ?"
 
 pub let delete_all_comments_for_post_sql : String = "DELETE FROM comments WHERE post_id = ?"
+
+pub let list_users_paginated_sql : String = "\nSELECT id, username, email, display_name, bio, avatar_url, created_at, updated_at FROM users WHERE id > ? ORDER BY id LIMIT ?"
+
+pub let list_posts_paginated_sql : String = "SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts WHERE id > ? ORDER BY id LIMIT ?"
+
+pub let list_published_posts_paginated_sql : String = "SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts\nWHERE status = 'published' AND id > ?\nORDER BY id\nLIMIT ?"
+
+pub let list_posts_by_author_paginated_sql : String = "SELECT id, author_id, category_id, title, slug, content, excerpt, status, published_at, created_at, updated_at FROM posts\nWHERE author_id = ? AND id > ?\nORDER BY id\nLIMIT ?"
+
+pub let list_posts_with_authors_paginated_sql : String = "SELECT\n  p.id, p.title, p.slug, p.excerpt, p.status,\n  p.published_at, p.created_at,\n  u.id as author_id, u.username as author_username,\n  u.display_name as author_display_name\nFROM posts p\nINNER JOIN users u ON p.author_id = u.id\nWHERE p.status = 'published' AND p.id > ?\nORDER BY p.id\nLIMIT ?"
 

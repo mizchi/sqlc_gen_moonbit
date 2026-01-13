@@ -203,3 +203,37 @@ UPDATE comments SET is_approved = 1 WHERE post_id = ?;
 
 -- name: DeleteAllCommentsForPost :exec
 DELETE FROM comments WHERE post_id = ?;
+
+-- ============================================
+-- Cursor-based Pagination
+-- ============================================
+
+-- name: ListUsersPaginated :many
+SELECT * FROM users WHERE id > ? ORDER BY id LIMIT ?;
+
+-- name: ListPostsPaginated :many
+SELECT * FROM posts WHERE id > ? ORDER BY id LIMIT ?;
+
+-- name: ListPublishedPostsPaginated :many
+SELECT * FROM posts
+WHERE status = 'published' AND id > ?
+ORDER BY id
+LIMIT ?;
+
+-- name: ListPostsByAuthorPaginated :many
+SELECT * FROM posts
+WHERE author_id = ? AND id > ?
+ORDER BY id
+LIMIT ?;
+
+-- name: ListPostsWithAuthorsPaginated :many
+SELECT
+  p.id, p.title, p.slug, p.excerpt, p.status,
+  p.published_at, p.created_at,
+  u.id as author_id, u.username as author_username,
+  u.display_name as author_display_name
+FROM posts p
+INNER JOIN users u ON p.author_id = u.id
+WHERE p.status = 'published' AND p.id > ?
+ORDER BY p.id
+LIMIT ?;

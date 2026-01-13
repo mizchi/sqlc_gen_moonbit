@@ -642,3 +642,99 @@ pub fn get_tag_count_for_post(db : @sqlite.Sqlite3, params : GetTagCountForPostP
   }
 }
 
+///| ListUsersPaginated
+///  SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id > ? ORDER BY id LIMIT ?
+pub fn list_users_paginated(db : @sqlite.Sqlite3, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] {
+  let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_paginated_sql))
+  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
+  let results : Array[ListUsersPaginatedRow] = []
+  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+    let row : ListUsersPaginatedRow = {
+      id: @sqlite.sqlite_column_int64(stmt, 0),
+      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+      age: (if @sqlite.sqlite_column_type(stmt, 3) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_int64(stmt, 3)) }),
+      balance: (if @sqlite.sqlite_column_type(stmt, 4) == @sqlite.SQLITE_NULL { None } else { Some(@sqlite.sqlite_column_double(stmt, 4)) }),
+      is_active: @sqlite.sqlite_column_int64(stmt, 5),
+      bio: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+    }
+    results.push(row)
+  }
+  @sqlite.sqlite_finalize(stmt)
+  results
+}
+
+///| ListPostsByAuthorPaginated
+/// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?
+pub fn list_posts_by_author_paginated(db : @sqlite.Sqlite3, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] {
+  let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_by_author_paginated_sql))
+  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int(stmt, 3, params.limit.to_int()) |> ignore
+  let results : Array[ListPostsByAuthorPaginatedRow] = []
+  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+    let row : ListPostsByAuthorPaginatedRow = {
+      id: @sqlite.sqlite_column_int64(stmt, 0),
+      author_id: @sqlite.sqlite_column_int64(stmt, 1),
+      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+      content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+      view_count: @sqlite.sqlite_column_int64(stmt, 4),
+      is_published: @sqlite.sqlite_column_int64(stmt, 5),
+      published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+    }
+    results.push(row)
+  }
+  @sqlite.sqlite_finalize(stmt)
+  results
+}
+
+///| ListPostsWithAuthorsPaginated
+/// SELECT   p.id, p.title, p.view_count, p.is_published, p.created_at,   u.id as author_id, u.name as author_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id > ? ORDER BY p.id LIMIT ?
+pub fn list_posts_with_authors_paginated(db : @sqlite.Sqlite3, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] {
+  let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_with_authors_paginated_sql))
+  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
+  let results : Array[ListPostsWithAuthorsPaginatedRow] = []
+  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+    let row : ListPostsWithAuthorsPaginatedRow = {
+      id: @sqlite.sqlite_column_int64(stmt, 0),
+      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+      view_count: @sqlite.sqlite_column_int64(stmt, 2),
+      is_published: @sqlite.sqlite_column_int64(stmt, 3),
+      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 4)),
+      author_id: @sqlite.sqlite_column_int64(stmt, 5),
+      author_name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 6)),
+    }
+    results.push(row)
+  }
+  @sqlite.sqlite_finalize(stmt)
+  results
+}
+
+///| ListPublishedPostsPaginated
+/// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE is_published = 1 AND id > ? ORDER BY id LIMIT ?
+pub fn list_published_posts_paginated(db : @sqlite.Sqlite3, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] {
+  let stmt = @sqlite.sqlite_prepare(db, cstring(list_published_posts_paginated_sql))
+  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
+  let results : Array[ListPublishedPostsPaginatedRow] = []
+  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+    let row : ListPublishedPostsPaginatedRow = {
+      id: @sqlite.sqlite_column_int64(stmt, 0),
+      author_id: @sqlite.sqlite_column_int64(stmt, 1),
+      title: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+      content: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+      view_count: @sqlite.sqlite_column_int64(stmt, 4),
+      is_published: @sqlite.sqlite_column_int64(stmt, 5),
+      published_at: (if @sqlite.sqlite_column_type(stmt, 6) == @sqlite.SQLITE_NULL { None } else { Some(bytes_to_string(@sqlite.sqlite_column_text(stmt, 6))) }),
+      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 7)),
+    }
+    results.push(row)
+  }
+  @sqlite.sqlite_finalize(stmt)
+  results
+}
+
