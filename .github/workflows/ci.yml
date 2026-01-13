@@ -58,13 +58,22 @@ jobs:
     continue-on-error: true  # TODO: Fix async test in CI environment
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Set up MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: cd examples/d1 && moon update
+        run: |
+          cd examples/d1
+          npm install
+          moon update
 
       - name: Run D1 tests
         run: cd examples/d1 && moon test --target js
