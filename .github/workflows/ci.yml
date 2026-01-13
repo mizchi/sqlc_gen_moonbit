@@ -55,7 +55,6 @@ jobs:
 
   test-d1:
     runs-on: ubuntu-latest
-    continue-on-error: true  # TODO: Fix async test in CI environment
     steps:
       - uses: actions/checkout@v4
 
@@ -80,7 +79,6 @@ jobs:
 
   test-sqlite-native:
     runs-on: ubuntu-latest
-    continue-on-error: true  # TODO: Fix native test in CI environment
     steps:
       - uses: actions/checkout@v4
       - name: Set up MoonBit
