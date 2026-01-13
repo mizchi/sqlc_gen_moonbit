@@ -5,3 +5,5 @@ _build/
 .moonagent/
 .wrangler/
 node_modules/gen/
+node_modules
+bin/protoc-gen-mbt
