@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "deps": {
     "mizchi/js": "0.10.10",
-    "mizchi/cloudflare": "0.1.5",
+    "mizchi/cloudflare": "0.1.6",
     "moonbitlang/async": "0.16.0"
   },
   "supported-targets": ["js"]
