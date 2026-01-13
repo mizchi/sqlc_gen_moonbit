@@ -17,15 +17,24 @@ pub fn Backend::to_string(self : Backend) -> String {
 // Plugin options
 
 ///|
+pub struct TypeOverride {
+  column : String?      // "table.column" 形式
+  db_type : String?     // "INTEGER", "TEXT" など
+  moonbit_type : String // 上書き先の型
+  nullable : Bool?      // 明示的にnullable指定
+}
+
+///|
 pub struct Options {
   backend : Backend
   validators : Bool
   json_schema : Bool
+  overrides : Array[TypeOverride]
 }
 
 ///|
 pub fn Options::default() -> Options {
-  { backend: Sqlite, validators: false, json_schema: false }
+  { backend: Sqlite, validators: false, json_schema: false, overrides: [] }
 }
 
 ///|
@@ -33,14 +42,155 @@ pub fn parse_plugin_options(data : Bytes) -> Options {
   if data.length() == 0 {
     return Options::default()
   }
-  // Parse JSON-like format: {"backend":"d1","validators":true,"json_schema":true}
+  // Parse JSON-like format: {"backend":"d1","validators":true,"json_schema":true,"overrides":[...]}
   let json_str = bytes_to_string_simple(data)
   let backend = if json_str.contains("\"d1\"") { D1 } else { Sqlite }
   let validators = json_str.contains("\"validators\":true") ||
     json_str.contains("\"validators\": true")
   let json_schema = json_str.contains("\"json_schema\":true") ||
     json_str.contains("\"json_schema\": true")
-  { backend, validators, json_schema }
+  let overrides = parse_overrides(json_str)
+  { backend, validators, json_schema, overrides }
+}
+
+///|
+fn find_substring(haystack : String, needle : String) -> Int? {
+  let h_len = haystack.length()
+  let n_len = needle.length()
+  if n_len > h_len {
+    return None
+  }
+  for i = 0; i <= h_len - n_len; i = i + 1 {
+    let mut found = true
+    for j = 0; j < n_len; j = j + 1 {
+      if haystack[i + j] != needle[j] {
+        found = false
+        break
+      }
+    }
+    if found {
+      return Some(i)
+    }
+  }
+  None
+}
+
+///|
+fn substring(s : String, start : Int, end : Int) -> String {
+  let buf = StringBuilder::new()
+  for i = start; i < end && i < s.length(); i = i + 1 {
+    buf.write_char(s[i].to_int().unsafe_to_char())
+  }
+  buf.to_string()
+}
+
+///|
+fn parse_overrides(json_str : String) -> Array[TypeOverride] {
+  let overrides : Array[TypeOverride] = []
+  // Find "overrides":[ ... ]
+  let start_marker = "\"overrides\":["
+  let start_marker_alt = "\"overrides\": ["
+  let start_idx = match find_substring(json_str, start_marker) {
+    Some(idx) => idx + start_marker.length()
+    None =>
+      match find_substring(json_str, start_marker_alt) {
+        Some(idx) => idx + start_marker_alt.length()
+        None => return overrides
+      }
+  }
+  // Find matching ]
+  let mut depth = 1
+  let mut end_idx = start_idx
+  for i = start_idx; i < json_str.length() && depth > 0; i = i + 1 {
+    let c = json_str[i]
+    if c == '[' {
+      depth = depth + 1
+    } else if c == ']' {
+      depth = depth - 1
+    }
+    end_idx = i
+  }
+  if depth != 0 {
+    return overrides
+  }
+  let array_content = substring(json_str, start_idx, end_idx)
+  // Parse each override object
+  parse_override_objects(array_content, overrides)
+  overrides
+}
+
+///|
+fn parse_override_objects(content : String, overrides : Array[TypeOverride]) -> Unit {
+  // Split by },{ pattern to get individual objects
+  let mut start = 0
+  let mut brace_depth = 0
+  for i = 0; i < content.length(); i = i + 1 {
+    let c = content[i]
+    if c == '{' {
+      if brace_depth == 0 {
+        start = i + 1
+      }
+      brace_depth = brace_depth + 1
+    } else if c == '}' {
+      brace_depth = brace_depth - 1
+      if brace_depth == 0 {
+        let obj_content = substring(content, start, i)
+        match parse_single_override(obj_content) {
+          Some(override_) => overrides.push(override_)
+          None => ()
+        }
+      }
+    }
+  }
+}
+
+///|
+fn parse_single_override(obj_content : String) -> TypeOverride? {
+  let column = extract_json_string(obj_content, "column")
+  let db_type = extract_json_string(obj_content, "db_type")
+  let moonbit_type = extract_json_string(obj_content, "moonbit_type")
+  match moonbit_type {
+    Some(mbt) => {
+      let nullable = if obj_content.contains("\"nullable\":true") ||
+        obj_content.contains("\"nullable\": true") {
+        Some(true)
+      } else if obj_content.contains("\"nullable\":false") ||
+        obj_content.contains("\"nullable\": false") {
+        Some(false)
+      } else {
+        None
+      }
+      Some({ column, db_type, moonbit_type: mbt, nullable })
+    }
+    None => None
+  }
+}
+
+///|
+fn extract_json_string(content : String, key : String) -> String? {
+  let pattern = "\"" + key + "\":\""
+  let pattern_alt = "\"" + key + "\": \""
+  let start_idx = match find_substring(content, pattern) {
+    Some(idx) => idx + pattern.length()
+    None =>
+      match find_substring(content, pattern_alt) {
+        Some(idx) => idx + pattern_alt.length()
+        None => return None
+      }
+  }
+  // Find closing quote
+  let mut end_idx = start_idx
+  for i = start_idx; i < content.length(); i = i + 1 {
+    if content[i] == '"' {
+      end_idx = i
+      break
+    }
+  }
+  if end_idx > start_idx {
+    Some(substring(content, start_idx, end_idx))
+  } else {
+    None
+  }
 }
 
 ///|
@@ -76,13 +226,13 @@ pub fn process_request(input : Bytes) -> Bytes {
   files.push(@plugin.File::new("moon.pkg", string_to_utf8(moon_pkg_content)))
 
   // Generate types (backend-specific for error types)
-  let types_content = generate_types(request, options.backend)
+  let types_content = generate_types(request, options)
   files.push(@plugin.File::new("sqlc_types.mbt", string_to_utf8(types_content)))
 
   // Generate queries (backend-specific)
   let queries_content = match options.backend {
-    Sqlite => generate_queries_sqlite(request)
-    D1 => generate_queries_d1(request)
+    Sqlite => generate_queries_sqlite(request, options.overrides)
+    D1 => generate_queries_d1(request, options.overrides)
   }
   files.push(
     @plugin.File::new("sqlc_queries.mbt", string_to_utf8(queries_content)),
@@ -152,7 +302,7 @@ fn generate_moon_pkg(options : Options) -> String {
 }
 
 ///|
-fn generate_types(request : @plugin.GenerateRequest, backend : Backend) -> String {
+fn generate_types(request : @plugin.GenerateRequest, options : Options) -> String {
   let buf = StringBuilder::new()
   buf.write_string("// Generated by sqlc-gen-moonbit\n")
   buf.write_string("// sqlc version: ")
@@ -161,7 +311,7 @@ fn generate_types(request : @plugin.GenerateRequest, backend : Backend) -> Strin
 
   // Define error type only for SQLite backend
   // D1 backend uses @cloudflare.D1Error directly
-  match backend {
+  match options.backend {
     Sqlite => {
       buf.write_string("///| SQL execution error\n")
       buf.write_string("pub suberror SqlError {\n")
@@ -181,7 +331,7 @@ fn generate_types(request : @plugin.GenerateRequest, backend : Backend) -> Strin
       if not(generated_structs.contains(struct_name)) &&
         query.columns.length() > 0 {
         generated_structs[struct_name] = true
-        generate_result_struct(buf, struct_name, query.columns)
+        generate_result_struct(buf, struct_name, query.columns, options.overrides)
       }
     }
   }
@@ -190,7 +340,7 @@ fn generate_types(request : @plugin.GenerateRequest, backend : Backend) -> Strin
   for query in request.queries {
     if query.params.length() > 0 {
       let struct_name = to_pascal_case(query.name) + "Params"
-      generate_params_struct(buf, struct_name, query.params)
+      generate_params_struct(buf, struct_name, query.params, options.overrides)
     }
   }
 
@@ -208,7 +358,10 @@ fn generate_types(request : @plugin.GenerateRequest, backend : Backend) -> Strin
 }
 
 ///|
-fn generate_queries_sqlite(request : @plugin.GenerateRequest) -> String {
+fn generate_queries_sqlite(
+  request : @plugin.GenerateRequest,
+  overrides : Array[TypeOverride]
+) -> String {
   let buf = StringBuilder::new()
   buf.write_string("// Generated by sqlc-gen-moonbit (backend: sqlite)\n\n")
 
@@ -232,13 +385,16 @@ fn generate_queries_sqlite(request : @plugin.GenerateRequest) -> String {
   // Generate query functions
   buf.write_string("// Query functions\n")
   for query in request.queries {
-    generate_query_function_sqlite(buf, query)
+    generate_query_function_sqlite(buf, query, overrides)
   }
   buf.to_string()
 }
 
 ///|
-fn generate_queries_d1(request : @plugin.GenerateRequest) -> String {
+fn generate_queries_d1(
+  request : @plugin.GenerateRequest,
+  overrides : Array[TypeOverride]
+) -> String {
   let buf = StringBuilder::new()
   buf.write_string("// Generated by sqlc-gen-moonbit (backend: d1)\n")
   buf.write_string("// Requires: mizchi/cloudflare\n\n")
@@ -246,7 +402,7 @@ fn generate_queries_d1(request : @plugin.GenerateRequest) -> String {
   // Generate query functions using cloudflare.mbt D1 types
   buf.write_string("// Query functions\n")
   for query in request.queries {
-    generate_query_function_d1(buf, query)
+    generate_query_function_d1(buf, query, overrides)
   }
   buf.to_string()
 }
@@ -256,6 +412,7 @@ fn generate_result_struct(
   buf : StringBuilder,
   name : String,
   columns : Array[@plugin.Column],
+  overrides : Array[TypeOverride]
 ) -> Unit {
   buf.write_string("///|\npub struct ")
   buf.write_string(name)
@@ -264,7 +421,7 @@ fn generate_result_struct(
     buf.write_string("  ")
     buf.write_string(to_snake_case(col.name))
     buf.write_string(" : ")
-    buf.write_string(sql_type_to_moonbit(col))
+    buf.write_string(sql_type_to_moonbit(col, overrides))
     buf.write_string("\n")
   }
   buf.write_string("} derive(Show, Eq)\n\n")
@@ -275,6 +432,7 @@ fn generate_params_struct(
   buf : StringBuilder,
   name : String,
   params : Array[@plugin.Parameter],
+  overrides : Array[TypeOverride]
 ) -> Unit {
   buf.write_string("///|\npub struct ")
   buf.write_string(name)
@@ -289,7 +447,7 @@ fn generate_params_struct(
     buf.write_string("  ")
     buf.write_string(param_name)
     buf.write_string(" : ")
-    buf.write_string(sql_type_to_moonbit(col))
+    buf.write_string(sql_type_to_moonbit(col, overrides))
     buf.write_string("\n")
   }
   buf.write_string("} derive(Show, Eq)\n\n")
@@ -310,7 +468,7 @@ fn generate_params_struct(
     }
     buf.write_string(param_name)
     buf.write_string(" : ")
-    buf.write_string(sql_type_to_moonbit(col))
+    buf.write_string(sql_type_to_moonbit(col, overrides))
   }
   buf.write_string(") -> ")
   buf.write_string(name)
@@ -336,6 +494,7 @@ fn generate_params_struct(
 fn generate_query_function_sqlite(
   buf : StringBuilder,
   query : @plugin.Query,
+  _overrides : Array[TypeOverride]
 ) -> Unit {
   let func_name = to_snake_case(query.name)
   let sql_const = to_snake_case(query.name) + "_sql"
@@ -474,6 +633,7 @@ fn generate_query_function_sqlite(
 fn generate_query_function_d1(
   buf : StringBuilder,
   query : @plugin.Query,
+  _overrides : Array[TypeOverride]
 ) -> Unit {
   let func_name = to_snake_case(query.name)
   let sql_const = to_snake_case(query.name) + "_sql"
@@ -1085,26 +1245,75 @@ fn column_to_moonbit(col : @plugin.Column, idx : Int) -> String {
 }
 
 ///|
-fn sql_type_to_moonbit(col : @plugin.Column) -> String {
+fn find_column_override(
+  col : @plugin.Column,
+  overrides : Array[TypeOverride]
+) -> TypeOverride? {
+  let table_name = col.table.name
+  let col_name = col.name
+  let full_col_name = table_name + "." + col_name
   let type_name = col.type_.name.to_upper()
-  let base_type = match type_name {
-    "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" => "Int64"
-    "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" => "Double"
-    "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" => "String"
-    "BLOB" | "BYTEA" => "Bytes"
-    "BOOLEAN" | "BOOL" => "Bool"
-    _ => "String" // Default to String for unknown types
-  }
-  if col.not_null {
-    if col.is_array {
-      "Array[" + base_type + "]"
-    } else {
-      base_type
+
+  // First, check for column-specific override
+  for override_ in overrides {
+    match override_.column {
+      Some(c) if c == full_col_name => return Some(override_)
+      _ => ()
     }
-  } else if col.is_array {
-    "Array[" + base_type + "]?"
-  } else {
-    base_type + "?"
+  }
+  // Then, check for db_type override
+  for override_ in overrides {
+    match override_.db_type {
+      Some(dt) if dt.to_upper() == type_name => return Some(override_)
+      _ => ()
+    }
+  }
+  None
+}
+
+///|
+fn sql_type_to_moonbit(
+  col : @plugin.Column,
+  overrides : Array[TypeOverride]
+) -> String {
+  // Check for override first
+  match find_column_override(col, overrides) {
+    Some(override_) => {
+      let base_type = override_.moonbit_type
+      // Determine nullability: explicit override > column definition
+      let is_nullable = match override_.nullable {
+        Some(n) => n
+        None => not(col.not_null)
+      }
+      if is_nullable {
+        base_type + "?"
+      } else {
+        base_type
+      }
+    }
+    None => {
+      // Default type mapping
+      let type_name = col.type_.name.to_upper()
+      let base_type = match type_name {
+        "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" => "Int64"
+        "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" => "Double"
+        "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" => "String"
+        "BLOB" | "BYTEA" => "Bytes"
+        "BOOLEAN" | "BOOL" => "Bool"
+        _ => "String" // Default to String for unknown types
+      }
+      if col.not_null {
+        if col.is_array {
+          "Array[" + base_type + "]"
+        } else {
+          base_type
+        }
+      } else if col.is_array {
+        "Array[" + base_type + "]?"
+      } else {
+        base_type + "?"
+      }
+    }
   }
 }
 
