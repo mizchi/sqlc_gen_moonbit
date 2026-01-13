@@ -1,5 +1,7 @@
 # sqlc-gen-moonbit
 
+[![CI](https://github.com/mizchi/sqlc_gen_moonbit/actions/workflows/ci.yml/badge.svg)](https://github.com/mizchi/sqlc_gen_moonbit/actions/workflows/ci.yml)
+
 > **⚠️ Experimental**: This project is experimental and under active development. APIs may change without notice.
 
 [sqlc](https://sqlc.dev/) plugin for generating type-safe MoonBit code from SQL.
@@ -134,8 +136,9 @@ Add dependencies to `moon.mod.json`:
 ```json
 {
   "deps": {
-    "mizchi/cloudflare": "0.0.13",
-    "mizchi/js": "0.6.4"
+    "mizchi/cloudflare": "0.1.4",
+    "mizchi/js": "0.10.10",
+    "moonbitlang/async": "0.16.0"
   }
 }
 ```
