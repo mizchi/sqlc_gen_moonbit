@@ -1,0 +1,14 @@
+import {
+  "mattn/postgres",
+}
+
+options(
+  "supported-targets": [ "native" ],
+  "formatter": {
+    "ignore": [
+      "sqlc_types.mbt",
+      "sqlc_queries.mbt",
+      "sqlc_validators.mbt"
+    ]
+  },
+)

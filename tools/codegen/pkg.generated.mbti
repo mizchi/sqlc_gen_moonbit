@@ -1,0 +1,14 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sqlc_gen_moonbit/tools/codegen"
+
+// Values
+
+// Errors
+
+// Types and methods
+type QueryDef
+
+// Type aliases
+
+// Traits
+

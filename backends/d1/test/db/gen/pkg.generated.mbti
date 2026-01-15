@@ -1,0 +1,845 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "backend_d1_test/db/gen"
+
+import(
+  "mizchi/cloudflare"
+)
+
+// Values
+pub async fn add_tag_to_post(@cloudflare.D1Database, AddTagToPostParams) -> Unit raise @cloudflare.D1Error
+
+pub let add_tag_to_post_sql : String
+
+pub async fn approve_all_comments_for_post(@cloudflare.D1Database, ApproveAllCommentsForPostParams) -> Unit raise @cloudflare.D1Error
+
+pub let approve_all_comments_for_post_sql : String
+
+pub async fn approve_comment(@cloudflare.D1Database, ApproveCommentParams) -> Unit raise @cloudflare.D1Error
+
+pub let approve_comment_sql : String
+
+pub async fn create_category(@cloudflare.D1Database, CreateCategoryParams) -> Unit raise @cloudflare.D1Error
+
+pub let create_category_sql : String
+
+pub async fn create_comment(@cloudflare.D1Database, CreateCommentParams) -> Unit raise @cloudflare.D1Error
+
+pub let create_comment_sql : String
+
+pub async fn create_post(@cloudflare.D1Database, CreatePostParams) -> Unit raise @cloudflare.D1Error
+
+pub let create_post_sql : String
+
+pub async fn create_tag(@cloudflare.D1Database, CreateTagParams) -> Unit raise @cloudflare.D1Error
+
+pub let create_tag_sql : String
+
+pub async fn create_user(@cloudflare.D1Database, CreateUserParams) -> Unit raise @cloudflare.D1Error
+
+pub async fn create_user_returning_id(@cloudflare.D1Database, CreateUserReturningIdParams) -> Int64 raise @cloudflare.D1Error
+
+pub let create_user_returning_id_sql : String
+
+pub let create_user_sql : String
+
+pub async fn delete_all_comments_for_post(@cloudflare.D1Database, DeleteAllCommentsForPostParams) -> Unit raise @cloudflare.D1Error
+
+pub let delete_all_comments_for_post_sql : String
+
+pub async fn delete_post(@cloudflare.D1Database, DeletePostParams) -> Unit raise @cloudflare.D1Error
+
+pub let delete_post_sql : String
+
+pub async fn delete_user_by_id(@cloudflare.D1Database, DeleteUserByIdParams) -> Int raise @cloudflare.D1Error
+
+pub let delete_user_by_id_sql : String
+
+pub async fn get_category_by_id(@cloudflare.D1Database, GetCategoryByIdParams) -> GetCategoryByIdRow? raise @cloudflare.D1Error
+
+pub let get_category_by_id_sql : String
+
+pub async fn get_or_create_tag(@cloudflare.D1Database, GetOrCreateTagParams) -> GetOrCreateTagRow? raise @cloudflare.D1Error
+
+pub let get_or_create_tag_sql : String
+
+pub async fn get_post_by_id(@cloudflare.D1Database, GetPostByIdParams) -> GetPostByIdRow? raise @cloudflare.D1Error
+
+pub let get_post_by_id_sql : String
+
+pub async fn get_post_by_slug(@cloudflare.D1Database, GetPostBySlugParams) -> GetPostBySlugRow? raise @cloudflare.D1Error
+
+pub let get_post_by_slug_sql : String
+
+pub async fn get_post_comments_with_count(@cloudflare.D1Database, GetPostCommentsWithCountParams) -> GetPostCommentsWithCountRow? raise @cloudflare.D1Error
+
+pub let get_post_comments_with_count_sql : String
+
+pub async fn get_post_with_author(@cloudflare.D1Database, GetPostWithAuthorParams) -> GetPostWithAuthorRow? raise @cloudflare.D1Error
+
+pub async fn get_post_with_author_by_slug(@cloudflare.D1Database, GetPostWithAuthorBySlugParams) -> GetPostWithAuthorBySlugRow? raise @cloudflare.D1Error
+
+pub let get_post_with_author_by_slug_sql : String
+
+pub let get_post_with_author_sql : String
+
+pub async fn get_post_with_category(@cloudflare.D1Database, GetPostWithCategoryParams) -> GetPostWithCategoryRow? raise @cloudflare.D1Error
+
+pub let get_post_with_category_sql : String
+
+pub async fn get_user_by_id(@cloudflare.D1Database, GetUserByIdParams) -> GetUserByIdRow? raise @cloudflare.D1Error
+
+pub let get_user_by_id_sql : String
+
+pub async fn get_user_by_username(@cloudflare.D1Database, GetUserByUsernameParams) -> GetUserByUsernameRow? raise @cloudflare.D1Error
+
+pub let get_user_by_username_sql : String
+
+pub async fn list_categories(@cloudflare.D1Database) -> Array[ListCategoriesRow] raise @cloudflare.D1Error
+
+pub let list_categories_sql : String
+
+pub async fn list_comments_for_post(@cloudflare.D1Database, ListCommentsForPostParams) -> Array[ListCommentsForPostRow] raise @cloudflare.D1Error
+
+pub let list_comments_for_post_sql : String
+
+pub async fn list_posts_by_author(@cloudflare.D1Database, ListPostsByAuthorParams) -> Array[ListPostsByAuthorRow] raise @cloudflare.D1Error
+
+pub async fn list_posts_by_author_paginated(@cloudflare.D1Database, ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] raise @cloudflare.D1Error
+
+pub let list_posts_by_author_paginated_sql : String
+
+pub let list_posts_by_author_sql : String
+
+pub async fn list_posts_paginated(@cloudflare.D1Database, ListPostsPaginatedParams) -> Array[ListPostsPaginatedRow] raise @cloudflare.D1Error
+
+pub let list_posts_paginated_sql : String
+
+pub async fn list_posts_with_authors(@cloudflare.D1Database, ListPostsWithAuthorsParams) -> Array[ListPostsWithAuthorsRow] raise @cloudflare.D1Error
+
+pub async fn list_posts_with_authors_paginated(@cloudflare.D1Database, ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] raise @cloudflare.D1Error
+
+pub let list_posts_with_authors_paginated_sql : String
+
+pub let list_posts_with_authors_sql : String
+
+pub async fn list_posts_with_details(@cloudflare.D1Database, ListPostsWithDetailsParams) -> Array[ListPostsWithDetailsRow] raise @cloudflare.D1Error
+
+pub let list_posts_with_details_sql : String
+
+pub async fn list_posts_with_tag_count(@cloudflare.D1Database, ListPostsWithTagCountParams) -> Array[ListPostsWithTagCountRow] raise @cloudflare.D1Error
+
+pub let list_posts_with_tag_count_sql : String
+
+pub async fn list_published_posts(@cloudflare.D1Database, ListPublishedPostsParams) -> Array[ListPublishedPostsRow] raise @cloudflare.D1Error
+
+pub async fn list_published_posts_paginated(@cloudflare.D1Database, ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] raise @cloudflare.D1Error
+
+pub let list_published_posts_paginated_sql : String
+
+pub let list_published_posts_sql : String
+
+pub async fn list_tags(@cloudflare.D1Database) -> Array[ListTagsRow] raise @cloudflare.D1Error
+
+pub async fn list_tags_for_post(@cloudflare.D1Database, ListTagsForPostParams) -> Array[ListTagsForPostRow] raise @cloudflare.D1Error
+
+pub let list_tags_for_post_sql : String
+
+pub let list_tags_sql : String
+
+pub async fn list_users(@cloudflare.D1Database) -> Array[ListUsersRow] raise @cloudflare.D1Error
+
+pub async fn list_users_paginated(@cloudflare.D1Database, ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] raise @cloudflare.D1Error
+
+pub let list_users_paginated_sql : String
+
+pub let list_users_sql : String
+
+pub async fn publish_post(@cloudflare.D1Database, PublishPostParams) -> Unit raise @cloudflare.D1Error
+
+pub let publish_post_sql : String
+
+pub async fn remove_all_tags_from_post(@cloudflare.D1Database, RemoveAllTagsFromPostParams) -> Unit raise @cloudflare.D1Error
+
+pub let remove_all_tags_from_post_sql : String
+
+pub async fn remove_tag_from_post(@cloudflare.D1Database, RemoveTagFromPostParams) -> Unit raise @cloudflare.D1Error
+
+pub let remove_tag_from_post_sql : String
+
+pub async fn update_user_display_name(@cloudflare.D1Database, UpdateUserDisplayNameParams) -> Int raise @cloudflare.D1Error
+
+pub let update_user_display_name_sql : String
+
+// Errors
+
+// Types and methods
+pub struct AddTagToPostParams {
+  post_id : Int64
+  tag_id : Int64
+}
+pub fn AddTagToPostParams::new(Int64, Int64) -> Self
+pub fn AddTagToPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for AddTagToPostParams
+pub impl Show for AddTagToPostParams
+
+pub struct ApproveAllCommentsForPostParams {
+  post_id : Int64
+}
+pub fn ApproveAllCommentsForPostParams::new(Int64) -> Self
+pub fn ApproveAllCommentsForPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ApproveAllCommentsForPostParams
+pub impl Show for ApproveAllCommentsForPostParams
+
+pub struct ApproveCommentParams {
+  id : Int64
+}
+pub fn ApproveCommentParams::new(Int64) -> Self
+pub fn ApproveCommentParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ApproveCommentParams
+pub impl Show for ApproveCommentParams
+
+pub struct CreateCategoryParams {
+  name : String
+  slug : String
+  description : String?
+}
+pub fn CreateCategoryParams::new(String, String, String?) -> Self
+pub fn CreateCategoryParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for CreateCategoryParams
+pub impl Show for CreateCategoryParams
+
+pub struct CreateCommentParams {
+  post_id : Int64
+  author_name : String
+  author_email : String
+  content : String
+}
+pub fn CreateCommentParams::new(Int64, String, String, String) -> Self
+pub fn CreateCommentParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for CreateCommentParams
+pub impl Show for CreateCommentParams
+
+pub struct CreatePostParams {
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+}
+pub fn CreatePostParams::new(Int64, Int64?, String, String, String, String?, String) -> Self
+pub fn CreatePostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for CreatePostParams
+pub impl Show for CreatePostParams
+
+pub struct CreateTagParams {
+  name : String
+  slug : String
+}
+pub fn CreateTagParams::new(String, String) -> Self
+pub fn CreateTagParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for CreateTagParams
+pub impl Show for CreateTagParams
+
+pub struct CreateUserParams {
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+}
+pub fn CreateUserParams::new(String, String, String, String?, String?) -> Self
+pub fn CreateUserParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for CreateUserParams
+pub impl Show for CreateUserParams
+
+pub struct CreateUserReturningIdParams {
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+}
+pub fn CreateUserReturningIdParams::new(String, String, String, String?, String?) -> Self
+pub fn CreateUserReturningIdParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for CreateUserReturningIdParams
+pub impl Show for CreateUserReturningIdParams
+
+pub struct DeleteAllCommentsForPostParams {
+  post_id : Int64
+}
+pub fn DeleteAllCommentsForPostParams::new(Int64) -> Self
+pub fn DeleteAllCommentsForPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for DeleteAllCommentsForPostParams
+pub impl Show for DeleteAllCommentsForPostParams
+
+pub struct DeletePostParams {
+  id : Int64
+}
+pub fn DeletePostParams::new(Int64) -> Self
+pub fn DeletePostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for DeletePostParams
+pub impl Show for DeletePostParams
+
+pub struct DeleteUserByIdParams {
+  id : Int64
+}
+pub fn DeleteUserByIdParams::new(Int64) -> Self
+pub fn DeleteUserByIdParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for DeleteUserByIdParams
+pub impl Show for DeleteUserByIdParams
+
+pub struct GetCategoryByIdParams {
+  id : Int64
+}
+pub fn GetCategoryByIdParams::new(Int64) -> Self
+pub fn GetCategoryByIdParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetCategoryByIdParams
+pub impl Show for GetCategoryByIdParams
+
+pub struct GetCategoryByIdRow {
+  id : Int64
+  name : String
+  slug : String
+  description : String?
+}
+pub impl Eq for GetCategoryByIdRow
+pub impl Show for GetCategoryByIdRow
+
+pub struct GetOrCreateTagParams {
+  name : String
+  slug : String
+}
+pub fn GetOrCreateTagParams::new(String, String) -> Self
+pub fn GetOrCreateTagParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetOrCreateTagParams
+pub impl Show for GetOrCreateTagParams
+
+pub struct GetOrCreateTagRow {
+  id : Int64
+  name : String
+  slug : String
+}
+pub impl Eq for GetOrCreateTagRow
+pub impl Show for GetOrCreateTagRow
+
+pub struct GetPostByIdParams {
+  id : Int64
+}
+pub fn GetPostByIdParams::new(Int64) -> Self
+pub fn GetPostByIdParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetPostByIdParams
+pub impl Show for GetPostByIdParams
+
+pub struct GetPostByIdRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for GetPostByIdRow
+pub impl Show for GetPostByIdRow
+
+pub struct GetPostBySlugParams {
+  slug : String
+}
+pub fn GetPostBySlugParams::new(String) -> Self
+pub fn GetPostBySlugParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetPostBySlugParams
+pub impl Show for GetPostBySlugParams
+
+pub struct GetPostBySlugRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for GetPostBySlugRow
+pub impl Show for GetPostBySlugRow
+
+pub struct GetPostCommentsWithCountParams {
+  id : Int64
+}
+pub fn GetPostCommentsWithCountParams::new(Int64) -> Self
+pub fn GetPostCommentsWithCountParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetPostCommentsWithCountParams
+pub impl Show for GetPostCommentsWithCountParams
+
+pub struct GetPostCommentsWithCountRow {
+  id : Int64
+  title : String
+  comment_count : Int64
+  approved_count : Double?
+}
+pub impl Eq for GetPostCommentsWithCountRow
+pub impl Show for GetPostCommentsWithCountRow
+
+pub struct GetPostWithAuthorBySlugParams {
+  slug : String
+}
+pub fn GetPostWithAuthorBySlugParams::new(String) -> Self
+pub fn GetPostWithAuthorBySlugParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetPostWithAuthorBySlugParams
+pub impl Show for GetPostWithAuthorBySlugParams
+
+pub struct GetPostWithAuthorBySlugRow {
+  id : Int64
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+  author_avatar_url : String?
+}
+pub impl Eq for GetPostWithAuthorBySlugRow
+pub impl Show for GetPostWithAuthorBySlugRow
+
+pub struct GetPostWithAuthorParams {
+  id : Int64
+}
+pub fn GetPostWithAuthorParams::new(Int64) -> Self
+pub fn GetPostWithAuthorParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetPostWithAuthorParams
+pub impl Show for GetPostWithAuthorParams
+
+pub struct GetPostWithAuthorRow {
+  id : Int64
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+  author_avatar_url : String?
+}
+pub impl Eq for GetPostWithAuthorRow
+pub impl Show for GetPostWithAuthorRow
+
+pub struct GetPostWithCategoryParams {
+  id : Int64
+}
+pub fn GetPostWithCategoryParams::new(Int64) -> Self
+pub fn GetPostWithCategoryParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetPostWithCategoryParams
+pub impl Show for GetPostWithCategoryParams
+
+pub struct GetPostWithCategoryRow {
+  id : Int64
+  title : String
+  slug : String
+  content : String
+  status : String
+  category_id : Int64?
+  category_name : String?
+  category_slug : String?
+}
+pub impl Eq for GetPostWithCategoryRow
+pub impl Show for GetPostWithCategoryRow
+
+pub struct GetUserByIdParams {
+  id : Int64
+}
+pub fn GetUserByIdParams::new(Int64) -> Self
+pub fn GetUserByIdParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetUserByIdParams
+pub impl Show for GetUserByIdParams
+
+pub struct GetUserByIdRow {
+  id : Int64
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for GetUserByIdRow
+pub impl Show for GetUserByIdRow
+
+pub struct GetUserByUsernameParams {
+  username : String
+}
+pub fn GetUserByUsernameParams::new(String) -> Self
+pub fn GetUserByUsernameParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for GetUserByUsernameParams
+pub impl Show for GetUserByUsernameParams
+
+pub struct GetUserByUsernameRow {
+  id : Int64
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for GetUserByUsernameRow
+pub impl Show for GetUserByUsernameRow
+
+pub struct ListCategoriesRow {
+  id : Int64
+  name : String
+  slug : String
+  description : String?
+}
+pub impl Eq for ListCategoriesRow
+pub impl Show for ListCategoriesRow
+
+pub struct ListCommentsForPostParams {
+  post_id : Int64
+}
+pub fn ListCommentsForPostParams::new(Int64) -> Self
+pub fn ListCommentsForPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListCommentsForPostParams
+pub impl Show for ListCommentsForPostParams
+
+pub struct ListCommentsForPostRow {
+  id : Int64
+  post_id : Int64
+  author_name : String
+  author_email : String
+  content : String
+  is_approved : Int64
+  created_at : String
+}
+pub impl Eq for ListCommentsForPostRow
+pub impl Show for ListCommentsForPostRow
+
+pub struct ListPostsByAuthorPaginatedParams {
+  author_id : Int64
+  id : Int64
+  limit : Int64
+}
+pub fn ListPostsByAuthorPaginatedParams::new(Int64, Int64, Int64) -> Self
+pub fn ListPostsByAuthorPaginatedParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsByAuthorPaginatedParams
+pub impl Show for ListPostsByAuthorPaginatedParams
+
+pub struct ListPostsByAuthorPaginatedRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListPostsByAuthorPaginatedRow
+pub impl Show for ListPostsByAuthorPaginatedRow
+
+pub struct ListPostsByAuthorParams {
+  author_id : Int64
+}
+pub fn ListPostsByAuthorParams::new(Int64) -> Self
+pub fn ListPostsByAuthorParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsByAuthorParams
+pub impl Show for ListPostsByAuthorParams
+
+pub struct ListPostsByAuthorRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListPostsByAuthorRow
+pub impl Show for ListPostsByAuthorRow
+
+pub struct ListPostsPaginatedParams {
+  id : Int64
+  limit : Int64
+}
+pub fn ListPostsPaginatedParams::new(Int64, Int64) -> Self
+pub fn ListPostsPaginatedParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsPaginatedParams
+pub impl Show for ListPostsPaginatedParams
+
+pub struct ListPostsPaginatedRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListPostsPaginatedRow
+pub impl Show for ListPostsPaginatedRow
+
+pub struct ListPostsWithAuthorsPaginatedParams {
+  id : Int64
+  limit : Int64
+}
+pub fn ListPostsWithAuthorsPaginatedParams::new(Int64, Int64) -> Self
+pub fn ListPostsWithAuthorsPaginatedParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsWithAuthorsPaginatedParams
+pub impl Show for ListPostsWithAuthorsPaginatedParams
+
+pub struct ListPostsWithAuthorsPaginatedRow {
+  id : Int64
+  title : String
+  slug : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+}
+pub impl Eq for ListPostsWithAuthorsPaginatedRow
+pub impl Show for ListPostsWithAuthorsPaginatedRow
+
+pub struct ListPostsWithAuthorsParams {
+  limit : Int64
+}
+pub fn ListPostsWithAuthorsParams::new(Int64) -> Self
+pub fn ListPostsWithAuthorsParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsWithAuthorsParams
+pub impl Show for ListPostsWithAuthorsParams
+
+pub struct ListPostsWithAuthorsRow {
+  id : Int64
+  title : String
+  slug : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+}
+pub impl Eq for ListPostsWithAuthorsRow
+pub impl Show for ListPostsWithAuthorsRow
+
+pub struct ListPostsWithDetailsParams {
+  limit : Int64
+}
+pub fn ListPostsWithDetailsParams::new(Int64) -> Self
+pub fn ListPostsWithDetailsParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsWithDetailsParams
+pub impl Show for ListPostsWithDetailsParams
+
+pub struct ListPostsWithDetailsRow {
+  id : Int64
+  title : String
+  slug : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  author_id : Int64
+  author_username : String
+  author_display_name : String
+  category_id : Int64?
+  category_name : String?
+}
+pub impl Eq for ListPostsWithDetailsRow
+pub impl Show for ListPostsWithDetailsRow
+
+pub struct ListPostsWithTagCountParams {
+  limit : Int64
+}
+pub fn ListPostsWithTagCountParams::new(Int64) -> Self
+pub fn ListPostsWithTagCountParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPostsWithTagCountParams
+pub impl Show for ListPostsWithTagCountParams
+
+pub struct ListPostsWithTagCountRow {
+  id : Int64
+  title : String
+  slug : String
+  status : String
+  tag_count : Int64
+}
+pub impl Eq for ListPostsWithTagCountRow
+pub impl Show for ListPostsWithTagCountRow
+
+pub struct ListPublishedPostsPaginatedParams {
+  id : Int64
+  limit : Int64
+}
+pub fn ListPublishedPostsPaginatedParams::new(Int64, Int64) -> Self
+pub fn ListPublishedPostsPaginatedParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPublishedPostsPaginatedParams
+pub impl Show for ListPublishedPostsPaginatedParams
+
+pub struct ListPublishedPostsPaginatedRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListPublishedPostsPaginatedRow
+pub impl Show for ListPublishedPostsPaginatedRow
+
+pub struct ListPublishedPostsParams {
+  limit : Int64
+}
+pub fn ListPublishedPostsParams::new(Int64) -> Self
+pub fn ListPublishedPostsParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListPublishedPostsParams
+pub impl Show for ListPublishedPostsParams
+
+pub struct ListPublishedPostsRow {
+  id : Int64
+  author_id : Int64
+  category_id : Int64?
+  title : String
+  slug : String
+  content : String
+  excerpt : String?
+  status : String
+  published_at : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListPublishedPostsRow
+pub impl Show for ListPublishedPostsRow
+
+pub struct ListTagsForPostParams {
+  post_id : Int64
+}
+pub fn ListTagsForPostParams::new(Int64) -> Self
+pub fn ListTagsForPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListTagsForPostParams
+pub impl Show for ListTagsForPostParams
+
+pub struct ListTagsForPostRow {
+  id : Int64
+  name : String
+  slug : String
+}
+pub impl Eq for ListTagsForPostRow
+pub impl Show for ListTagsForPostRow
+
+pub struct ListTagsRow {
+  id : Int64
+  name : String
+  slug : String
+}
+pub impl Eq for ListTagsRow
+pub impl Show for ListTagsRow
+
+pub struct ListUsersPaginatedParams {
+  id : Int64
+  limit : Int64
+}
+pub fn ListUsersPaginatedParams::new(Int64, Int64) -> Self
+pub fn ListUsersPaginatedParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for ListUsersPaginatedParams
+pub impl Show for ListUsersPaginatedParams
+
+pub struct ListUsersPaginatedRow {
+  id : Int64
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListUsersPaginatedRow
+pub impl Show for ListUsersPaginatedRow
+
+pub struct ListUsersRow {
+  id : Int64
+  username : String
+  email : String
+  display_name : String
+  bio : String?
+  avatar_url : String?
+  created_at : String
+  updated_at : String
+}
+pub impl Eq for ListUsersRow
+pub impl Show for ListUsersRow
+
+pub struct PublishPostParams {
+  id : Int64
+}
+pub fn PublishPostParams::new(Int64) -> Self
+pub fn PublishPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for PublishPostParams
+pub impl Show for PublishPostParams
+
+pub struct RemoveAllTagsFromPostParams {
+  post_id : Int64
+}
+pub fn RemoveAllTagsFromPostParams::new(Int64) -> Self
+pub fn RemoveAllTagsFromPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for RemoveAllTagsFromPostParams
+pub impl Show for RemoveAllTagsFromPostParams
+
+pub struct RemoveTagFromPostParams {
+  post_id : Int64
+  tag_id : Int64
+}
+pub fn RemoveTagFromPostParams::new(Int64, Int64) -> Self
+pub fn RemoveTagFromPostParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for RemoveTagFromPostParams
+pub impl Show for RemoveTagFromPostParams
+
+pub struct UpdateUserDisplayNameParams {
+  display_name : String
+  id : Int64
+}
+pub fn UpdateUserDisplayNameParams::new(String, Int64) -> Self
+pub fn UpdateUserDisplayNameParams::validate(Self) -> Result[Unit, String]
+pub impl Eq for UpdateUserDisplayNameParams
+pub impl Show for UpdateUserDisplayNameParams
+
+// Type aliases
+
+// Traits
+

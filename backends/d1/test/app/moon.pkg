@@ -1,0 +1,15 @@
+import {
+  "mizchi/js",
+  "mizchi/js/core",
+  "mizchi/js/web/http",
+  "mizchi/js/web/url",
+  "mizchi/js/builtins/json",
+  "mizchi/js/builtins/global",
+  "mizchi/cloudflare",
+  "backend_d1_test/db/gen",
+}
+
+options(
+  link: { "js": { "exports": [ "get_fetch_handler" ] } },
+  "supported-targets": [ "js" ],
+)

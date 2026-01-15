@@ -1,0 +1,8 @@
+import {
+  "mizchi/js/core",
+  "mizchi/cloudflare",
+}
+
+options(
+  "supported-targets": [ "js" ],
+)

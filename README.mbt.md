@@ -12,6 +12,7 @@
 |---------|--------|---------|--------------|
 | `sqlite` | `native` | Native binary | `mizchi/sqlite` |
 | `d1` | `js` | Cloudflare Workers | `mizchi/cloudflare`, `mizchi/js` |
+| `postgres` | `native` | Native binary | `mattn/postgres` |
 
 ## Features
 
@@ -149,7 +150,9 @@ Add dependencies to `moon.mod.json`:
 
 ```moonbit
 ///|
-pub async fn handler(db : @cloudflare.D1Database) -> Unit raise @cloudflare.D1Error {
+pub async fn handler(
+  db : @cloudflare.D1Database,
+) -> Unit raise @cloudflare.D1Error {
   // Create user
   @gen.create_user(db, @gen.CreateUserParams::new("Alice", "alice@example.com"))
 
@@ -222,9 +225,9 @@ For each query, sqlc-gen-moonbit generates:
 
 ## Examples
 
-- [`examples/sqlite-native`](./examples/sqlite-native) - SQLite with native binding
-- [`examples/d1`](./examples/d1) - Cloudflare D1 with Atlas migrations
-- [`examples/d1-basic`](./examples/d1-basic) - Cloudflare Worker with D1
+- [`backends/sqlite_native/example`](./backends/sqlite_native/example) - SQLite with native binding
+- [`backends/d1/example`](./backends/d1/example) - Cloudflare Worker with D1
+- [`backends/postgres_native/example`](./backends/postgres_native/example) - PostgreSQL with native binding
 
 ## Development
 

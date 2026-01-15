@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "sqlc_gen_moonbit/gen/plugin"
+package "sqlc_gen_moonbit/lib/proto/plugin"
 
 import(
   "moonbitlang/core/json"

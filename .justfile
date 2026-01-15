@@ -1,90 +1,76 @@
 # sqlc_gen_moonbit development tasks
 
-# Default: show available commands
 default:
     @just --list
 
-# Build the native sqlc plugin
-build-plugin:
+# Build plugins and copy to bin/
+build:
     moon build --target native ./cmd/native
-
-# Build the wasm sqlc plugin
-build-plugin-wasm:
     moon build --target wasm ./cmd/wasm
+    mkdir -p bin
+    cp _build/native/release/build/cmd/native/native.exe bin/sqlc-gen-moonbit
+    cp _build/wasm/release/build/cmd/wasm/wasm.wasm bin/sqlc-gen-moonbit.wasm
 
-# Run all tests
-test: test-sqlite-native test-d1
+# Run core tests (default)
+test: test-core
 
-# Test sqlite-native example
-test-sqlite-native:
-    cd examples/sqlite-native && moon test --target native
+# Run all tests including postgres (requires libpq)
+test-all: test-core test-pg
 
-# Test d1 example
-test-d1:
-    cd examples/d1 && moon test --target js
+# Core tests (no postgres)
+test-core:
+    moon test --target native ./lib/codegen
+    cd backends/sqlite_native/test && moon test --target native
+    cd backends/d1/test && moon test --target js
 
-# Generate code for all examples
-generate: build-plugin generate-sqlite-native generate-d1
+# Postgres tests (requires libpq + DATABASE_URL/POSTGRES_TEST_URL)
+test-pg:
+    tools/pg/run.sh moon test --target native --package backend_postgres_native_test -C backends/postgres_native/test
 
-# Generate code for sqlite-native example
-generate-sqlite-native: build-plugin
-    cd examples/sqlite-native && sqlc generate
+# Generate code for examples
+generate: build
+    cd backends/sqlite_native/example && sqlc generate
+    cd backends/d1/example && sqlc generate
 
-# Generate code for d1 example
-generate-d1: build-plugin
-    cd examples/d1 && sqlc generate
-
-# Build d1 worker for wrangler
-build-d1:
-    cd examples/d1 && moon build --target js
-
-# Start d1 worker with wrangler (requires wrangler.toml and migrations)
-dev-d1: build-d1
-    cd examples/d1 && npx wrangler dev
-
-# ===== D1 Migration Commands (Atlas) =====
-
-# Generate new migration from schema diff
-migrate-diff name:
-    cd examples/d1 && atlas migrate diff {{name}} --env local
-
-# Apply migrations to local D1
-migrate-apply:
-    cd examples/d1 && npx wrangler d1 migrations apply blog-db --local
-
-# Apply migrations to remote D1
-migrate-apply-remote:
-    cd examples/d1 && npx wrangler d1 migrations apply blog-db --remote
-
-# Show migration status
-migrate-status:
-    cd examples/d1 && atlas migrate status --env local
-
-# Validate migrations
-migrate-lint:
-    cd examples/d1 && atlas migrate lint --env local
-
-# Hash migrations (after manual edit)
-migrate-hash:
-    cd examples/d1 && atlas migrate hash --env local
+# D1 tasks
+# action: build|dev|migrate-diff|migrate-apply|migrate-apply-remote|migrate-status|migrate-lint|migrate-hash
+# name: required for migrate-diff
+d1 action="build" name="":
+    tools/d1/run.sh {{action}} {{name}}
 
 # ===== Check & Format =====
+
+# Update generated interfaces
+info:
+    moon info --target native cmd/native
+    moon info --target wasm cmd/wasm
+    moon info --target native lib/codegen
+    moon info --target native lib/proto/analysis
+    moon info --target native lib/proto/plugin
+    moon info --target native lib/proto/vet
+    moon info --target native tools/codegen
+    cd backends/sqlite_native/example && moon info --target native
+    cd backends/d1/example && moon info --target js
+    cd backends/postgres_native/example && moon info --target native
+    cd backends/sqlite_native/test && moon info --target native
+    cd backends/d1/test && moon info --target js
+    cd backends/postgres_native/test && moon info --target native
 
 # Check all MoonBit code
 check:
     moon check --target native ./cmd/native
     moon check --target wasm ./cmd/wasm
-    cd examples/sqlite-native && moon check
-    cd examples/d1 && moon check
+    cd backends/sqlite_native/example && moon check --target native
+    cd backends/d1/example && moon check --target js
 
 # Clean build artifacts
 clean:
     moon clean
-    cd examples/sqlite-native && moon clean
-    cd examples/d1 && moon clean
+    cd backends/sqlite_native/example && moon clean
+    cd backends/d1/example && moon clean
 
 # Format all MoonBit code
 fmt:
     moon fmt
-    cd examples/sqlite-native && moon fmt
-    cd examples/d1 && moon fmt
+    cd backends/sqlite_native/example && moon fmt
+    cd backends/d1/example && moon fmt

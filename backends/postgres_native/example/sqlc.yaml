@@ -1,0 +1,16 @@
+version: "2"
+plugins:
+  - name: moonbit
+    wasm:
+      url: "file://../../bin/sqlc-gen-moonbit.wasm"
+      # url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.1.0/sqlc-gen-moonbit.wasm"
+      # sha256: "c8dfb779b6fc905fc68a86c62c291284c37ca09a86b646bf3ab234e33a5fa095"
+sql:
+  - engine: postgresql
+    schema: "db/postgres/schema.sql"
+    queries: "db/postgres/query.sql"
+    codegen:
+      - plugin: moonbit
+        out: "db/gen"
+        options:
+          backend: "postgres"

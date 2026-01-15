@@ -2,95 +2,34 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up MoonBit
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
         run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          sudo apt-get update
+          sudo apt-get install -y build-essential curl just libpq-dev libsqlite3-dev pkg-config sqlite3
 
-      - name: Install dependencies
-        run: |
-          moon update
-          cd examples/sqlite-native && moon update
-          cd ../d1 && moon update
-
-      - name: Check code
-        run: |
-          moon check --target native ./cmd/native
-          moon check --target wasm ./cmd/wasm
-          cd examples/sqlite-native && moon check
-          cd ../d1 && moon check
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up MoonBit
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: moon update
-
-      - name: Build native plugin
-        run: moon build --target native ./cmd/native
-
-      - name: Build WASM plugin
-        run: moon build --target wasm ./cmd/wasm
-
-      - name: Verify WASM exists
-        run: |
-          ls -la target/wasm/release/build/cmd/wasm/wasm.wasm
-          shasum -a 256 target/wasm/release/build/cmd/wasm/wasm.wasm
-
-  test-d1:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Set up MoonBit
+      - name: Install MoonBit CLI
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
 
-      - name: Install dependencies
-        run: |
-          cd examples/d1
-          npm install
-          moon update
+      - name: Moon update
+        run: moon update
 
-      - name: Run D1 tests
-        run: cd examples/d1 && moon test --target js
-
-  test-sqlite-native:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up MoonBit
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
-      - name: Install SQLite
-        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
-
-      - name: Install dependencies
-        run: cd examples/sqlite-native && moon update
-
-      - name: Run SQLite native tests
-        run: cd examples/sqlite-native && moon test --target native
+      - name: Run tests
+        run: just test

@@ -108,7 +108,7 @@ fn read_all_stdin() -> Bytes {
       offset = offset + 1
     }
   }
-  Bytes::from_fixedarray(result_arr)
+  Bytes::from_array(result_arr)
 }
 
 ///|

@@ -1,0 +1,13 @@
+import {
+  "backend_postgres_native_example/db/gen",
+  "mattn/postgres",
+}
+
+options(
+  "is-main": true,
+  link: {
+    "native": {
+      "cc-link-flags": "-lpq",
+    },
+  },
+)

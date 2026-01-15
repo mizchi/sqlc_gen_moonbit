@@ -1,0 +1,12 @@
+{
+  "name": "backend_postgres_native_example",
+  "version": "0.0.1",
+  "deps": {
+    "mattn/postgres": "0.10.4",
+    "moonbitlang/x": "0.4.38"
+  },
+  "supported-targets": [
+    "native"
+  ],
+  "preferred-target": "native"
+}

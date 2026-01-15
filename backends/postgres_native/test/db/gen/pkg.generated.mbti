@@ -1,0 +1,724 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "backend_postgres_native_test/db/gen"
+
+import(
+  "mattn/postgres"
+)
+
+// Values
+pub fn activate_user(@postgres.Connection, ActivateUserParams) -> Result[Int, @postgres.PgError]
+
+pub let activate_user_sql : String
+
+pub fn add_tag_to_post(@postgres.Connection, AddTagToPostParams) -> Result[Unit, @postgres.PgError]
+
+pub let add_tag_to_post_sql : String
+
+pub fn count_active_users(@postgres.Connection) -> Result[CountActiveUsersRow?, @postgres.PgError]
+
+pub let count_active_users_sql : String
+
+pub fn create_post(@postgres.Connection, CreatePostParams) -> Result[Unit, @postgres.PgError]
+
+pub fn create_post_returning_id(@postgres.Connection, CreatePostReturningIdParams) -> Result[Int64, @postgres.PgError]
+
+pub let create_post_returning_id_sql : String
+
+pub let create_post_sql : String
+
+pub fn create_tag(@postgres.Connection, CreateTagParams) -> Result[Unit, @postgres.PgError]
+
+pub fn create_tag_returning_id(@postgres.Connection, CreateTagReturningIdParams) -> Result[Int64, @postgres.PgError]
+
+pub let create_tag_returning_id_sql : String
+
+pub let create_tag_sql : String
+
+pub fn create_user(@postgres.Connection, CreateUserParams) -> Result[Unit, @postgres.PgError]
+
+pub fn create_user_returning_id(@postgres.Connection, CreateUserReturningIdParams) -> Result[Int64, @postgres.PgError]
+
+pub let create_user_returning_id_sql : String
+
+pub let create_user_sql : String
+
+pub fn deactivate_user(@postgres.Connection, DeactivateUserParams) -> Result[Int, @postgres.PgError]
+
+pub let deactivate_user_sql : String
+
+pub fn delete_post(@postgres.Connection, DeletePostParams) -> Result[Int, @postgres.PgError]
+
+pub let delete_post_sql : String
+
+pub fn delete_tag(@postgres.Connection, DeleteTagParams) -> Result[Int, @postgres.PgError]
+
+pub let delete_tag_sql : String
+
+pub fn delete_user_by_id(@postgres.Connection, DeleteUserByIdParams) -> Result[Int, @postgres.PgError]
+
+pub let delete_user_by_id_sql : String
+
+pub fn get_author_stats(@postgres.Connection, GetAuthorStatsParams) -> Result[GetAuthorStatsRow?, @postgres.PgError]
+
+pub let get_author_stats_sql : String
+
+pub fn get_post_by_id(@postgres.Connection, GetPostByIdParams) -> Result[GetPostByIdRow?, @postgres.PgError]
+
+pub let get_post_by_id_sql : String
+
+pub fn get_post_count_by_author(@postgres.Connection, GetPostCountByAuthorParams) -> Result[GetPostCountByAuthorRow?, @postgres.PgError]
+
+pub let get_post_count_by_author_sql : String
+
+pub fn get_post_with_author(@postgres.Connection, GetPostWithAuthorParams) -> Result[GetPostWithAuthorRow?, @postgres.PgError]
+
+pub let get_post_with_author_sql : String
+
+pub fn get_tag_by_name(@postgres.Connection, GetTagByNameParams) -> Result[GetTagByNameRow?, @postgres.PgError]
+
+pub let get_tag_by_name_sql : String
+
+pub fn get_tag_count_for_post(@postgres.Connection, GetTagCountForPostParams) -> Result[GetTagCountForPostRow?, @postgres.PgError]
+
+pub let get_tag_count_for_post_sql : String
+
+pub fn get_user_by_email(@postgres.Connection, GetUserByEmailParams) -> Result[GetUserByEmailRow?, @postgres.PgError]
+
+pub let get_user_by_email_sql : String
+
+pub fn get_user_by_id(@postgres.Connection, GetUserByIdParams) -> Result[GetUserByIdRow?, @postgres.PgError]
+
+pub let get_user_by_id_sql : String
+
+pub fn get_user_count(@postgres.Connection) -> Result[GetUserCountRow?, @postgres.PgError]
+
+pub let get_user_count_sql : String
+
+pub fn get_users_with_bio(@postgres.Connection) -> Result[Array[GetUsersWithBioRow], @postgres.PgError]
+
+pub let get_users_with_bio_sql : String
+
+pub fn get_users_with_positive_balance(@postgres.Connection) -> Result[Array[GetUsersWithPositiveBalanceRow], @postgres.PgError]
+
+pub let get_users_with_positive_balance_sql : String
+
+pub fn get_users_without_bio(@postgres.Connection) -> Result[Array[GetUsersWithoutBioRow], @postgres.PgError]
+
+pub let get_users_without_bio_sql : String
+
+pub fn increment_view_count(@postgres.Connection, IncrementViewCountParams) -> Result[Int, @postgres.PgError]
+
+pub let increment_view_count_sql : String
+
+pub fn list_active_users(@postgres.Connection) -> Result[Array[ListActiveUsersRow], @postgres.PgError]
+
+pub let list_active_users_sql : String
+
+pub fn list_posts_by_author(@postgres.Connection, ListPostsByAuthorParams) -> Result[Array[ListPostsByAuthorRow], @postgres.PgError]
+
+pub fn list_posts_by_author_paginated(@postgres.Connection, ListPostsByAuthorPaginatedParams) -> Result[Array[ListPostsByAuthorPaginatedRow], @postgres.PgError]
+
+pub let list_posts_by_author_paginated_sql : String
+
+pub let list_posts_by_author_sql : String
+
+pub fn list_posts_with_authors(@postgres.Connection) -> Result[Array[ListPostsWithAuthorsRow], @postgres.PgError]
+
+pub fn list_posts_with_authors_paginated(@postgres.Connection, ListPostsWithAuthorsPaginatedParams) -> Result[Array[ListPostsWithAuthorsPaginatedRow], @postgres.PgError]
+
+pub let list_posts_with_authors_paginated_sql : String
+
+pub let list_posts_with_authors_sql : String
+
+pub fn list_published_posts_paginated(@postgres.Connection, ListPublishedPostsPaginatedParams) -> Result[Array[ListPublishedPostsPaginatedRow], @postgres.PgError]
+
+pub let list_published_posts_paginated_sql : String
+
+pub fn list_tags(@postgres.Connection) -> Result[Array[ListTagsRow], @postgres.PgError]
+
+pub fn list_tags_for_post(@postgres.Connection, ListTagsForPostParams) -> Result[Array[ListTagsForPostRow], @postgres.PgError]
+
+pub let list_tags_for_post_sql : String
+
+pub let list_tags_sql : String
+
+pub fn list_users(@postgres.Connection) -> Result[Array[ListUsersRow], @postgres.PgError]
+
+pub fn list_users_paginated(@postgres.Connection, ListUsersPaginatedParams) -> Result[Array[ListUsersPaginatedRow], @postgres.PgError]
+
+pub let list_users_paginated_sql : String
+
+pub let list_users_sql : String
+
+pub fn list_users_with_limit(@postgres.Connection, ListUsersWithLimitParams) -> Result[Array[ListUsersWithLimitRow], @postgres.PgError]
+
+pub let list_users_with_limit_sql : String
+
+pub fn publish_post(@postgres.Connection, PublishPostParams) -> Result[Int, @postgres.PgError]
+
+pub let publish_post_sql : String
+
+pub fn remove_tag_from_post(@postgres.Connection, RemoveTagFromPostParams) -> Result[Int, @postgres.PgError]
+
+pub let remove_tag_from_post_sql : String
+
+pub fn search_users_by_name(@postgres.Connection, SearchUsersByNameParams) -> Result[Array[SearchUsersByNameRow], @postgres.PgError]
+
+pub let search_users_by_name_sql : String
+
+pub fn update_user_balance(@postgres.Connection, UpdateUserBalanceParams) -> Result[Int, @postgres.PgError]
+
+pub let update_user_balance_sql : String
+
+pub fn update_user_bio(@postgres.Connection, UpdateUserBioParams) -> Result[Int, @postgres.PgError]
+
+pub let update_user_bio_sql : String
+
+pub fn update_user_name(@postgres.Connection, UpdateUserNameParams) -> Result[Int, @postgres.PgError]
+
+pub let update_user_name_sql : String
+
+// Errors
+
+// Types and methods
+pub struct ActivateUserParams {
+  id : Int64
+}
+pub fn ActivateUserParams::new(Int64) -> Self
+pub impl Eq for ActivateUserParams
+pub impl Show for ActivateUserParams
+
+pub struct AddTagToPostParams {
+  post_id : String
+  tag_id : String
+}
+pub fn AddTagToPostParams::new(String, String) -> Self
+pub impl Eq for AddTagToPostParams
+pub impl Show for AddTagToPostParams
+
+pub struct CountActiveUsersRow {
+  count : Int64
+}
+pub impl Eq for CountActiveUsersRow
+pub impl Show for CountActiveUsersRow
+
+pub struct CreatePostParams {
+  author_id : String
+  title : String
+  content : String
+  is_published : String
+}
+pub fn CreatePostParams::new(String, String, String, String) -> Self
+pub impl Eq for CreatePostParams
+pub impl Show for CreatePostParams
+
+pub struct CreatePostReturningIdParams {
+  author_id : String
+  title : String
+  content : String
+  is_published : String
+}
+pub fn CreatePostReturningIdParams::new(String, String, String, String) -> Self
+pub impl Eq for CreatePostReturningIdParams
+pub impl Show for CreatePostReturningIdParams
+
+pub struct CreateTagParams {
+  name : String
+}
+pub fn CreateTagParams::new(String) -> Self
+pub impl Eq for CreateTagParams
+pub impl Show for CreateTagParams
+
+pub struct CreateTagReturningIdParams {
+  name : String
+}
+pub fn CreateTagReturningIdParams::new(String) -> Self
+pub impl Eq for CreateTagReturningIdParams
+pub impl Show for CreateTagReturningIdParams
+
+pub struct CreateUserParams {
+  name : String
+  email : String
+  age : String?
+  balance : String?
+  is_active : String
+  bio : String?
+}
+pub fn CreateUserParams::new(String, String, String?, String?, String, String?) -> Self
+pub impl Eq for CreateUserParams
+pub impl Show for CreateUserParams
+
+pub struct CreateUserReturningIdParams {
+  name : String
+  email : String
+  age : String?
+  balance : String?
+  is_active : String
+  bio : String?
+}
+pub fn CreateUserReturningIdParams::new(String, String, String?, String?, String, String?) -> Self
+pub impl Eq for CreateUserReturningIdParams
+pub impl Show for CreateUserReturningIdParams
+
+pub struct DeactivateUserParams {
+  id : Int64
+}
+pub fn DeactivateUserParams::new(Int64) -> Self
+pub impl Eq for DeactivateUserParams
+pub impl Show for DeactivateUserParams
+
+pub struct DeletePostParams {
+  id : Int64
+}
+pub fn DeletePostParams::new(Int64) -> Self
+pub impl Eq for DeletePostParams
+pub impl Show for DeletePostParams
+
+pub struct DeleteTagParams {
+  id : Int64
+}
+pub fn DeleteTagParams::new(Int64) -> Self
+pub impl Eq for DeleteTagParams
+pub impl Show for DeleteTagParams
+
+pub struct DeleteUserByIdParams {
+  id : Int64
+}
+pub fn DeleteUserByIdParams::new(Int64) -> Self
+pub impl Eq for DeleteUserByIdParams
+pub impl Show for DeleteUserByIdParams
+
+pub struct GetAuthorStatsParams {
+  author_id : String
+}
+pub fn GetAuthorStatsParams::new(String) -> Self
+pub impl Eq for GetAuthorStatsParams
+pub impl Show for GetAuthorStatsParams
+
+pub struct GetAuthorStatsRow {
+  post_count : Int64
+  total_views : String?
+}
+pub impl Eq for GetAuthorStatsRow
+pub impl Show for GetAuthorStatsRow
+
+pub struct GetPostByIdParams {
+  id : Int64
+}
+pub fn GetPostByIdParams::new(Int64) -> Self
+pub impl Eq for GetPostByIdParams
+pub impl Show for GetPostByIdParams
+
+pub struct GetPostByIdRow {
+  id : Int64
+  author_id : Int
+  title : String
+  content : String
+  view_count : Int
+  is_published : Bool
+  published_at : String?
+  created_at : String
+}
+pub impl Eq for GetPostByIdRow
+pub impl Show for GetPostByIdRow
+
+pub struct GetPostCountByAuthorParams {
+  author_id : String
+}
+pub fn GetPostCountByAuthorParams::new(String) -> Self
+pub impl Eq for GetPostCountByAuthorParams
+pub impl Show for GetPostCountByAuthorParams
+
+pub struct GetPostCountByAuthorRow {
+  post_count : Int64
+}
+pub impl Eq for GetPostCountByAuthorRow
+pub impl Show for GetPostCountByAuthorRow
+
+pub struct GetPostWithAuthorParams {
+  id : Int64
+}
+pub fn GetPostWithAuthorParams::new(Int64) -> Self
+pub impl Eq for GetPostWithAuthorParams
+pub impl Show for GetPostWithAuthorParams
+
+pub struct GetPostWithAuthorRow {
+  id : Int64
+  title : String
+  content : String
+  view_count : Int
+  is_published : Bool
+  published_at : String?
+  created_at : String
+  author_id : Int64
+  author_name : String
+  author_email : String
+}
+pub impl Eq for GetPostWithAuthorRow
+pub impl Show for GetPostWithAuthorRow
+
+pub struct GetTagByNameParams {
+  name : String
+}
+pub fn GetTagByNameParams::new(String) -> Self
+pub impl Eq for GetTagByNameParams
+pub impl Show for GetTagByNameParams
+
+pub struct GetTagByNameRow {
+  id : Int64
+  name : String
+}
+pub impl Eq for GetTagByNameRow
+pub impl Show for GetTagByNameRow
+
+pub struct GetTagCountForPostParams {
+  post_id : String
+}
+pub fn GetTagCountForPostParams::new(String) -> Self
+pub impl Eq for GetTagCountForPostParams
+pub impl Show for GetTagCountForPostParams
+
+pub struct GetTagCountForPostRow {
+  tag_count : Int64
+}
+pub impl Eq for GetTagCountForPostRow
+pub impl Show for GetTagCountForPostRow
+
+pub struct GetUserByEmailParams {
+  email : String
+}
+pub fn GetUserByEmailParams::new(String) -> Self
+pub impl Eq for GetUserByEmailParams
+pub impl Show for GetUserByEmailParams
+
+pub struct GetUserByEmailRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for GetUserByEmailRow
+pub impl Show for GetUserByEmailRow
+
+pub struct GetUserByIdParams {
+  id : Int64
+}
+pub fn GetUserByIdParams::new(Int64) -> Self
+pub impl Eq for GetUserByIdParams
+pub impl Show for GetUserByIdParams
+
+pub struct GetUserByIdRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for GetUserByIdRow
+pub impl Show for GetUserByIdRow
+
+pub struct GetUserCountRow {
+  count : Int64
+}
+pub impl Eq for GetUserCountRow
+pub impl Show for GetUserCountRow
+
+pub struct GetUsersWithBioRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for GetUsersWithBioRow
+pub impl Show for GetUsersWithBioRow
+
+pub struct GetUsersWithPositiveBalanceRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for GetUsersWithPositiveBalanceRow
+pub impl Show for GetUsersWithPositiveBalanceRow
+
+pub struct GetUsersWithoutBioRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for GetUsersWithoutBioRow
+pub impl Show for GetUsersWithoutBioRow
+
+pub struct IncrementViewCountParams {
+  id : Int64
+}
+pub fn IncrementViewCountParams::new(Int64) -> Self
+pub impl Eq for IncrementViewCountParams
+pub impl Show for IncrementViewCountParams
+
+pub struct ListActiveUsersRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for ListActiveUsersRow
+pub impl Show for ListActiveUsersRow
+
+pub struct ListPostsByAuthorPaginatedParams {
+  author_id : String
+  id : Int64
+  limit : Int
+}
+pub fn ListPostsByAuthorPaginatedParams::new(String, Int64, Int) -> Self
+pub impl Eq for ListPostsByAuthorPaginatedParams
+pub impl Show for ListPostsByAuthorPaginatedParams
+
+pub struct ListPostsByAuthorPaginatedRow {
+  id : Int64
+  author_id : Int
+  title : String
+  content : String
+  view_count : Int
+  is_published : Bool
+  published_at : String?
+  created_at : String
+}
+pub impl Eq for ListPostsByAuthorPaginatedRow
+pub impl Show for ListPostsByAuthorPaginatedRow
+
+pub struct ListPostsByAuthorParams {
+  author_id : String
+}
+pub fn ListPostsByAuthorParams::new(String) -> Self
+pub impl Eq for ListPostsByAuthorParams
+pub impl Show for ListPostsByAuthorParams
+
+pub struct ListPostsByAuthorRow {
+  id : Int64
+  author_id : Int
+  title : String
+  content : String
+  view_count : Int
+  is_published : Bool
+  published_at : String?
+  created_at : String
+}
+pub impl Eq for ListPostsByAuthorRow
+pub impl Show for ListPostsByAuthorRow
+
+pub struct ListPostsWithAuthorsPaginatedParams {
+  id : Int64
+  limit : Int
+}
+pub fn ListPostsWithAuthorsPaginatedParams::new(Int64, Int) -> Self
+pub impl Eq for ListPostsWithAuthorsPaginatedParams
+pub impl Show for ListPostsWithAuthorsPaginatedParams
+
+pub struct ListPostsWithAuthorsPaginatedRow {
+  id : Int64
+  title : String
+  view_count : Int
+  is_published : Bool
+  created_at : String
+  author_id : Int64
+  author_name : String
+}
+pub impl Eq for ListPostsWithAuthorsPaginatedRow
+pub impl Show for ListPostsWithAuthorsPaginatedRow
+
+pub struct ListPostsWithAuthorsRow {
+  id : Int64
+  title : String
+  view_count : Int
+  is_published : Bool
+  created_at : String
+  author_id : Int64
+  author_name : String
+}
+pub impl Eq for ListPostsWithAuthorsRow
+pub impl Show for ListPostsWithAuthorsRow
+
+pub struct ListPublishedPostsPaginatedParams {
+  id : Int64
+  limit : Int
+}
+pub fn ListPublishedPostsPaginatedParams::new(Int64, Int) -> Self
+pub impl Eq for ListPublishedPostsPaginatedParams
+pub impl Show for ListPublishedPostsPaginatedParams
+
+pub struct ListPublishedPostsPaginatedRow {
+  id : Int64
+  author_id : Int
+  title : String
+  content : String
+  view_count : Int
+  is_published : Bool
+  published_at : String?
+  created_at : String
+}
+pub impl Eq for ListPublishedPostsPaginatedRow
+pub impl Show for ListPublishedPostsPaginatedRow
+
+pub struct ListTagsForPostParams {
+  post_id : String
+}
+pub fn ListTagsForPostParams::new(String) -> Self
+pub impl Eq for ListTagsForPostParams
+pub impl Show for ListTagsForPostParams
+
+pub struct ListTagsForPostRow {
+  id : Int64
+  name : String
+}
+pub impl Eq for ListTagsForPostRow
+pub impl Show for ListTagsForPostRow
+
+pub struct ListTagsRow {
+  id : Int64
+  name : String
+}
+pub impl Eq for ListTagsRow
+pub impl Show for ListTagsRow
+
+pub struct ListUsersPaginatedParams {
+  id : Int64
+  limit : Int
+}
+pub fn ListUsersPaginatedParams::new(Int64, Int) -> Self
+pub impl Eq for ListUsersPaginatedParams
+pub impl Show for ListUsersPaginatedParams
+
+pub struct ListUsersPaginatedRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for ListUsersPaginatedRow
+pub impl Show for ListUsersPaginatedRow
+
+pub struct ListUsersRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for ListUsersRow
+pub impl Show for ListUsersRow
+
+pub struct ListUsersWithLimitParams {
+  limit : Int
+}
+pub fn ListUsersWithLimitParams::new(Int) -> Self
+pub impl Eq for ListUsersWithLimitParams
+pub impl Show for ListUsersWithLimitParams
+
+pub struct ListUsersWithLimitRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for ListUsersWithLimitRow
+pub impl Show for ListUsersWithLimitRow
+
+pub struct PublishPostParams {
+  id : Int64
+}
+pub fn PublishPostParams::new(Int64) -> Self
+pub impl Eq for PublishPostParams
+pub impl Show for PublishPostParams
+
+pub struct RemoveTagFromPostParams {
+  post_id : String
+  tag_id : String
+}
+pub fn RemoveTagFromPostParams::new(String, String) -> Self
+pub impl Eq for RemoveTagFromPostParams
+pub impl Show for RemoveTagFromPostParams
+
+pub struct SearchUsersByNameParams {
+  name : String
+}
+pub fn SearchUsersByNameParams::new(String) -> Self
+pub impl Eq for SearchUsersByNameParams
+pub impl Show for SearchUsersByNameParams
+
+pub struct SearchUsersByNameRow {
+  id : Int64
+  name : String
+  email : String
+  age : Int?
+  balance : Double?
+  is_active : Bool
+  bio : String?
+  created_at : String
+}
+pub impl Eq for SearchUsersByNameRow
+pub impl Show for SearchUsersByNameRow
+
+pub struct UpdateUserBalanceParams {
+  id : Int64
+  balance : String?
+}
+pub fn UpdateUserBalanceParams::new(Int64, String?) -> Self
+pub impl Eq for UpdateUserBalanceParams
+pub impl Show for UpdateUserBalanceParams
+
+pub struct UpdateUserBioParams {
+  id : Int64
+  bio : String?
+}
+pub fn UpdateUserBioParams::new(Int64, String?) -> Self
+pub impl Eq for UpdateUserBioParams
+pub impl Show for UpdateUserBioParams
+
+pub struct UpdateUserNameParams {
+  id : Int64
+  name : String
+}
+pub fn UpdateUserNameParams::new(Int64, String) -> Self
+pub impl Eq for UpdateUserNameParams
+pub impl Show for UpdateUserNameParams
+
+// Type aliases
+
+// Traits
+

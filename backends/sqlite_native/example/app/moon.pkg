@@ -1,0 +1,14 @@
+import {
+  "mizchi/sqlite",
+  "moonbitlang/x/encoding",
+  "backend_sqlite_native_example/db/gen",
+}
+
+options(
+  "is-main": true,
+  link: {
+    "native": {
+      "cc-link-flags": "-lsqlite3",
+    },
+  },
+)

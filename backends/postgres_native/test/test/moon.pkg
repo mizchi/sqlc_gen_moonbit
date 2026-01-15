@@ -1,0 +1,13 @@
+import {
+  "mattn/postgres",
+  "backend_postgres_native_test/db/gen",
+}
+
+options(
+  "supported-targets": [ "native" ],
+  link: {
+    "native": {
+      "cc-link-flags": "-lpq",
+    },
+  },
+)

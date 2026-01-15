@@ -1,0 +1,84 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "backend_postgres_native_example/db/gen"
+
+import(
+  "mattn/postgres"
+)
+
+// Values
+pub fn create_user(@postgres.Connection, CreateUserParams) -> Result[Int64, @postgres.PgError]
+
+pub let create_user_sql : String
+
+pub fn delete_user(@postgres.Connection, DeleteUserParams) -> Result[Unit, @postgres.PgError]
+
+pub let delete_user_sql : String
+
+pub fn get_user(@postgres.Connection, GetUserParams) -> Result[GetUserRow?, @postgres.PgError]
+
+pub let get_user_sql : String
+
+pub fn list_users(@postgres.Connection) -> Result[Array[ListUsersRow], @postgres.PgError]
+
+pub let list_users_sql : String
+
+pub fn update_user(@postgres.Connection, UpdateUserParams) -> Result[Int, @postgres.PgError]
+
+pub let update_user_sql : String
+
+// Errors
+
+// Types and methods
+pub struct CreateUserParams {
+  name : String
+  email : String
+}
+pub fn CreateUserParams::new(String, String) -> Self
+pub impl Eq for CreateUserParams
+pub impl Show for CreateUserParams
+
+pub struct DeleteUserParams {
+  id : Int64
+}
+pub fn DeleteUserParams::new(Int64) -> Self
+pub impl Eq for DeleteUserParams
+pub impl Show for DeleteUserParams
+
+pub struct GetUserParams {
+  id : Int64
+}
+pub fn GetUserParams::new(Int64) -> Self
+pub impl Eq for GetUserParams
+pub impl Show for GetUserParams
+
+pub struct GetUserRow {
+  id : Int64
+  name : String
+  email : String
+  created_at : String?
+}
+pub impl Eq for GetUserRow
+pub impl Show for GetUserRow
+
+pub struct ListUsersRow {
+  id : Int64
+  name : String
+  email : String
+  created_at : String?
+}
+pub impl Eq for ListUsersRow
+pub impl Show for ListUsersRow
+
+pub struct UpdateUserParams {
+  id : Int64
+  name : String
+  email : String
+}
+pub fn UpdateUserParams::new(Int64, String, String) -> Self
+pub impl Eq for UpdateUserParams
+pub impl Show for UpdateUserParams
+
+// Type aliases
+
+// Traits
+

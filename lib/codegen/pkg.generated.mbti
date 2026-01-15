@@ -1,0 +1,39 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sqlc_gen_moonbit/lib/codegen"
+
+// Values
+pub fn parse_plugin_options(Bytes) -> Options
+
+pub fn process_request(Bytes) -> Bytes
+
+pub fn string_to_utf8(String) -> Bytes
+
+// Errors
+
+// Types and methods
+pub enum Backend {
+  Sqlite
+  D1
+  Postgres
+}
+pub fn Backend::to_string(Self) -> String
+
+pub struct Options {
+  backend : Backend
+  validators : Bool
+  json_schema : Bool
+  overrides : Array[TypeOverride]
+}
+pub fn Options::default() -> Self
+
+pub struct TypeOverride {
+  column : String?
+  db_type : String?
+  moonbit_type : String
+  nullable : Bool?
+}
+
+// Type aliases
+
+// Traits
+

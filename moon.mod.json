@@ -5,7 +5,8 @@
     "moonbitlang/protobuf": "0.1.0",
     "moonbitlang/x": "0.4.38",
     "mizchi/sqlite": "0.1.3",
-    "BigOrangeQWQ/wasi-io": "0.2.6"
+    "BigOrangeQWQ/wasi-io": "0.2.6",
+    "mattn/postgres": "0.10.4"
   },
   "readme": "README.mbt.md",
   "repository": "",
