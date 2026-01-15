@@ -2,8 +2,8 @@ version: "2"
 plugins:
   - name: moonbit
     wasm:
-      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.2.0/sqlc-gen-moonbit.wasm"
-      sha256: "2c2b7370df990622916c6f8b6e06622feed810154d6b218fa2db15a7da3926d3"
+      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.2.1/sqlc-gen-moonbit.wasm"
+      sha256: "c12dd1b4984b83b7ca97930c329779a9bd2c1505a650f7417638bdf00426e57f"
 sql:
   - engine: sqlite
     schema: "db/sqlite/schema.sql"

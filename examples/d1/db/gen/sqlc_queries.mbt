@@ -4,12 +4,12 @@
 // Query functions
 ///| GetUser
 /// SELECT id, name, email, created_at FROM users WHERE id = ?
-pub async fn get_user(db : @cloudflare.D1Database, params : GetUserParams) -> GetUserRow? {
-  let stmt = db.prepare(get_user_sql).bind([@core.any(params.id.to_int())])
+pub async fn get_user(db : @cloudflare.D1Database, params : GetUserParams) -> GetUserRow? raise @cloudflare.D1Error {
+  let stmt = db.prepare(get_user_sql).bind([@core.any(params.id)])
   match stmt.first() {
     None => None
     Some(result) => Some({
-      id: @cloudflare.js_number_to_int64(result["id"]),
+      id: @cloudflare.js_number_to_int64(result["id"]).to_int(),
       name: result["name"].cast(),
       email: result["email"].cast(),
       created_at: result["created_at"].cast(),
@@ -19,14 +19,14 @@ pub async fn get_user(db : @cloudflare.D1Database, params : GetUserParams) -> Ge
 
 ///| ListUsers
 /// SELECT id, name, email, created_at FROM users ORDER BY name
-pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
+pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] raise @cloudflare.D1Error {
   let stmt = db.prepare(list_users_sql)
   let d1_result = stmt.all()
   let results_arr = d1_result.get_results()
   let results : Array[ListUsersRow] = []
   for row in results_arr {
     results.push({
-      id: @cloudflare.js_number_to_int64(row["id"]),
+      id: @cloudflare.js_number_to_int64(row["id"]).to_int(),
       name: row["name"].cast(),
       email: row["email"].cast(),
       created_at: row["created_at"].cast(),
@@ -37,7 +37,7 @@ pub async fn list_users(db : @cloudflare.D1Database) -> Array[ListUsersRow] {
 
 ///| CreateUser
 /// INSERT INTO users (name, email) VALUES (?, ?)
-pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams) -> Int64 {
+pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams) -> Int64 raise @cloudflare.D1Error {
   let stmt = db.prepare(create_user_sql).bind([@core.any(params.name), @core.any(params.email)])
   let result = stmt.run()
   match result.meta() {
@@ -48,8 +48,8 @@ pub async fn create_user(db : @cloudflare.D1Database, params : CreateUserParams)
 
 ///| UpdateUser
 /// UPDATE users SET name = ?, email = ? WHERE id = ?
-pub async fn update_user(db : @cloudflare.D1Database, params : UpdateUserParams) -> Int {
-  let stmt = db.prepare(update_user_sql).bind([@core.any(params.name), @core.any(params.email), @core.any(params.id.to_int())])
+pub async fn update_user(db : @cloudflare.D1Database, params : UpdateUserParams) -> Int raise @cloudflare.D1Error {
+  let stmt = db.prepare(update_user_sql).bind([@core.any(params.name), @core.any(params.email), @core.any(params.id)])
   let result = stmt.run()
   match result.meta() {
     Some(m) => m.changes().unwrap_or(0)
@@ -59,8 +59,8 @@ pub async fn update_user(db : @cloudflare.D1Database, params : UpdateUserParams)
 
 ///| DeleteUser
 /// DELETE FROM users WHERE id = ?
-pub async fn delete_user(db : @cloudflare.D1Database, params : DeleteUserParams) -> Int {
-  let stmt = db.prepare(delete_user_sql).bind([@core.any(params.id.to_int())])
+pub async fn delete_user(db : @cloudflare.D1Database, params : DeleteUserParams) -> Int raise @cloudflare.D1Error {
+  let stmt = db.prepare(delete_user_sql).bind([@core.any(params.id)])
   let result = stmt.run()
   match result.meta() {
     Some(m) => m.changes().unwrap_or(0)

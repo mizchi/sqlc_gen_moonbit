@@ -3,7 +3,7 @@
 
 ///|
 pub struct GetUserRow {
-  id : Int64
+  id : Int
   name : String
   email : String
   created_at : String
@@ -11,7 +11,7 @@ pub struct GetUserRow {
 
 ///|
 pub struct ListUsersRow {
-  id : Int64
+  id : Int
   name : String
   email : String
   created_at : String
@@ -19,11 +19,11 @@ pub struct ListUsersRow {
 
 ///|
 pub struct GetUserParams {
-  id : Int64
+  id : Int
 } derive(Show, Eq)
 
 ///|
-pub fn GetUserParams::new(id : Int64) -> GetUserParams {
+pub fn GetUserParams::new(id : Int) -> GetUserParams {
   { id, }
 }
 
@@ -42,21 +42,21 @@ pub fn CreateUserParams::new(name : String, email : String) -> CreateUserParams 
 pub struct UpdateUserParams {
   name : String
   email : String
-  id : Int64
+  id : Int
 } derive(Show, Eq)
 
 ///|
-pub fn UpdateUserParams::new(name : String, email : String, id : Int64) -> UpdateUserParams {
+pub fn UpdateUserParams::new(name : String, email : String, id : Int) -> UpdateUserParams {
   { name, email, id, }
 }
 
 ///|
 pub struct DeleteUserParams {
-  id : Int64
+  id : Int
 } derive(Show, Eq)
 
 ///|
-pub fn DeleteUserParams::new(id : Int64) -> DeleteUserParams {
+pub fn DeleteUserParams::new(id : Int) -> DeleteUserParams {
   { id, }
 }
 

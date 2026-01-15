@@ -1428,19 +1428,11 @@ fn param_to_core_any(col : @plugin.Column, expr : String) -> String {
   let is_nullable = not(col.not_null)
   if is_nullable {
     // For nullable params, use match to handle None - @core.null() for null value
-    match type_name {
-      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-        "(match " +
-        expr +
-        " { Some(v) => @core.any(v.to_int()); None => @core.null() })"
-      _ =>
-        "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
-    }
+    "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
   } else {
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-        "@core.any(" + expr + ".to_int())"
-      "INT8" | "BIGINT" => "@core.any(" + expr + ")"
+      "INTEGER" | "INT" | "INT4" | "SMALLINT" | "INT8" | "BIGINT" =>
+        "@core.any(" + expr + ")"
       "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
         "@core.any(" + expr + ")"
       "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
@@ -1461,7 +1453,15 @@ fn column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
   if not(col.not_null) {
     // For nullable columns, check for null/undefined first
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
+      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
+        "(if @core.is_null(" +
+        field_access +
+        ") || @core.typeof_(" +
+        field_access +
+        ") == \"undefined\" { None } else { Some(@cloudflare.js_number_to_int64(" +
+        field_access +
+        ").to_int()) })"
+      "INT8" | "BIGINT" =>
         "(if @core.is_null(" +
         field_access +
         ") || @core.typeof_(" +
@@ -1483,7 +1483,10 @@ fn column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
     match type_name {
       // Use @cloudflare.js_number_to_int64 for INTEGER types
       // D1/SQLite returns JavaScript numbers which need conversion to MoonBit Int64 ({hi, lo} format)
-      "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
+      // For smaller integer types (INTEGER, INT, INT4, SMALLINT), convert to Int
+      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
+        "@cloudflare.js_number_to_int64(" + field_access + ").to_int()"
+      "INT8" | "BIGINT" =>
         "@cloudflare.js_number_to_int64(" + field_access + ")"
       "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
         field_access + ".cast()"

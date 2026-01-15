@@ -49,7 +49,7 @@ pub fn get_handler() -> @cloudflare.CloudflareFetchHandler {
       json_response(@json.JSON::stringify(result), 200)
     } else if pathname.has_prefix("/users/") {
       let id_str = pathname[7:].to_string()
-      let id = @global.parse_int(id_str).unwrap_or(0).to_int64()
+      let id = @global.parse_int(id_str).unwrap_or(0)
 
       // Get user by ID
       let user = @gen.get_user(db, @gen.GetUserParams::new(id)) catch {
