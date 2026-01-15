@@ -1,10 +1,9 @@
 .DS_Store
-target
+target/
 _build/
 .mooncakes/
 .moonagent/
 .wrangler/
-node_modules/gen/
-node_modules
+node_modules/
 bin/
-targe
+vendor/protoc-gen-mbt/
