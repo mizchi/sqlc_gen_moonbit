@@ -1,7 +1,7 @@
 import {
   "mizchi/sqlite",
   "moonbitlang/x/encoding",
-  "backend_sqlite_native_example/db/gen",
+  "example_sqlite_native/db/gen",
 }
 
 options(

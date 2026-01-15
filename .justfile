@@ -29,8 +29,8 @@ test-pg:
 
 # Generate code for examples
 generate: build
-    cd backends/sqlite_native/example && sqlc generate
-    cd backends/d1/example && sqlc generate
+    cd examples/sqlite_native && sqlc generate
+    cd examples/d1 && sqlc generate
 
 # D1 tasks
 # action: build|dev|migrate-diff|migrate-apply|migrate-apply-remote|migrate-status|migrate-lint|migrate-hash
@@ -49,9 +49,9 @@ info:
     moon info --target native lib/proto/plugin
     moon info --target native lib/proto/vet
     moon info --target native tools/codegen
-    cd backends/sqlite_native/example && moon info --target native
-    cd backends/d1/example && moon info --target js
-    cd backends/postgres_native/example && moon info --target native
+    cd examples/sqlite_native && moon info --target native
+    cd examples/d1 && moon info --target js
+    cd examples/postgres_native && moon info --target native
     cd backends/sqlite_native/test && moon info --target native
     cd backends/d1/test && moon info --target js
     cd backends/postgres_native/test && moon info --target native
@@ -60,17 +60,17 @@ info:
 check:
     moon check --target native ./cmd/native
     moon check --target wasm ./cmd/wasm
-    cd backends/sqlite_native/example && moon check --target native
-    cd backends/d1/example && moon check --target js
+    cd examples/sqlite_native && moon check --target native
+    cd examples/d1 && moon check --target js
 
 # Clean build artifacts
 clean:
     moon clean
-    cd backends/sqlite_native/example && moon clean
-    cd backends/d1/example && moon clean
+    cd examples/sqlite_native && moon clean
+    cd examples/d1 && moon clean
 
 # Format all MoonBit code
 fmt:
     moon fmt
-    cd backends/sqlite_native/example && moon fmt
-    cd backends/d1/example && moon fmt
+    cd examples/sqlite_native && moon fmt
+    cd examples/d1 && moon fmt

@@ -1,5 +1,5 @@
 {
-  "name": "backend_postgres_native_example",
+  "name": "example_postgres_native",
   "version": "0.0.1",
   "deps": {
     "mattn/postgres": "0.10.4",

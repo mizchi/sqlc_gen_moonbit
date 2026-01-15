@@ -225,9 +225,9 @@ For each query, sqlc-gen-moonbit generates:
 
 ## Examples
 
-- [`backends/sqlite_native/example`](./backends/sqlite_native/example) - SQLite with native binding
-- [`backends/d1/example`](./backends/d1/example) - Cloudflare Worker with D1
-- [`backends/postgres_native/example`](./backends/postgres_native/example) - PostgreSQL with native binding
+- [`examples/sqlite_native`](./examples/sqlite_native) - SQLite with native binding
+- [`examples/d1`](./examples/d1) - Cloudflare Worker with D1
+- [`examples/postgres_native`](./examples/postgres_native) - PostgreSQL with native binding
 
 ## Development
 

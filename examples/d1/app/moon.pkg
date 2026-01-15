@@ -6,7 +6,7 @@ import {
   "mizchi/cloudflare",
   "mizchi/js/builtins/global",
   "mizchi/js/builtins/json",
-  "backend_d1_example/db/gen",
+  "example_d1/db/gen",
 }
 
 options(

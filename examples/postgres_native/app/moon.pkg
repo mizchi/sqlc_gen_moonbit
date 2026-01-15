@@ -1,5 +1,5 @@
 import {
-  "backend_postgres_native_example/db/gen",
+  "example_postgres_native/db/gen",
   "mattn/postgres",
 }
 

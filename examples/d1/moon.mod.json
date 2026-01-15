@@ -1,5 +1,5 @@
 {
-  "name": "backend_d1_example",
+  "name": "example_d1",
   "version": "0.0.1",
   "deps": {
     "mizchi/js": "0.10.10",
