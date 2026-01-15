@@ -20,12 +20,12 @@ test-all: test-core test-pg
 # Core tests (no postgres)
 test-core:
     moon test --target native ./lib/codegen
-    cd backends/sqlite_native/test && moon test --target native
-    cd backends/d1/test && moon test --target js
+    cd tests/sqlite_native/test && moon test --target native
+    cd tests/d1/test && moon test --target js
 
 # Postgres tests (requires libpq + DATABASE_URL/POSTGRES_TEST_URL)
 test-pg:
-    tools/pg/run.sh moon test --target native --package backend_postgres_native_test -C backends/postgres_native/test
+    tools/pg/run.sh moon test --target native --package backend_postgres_native_test -C tests/postgres_native/test
 
 # Generate code for examples
 generate: build
@@ -52,9 +52,9 @@ info:
     cd examples/sqlite_native && moon info --target native
     cd examples/d1 && moon info --target js
     cd examples/postgres_native && moon info --target native
-    cd backends/sqlite_native/test && moon info --target native
-    cd backends/d1/test && moon info --target js
-    cd backends/postgres_native/test && moon info --target native
+    cd tests/sqlite_native/test && moon info --target native
+    cd tests/d1/test && moon info --target js
+    cd tests/postgres_native/test && moon info --target native
 
 # Check all MoonBit code
 check:
