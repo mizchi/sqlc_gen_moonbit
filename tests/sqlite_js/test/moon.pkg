@@ -1,0 +1,5 @@
+import {
+  "mizchi/sqlite",
+  "moonbitlang/x/encoding",
+  "backend_sqlite_js_test/db/gen",
+}

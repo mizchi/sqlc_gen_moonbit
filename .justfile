@@ -21,6 +21,7 @@ test-all: test-core test-pg
 test-core:
     moon test --target native ./lib/codegen
     cd tests/sqlite_native && moon test --target native
+    cd tests/sqlite_js && moon test --target js
     cd tests/d1 && moon test --target js
 
 # Postgres tests (requires libpq + DATABASE_URL/POSTGRES_TEST_URL)
@@ -53,6 +54,7 @@ info:
     cd examples/d1 && moon info --target js
     cd examples/postgres_native && moon info --target native
     cd tests/sqlite_native && moon info --target native
+    cd tests/sqlite_js && moon info --target js
     cd tests/d1 && moon info --target js
     cd tests/postgres_native && moon info --target native
 
