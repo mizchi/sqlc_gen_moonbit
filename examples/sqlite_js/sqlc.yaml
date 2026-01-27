@@ -1,0 +1,15 @@
+version: "2"
+plugins:
+  - name: moonbit
+    wasm:
+      url: "file://../../bin/sqlc-gen-moonbit.wasm"
+      sha256: "26eb1d10957f0f4f0197ab204a4ef5a0c9052f10ac40bdf242ae9e223cb5b820"
+sql:
+  - engine: sqlite
+    schema: "db/sqlite_js/schema.sql"
+    queries: "db/sqlite_js/query.sql"
+    codegen:
+      - plugin: moonbit
+        out: "db/gen"
+        options:
+          backend: "sqlite_js"

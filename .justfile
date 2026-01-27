@@ -31,6 +31,7 @@ test-pg:
 # Generate code for examples
 generate: build
     cd examples/sqlite_native && sqlc generate
+    cd examples/sqlite_js && sqlc generate
     cd examples/d1 && sqlc generate
 
 # D1 tasks
@@ -51,6 +52,7 @@ info:
     moon info --target native lib/proto/vet
     moon info --target native tools/codegen
     cd examples/sqlite_native && moon info --target native
+    cd examples/sqlite_js && moon info --target js
     cd examples/d1 && moon info --target js
     cd examples/postgres_native && moon info --target native
     cd tests/sqlite_native && moon info --target native
@@ -63,16 +65,19 @@ check:
     moon check --target native ./cmd/native
     moon check --target wasm ./cmd/wasm
     cd examples/sqlite_native && moon check --target native
+    cd examples/sqlite_js && moon check --target js
     cd examples/d1 && moon check --target js
 
 # Clean build artifacts
 clean:
     moon clean
     cd examples/sqlite_native && moon clean
+    cd examples/sqlite_js && moon clean
     cd examples/d1 && moon clean
 
 # Format all MoonBit code
 fmt:
     moon fmt
     cd examples/sqlite_native && moon fmt
+    cd examples/sqlite_js && moon fmt
     cd examples/d1 && moon fmt
