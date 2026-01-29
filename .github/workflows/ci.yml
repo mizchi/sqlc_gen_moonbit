@@ -9,6 +9,34 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -uroot -pmysql"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,5 +62,39 @@ jobs:
       - name: Install D1 test dependencies
         run: cd tests/d1 && npm ci
 
-      - name: Run tests
-        run: just --justfile .justfile test
+      - name: Run core tests
+        run: just --justfile .justfile test-core
+
+      - name: Setup PostgreSQL schema
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d testdb -c "
+            CREATE TABLE IF NOT EXISTS users (
+              id BIGSERIAL PRIMARY KEY,
+              name TEXT NOT NULL,
+              email TEXT NOT NULL UNIQUE,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+          "
+
+      - name: Setup MySQL schema
+        run: |
+          mysql -h 127.0.0.1 -uroot -pmysql testdb -e "
+            CREATE TABLE IF NOT EXISTS users (
+              id BIGINT PRIMARY KEY AUTO_INCREMENT,
+              name VARCHAR(255) NOT NULL,
+              email VARCHAR(255) NOT NULL UNIQUE,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+          "
+
+      - name: Install postgres_js dependencies
+        run: cd examples/postgres_js && npm ci
+
+      - name: Install mysql_js dependencies
+        run: cd examples/mysql_js && npm ci
+
+      - name: Run postgres_js test
+        run: just --justfile .justfile test-postgres-js
+
+      - name: Run mysql_js test
+        run: just --justfile .justfile test-mysql-js
