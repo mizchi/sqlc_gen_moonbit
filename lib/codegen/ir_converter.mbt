@@ -101,3 +101,77 @@ pub fn query_columns_to_ir_struct(query : @plugin.Query) -> @ir.Struct {
   }
   s
 }
+
+///|
+/// Convert SQL type to IR Type with TypeOverride support
+pub fn column_to_ir_type_with_override(
+  col : @plugin.Column,
+  overrides : Array[TypeOverride],
+) -> @ir.Type {
+  match find_column_override(col, overrides) {
+    Some(override_) => {
+      let base_type = @ir.Type::named(override_.moonbit_type)
+      let is_nullable = match override_.nullable {
+        Some(n) => n
+        None => not(col.not_null)
+      }
+      if is_nullable {
+        @ir.Type::optional(base_type)
+      } else {
+        base_type
+      }
+    }
+    None => column_to_ir_type(col)
+  }
+}
+
+///|
+/// Convert @plugin.Column to @ir.Field with TypeOverride support
+pub fn column_to_ir_field_with_override(
+  col : @plugin.Column,
+  param_number : Int,
+  overrides : Array[TypeOverride],
+) -> @ir.Field {
+  let field_name = if col.name.length() > 0 {
+    to_snake_case(col.name)
+  } else {
+    "p" + param_number.to_string()
+  }
+  let ty = column_to_ir_type_with_override(col, overrides)
+  let constraints = column_to_constraints(col)
+  @ir.Field::new(field_name, ty).with_constraints(constraints)
+}
+
+///|
+/// Convert query params to IR Struct with TypeOverride and derives
+pub fn query_params_to_ir_struct_full(
+  query : @plugin.Query,
+  overrides : Array[TypeOverride],
+) -> @ir.Struct {
+  let struct_name = to_pascal_case(query.name) + "Params"
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  for param in query.params {
+    let field = column_to_ir_field_with_override(
+      param.column,
+      param.number,
+      overrides,
+    )
+    s = s.with_field(field)
+  }
+  s
+}
+
+///|
+/// Convert query columns to IR Struct with TypeOverride and derives
+pub fn query_columns_to_ir_struct_full(
+  query : @plugin.Query,
+  overrides : Array[TypeOverride],
+) -> @ir.Struct {
+  let struct_name = to_pascal_case(query.name) + "Row"
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  for i, col in query.columns {
+    let field = column_to_ir_field_with_override(col, i + 1, overrides)
+    s = s.with_field(field)
+  }
+  s
+}

@@ -1,86 +1,91 @@
-// Common code generation utilities
+// Common code generation utilities using codegen.mbt
+
+///|
+let emitter : @emit.MoonBitEmitter = @emit.MoonBitEmitter::new()
 
 ///|
 pub fn generate_result_struct(
   buf : StringBuilder,
-  name : String,
-  columns : Array[@plugin.Column],
+  _name : String,
+  _columns : Array[@plugin.Column],
   overrides : Array[TypeOverride],
+  query : @plugin.Query,
 ) -> Unit {
-  buf.write_string("///|\npub struct ")
-  buf.write_string(name)
-  buf.write_string(" {\n")
-  for col in columns {
-    buf.write_string("  ")
-    buf.write_string(to_snake_case(col.name))
-    buf.write_string(" : ")
-    buf.write_string(sql_type_to_moonbit(col, overrides))
-    buf.write_string("\n")
-  }
-  buf.write_string("} derive(Show, Eq)\n\n")
+  let ir_struct = query_columns_to_ir_struct_full(query, overrides)
+  buf.write_string(emitter.emit_struct(ir_struct))
+  buf.write_string("\n")
 }
 
 ///|
 pub fn generate_params_struct(
   buf : StringBuilder,
-  name : String,
-  params : Array[@plugin.Parameter],
+  _name : String,
+  _params : Array[@plugin.Parameter],
   overrides : Array[TypeOverride],
+  query : @plugin.Query,
 ) -> Unit {
-  buf.write_string("///|\npub struct ")
-  buf.write_string(name)
-  buf.write_string(" {\n")
-  for param in params {
-    let col = param.column
-    let param_name = if col.name.length() > 0 {
-      to_snake_case(col.name)
-    } else {
-      "p" + param.number.to_string()
-    }
-    buf.write_string("  ")
-    buf.write_string(param_name)
-    buf.write_string(" : ")
-    buf.write_string(sql_type_to_moonbit(col, overrides))
-    buf.write_string("\n")
-  }
-  buf.write_string("} derive(Show, Eq)\n\n")
-
+  let ir_struct = query_params_to_ir_struct_full(query, overrides)
+  buf.write_string(emitter.emit_struct(ir_struct))
+  buf.write_string("\n")
   // Generate constructor function
+  generate_params_constructor(buf, ir_struct)
+}
+
+///|
+fn generate_params_constructor(buf : StringBuilder, s : @ir.Struct) -> Unit {
   buf.write_string("///|\npub fn ")
-  buf.write_string(name)
+  buf.write_string(s.name)
   buf.write_string("::new(")
-  for i, param in params {
-    let col = param.column
-    let param_name = if col.name.length() > 0 {
-      to_snake_case(col.name)
-    } else {
-      "p" + param.number.to_string()
-    }
+  for i, field in s.fields {
     if i > 0 {
       buf.write_string(", ")
     }
-    buf.write_string(param_name)
+    buf.write_string(field.name)
     buf.write_string(" : ")
-    buf.write_string(sql_type_to_moonbit(col, overrides))
+    emit_ir_type(buf, field.ty)
   }
   buf.write_string(") -> ")
-  buf.write_string(name)
+  buf.write_string(s.name)
   buf.write_string(" {\n")
   buf.write_string("  { ")
-  for i, param in params {
-    let col = param.column
-    let param_name = if col.name.length() > 0 {
-      to_snake_case(col.name)
-    } else {
-      "p" + param.number.to_string()
-    }
+  for i, field in s.fields {
     if i > 0 {
       buf.write_string(", ")
     }
-    buf.write_string(param_name)
+    buf.write_string(field.name)
   }
-  buf.write_string(", }\n")
+  buf.write_string(" }\n")
   buf.write_string("}\n\n")
+}
+
+///|
+fn emit_ir_type(buf : StringBuilder, ty : @ir.Type) -> Unit {
+  match ty {
+    @ir.Type::Primitive(name) => buf.write_string(name)
+    @ir.Type::Optional(inner) => {
+      emit_ir_type(buf, inner)
+      buf.write_string("?")
+    }
+    @ir.Type::Array(inner) => {
+      buf.write_string("Array[")
+      emit_ir_type(buf, inner)
+      buf.write_string("]")
+    }
+    @ir.Type::Named(name, args) => {
+      buf.write_string(name)
+      if args.length() > 0 {
+        buf.write_string("[")
+        for i, arg in args {
+          if i > 0 {
+            buf.write_string(", ")
+          }
+          emit_ir_type(buf, arg)
+        }
+        buf.write_string("]")
+      }
+    }
+    _ => buf.write_string("Unit")
+  }
 }
 
 ///|

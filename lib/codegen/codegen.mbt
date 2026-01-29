@@ -144,6 +144,7 @@ fn generate_types(
           struct_name,
           query.columns,
           options.overrides,
+          query,
         )
       }
     }
@@ -153,7 +154,13 @@ fn generate_types(
   for query in request.queries {
     if query.params.length() > 0 {
       let struct_name = to_pascal_case(query.name) + "Params"
-      generate_params_struct(buf, struct_name, query.params, options.overrides)
+      generate_params_struct(
+        buf,
+        struct_name,
+        query.params,
+        options.overrides,
+        query,
+      )
     }
   }
 
