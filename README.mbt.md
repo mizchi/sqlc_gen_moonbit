@@ -289,6 +289,67 @@ For each query, sqlc-gen-moonbit generates:
 | `:execrows`| `Int`       | Returns number of affected rows |
 | `:execlastid` | `Int64`  | Returns last inserted ID (for `INSERT ... RETURNING id`) |
 
+## Standalone Code Generation
+
+You can use the standalone API without sqlc:
+
+### 1. Add dependency
+
+```bash
+moon add mizchi/sqlc_gen_moonbit
+```
+
+### 2. Create SQL file with annotations
+
+`queries.sql`:
+
+```sql
+-- @query GetUser :one
+-- @param id INTEGER
+-- @returns id INTEGER, name TEXT, email TEXT
+SELECT * FROM users WHERE id = ?;
+
+-- @query ListUsers :many
+-- @returns id INTEGER, name TEXT, email TEXT
+SELECT * FROM users ORDER BY name;
+
+-- @query CreateUser :exec
+-- @param name TEXT
+-- @param email TEXT
+INSERT INTO users (name, email) VALUES (?, ?);
+```
+
+### 3. Generate code
+
+Create `tasks/main.mbt`:
+
+```moonbit
+fn main {
+  let sql_content = @fs.read_file_to_string("queries.sql") catch { e => panic() }
+  let code = @codegen.generate_from_sql(sql_content)
+  println(code)
+}
+```
+
+Add `tasks/moon.pkg`:
+
+```
+import {
+  "moonbitlang/x/fs",
+  "mizchi/sqlc_gen_moonbit/lib/codegen" as @codegen,
+}
+
+options(
+  "is-main": true,
+)
+```
+
+Run:
+
+```bash
+moon run tasks > db/gen/sqlc_queries.mbt
+```
+
 ## Examples
 
 - [`examples/sqlite_native`](./examples/sqlite_native) - SQLite with native binding
