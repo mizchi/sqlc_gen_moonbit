@@ -1,0 +1,15 @@
+import {
+  "example_postgres_js/db/gen",
+  "mizchi/npm_typed/pg",
+  "mizchi/js/core",
+}
+
+options(
+  "is-main": true,
+  link: {
+    "js": {
+      "exports": ["main"],
+    },
+  },
+  "supported-targets": [ "js" ],
+)
