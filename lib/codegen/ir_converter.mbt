@@ -89,3 +89,15 @@ pub fn query_params_to_ir_struct(query : @plugin.Query) -> @ir.Struct {
   }
   s
 }
+
+///|
+/// Convert query columns to IR Struct (for Row types)
+pub fn query_columns_to_ir_struct(query : @plugin.Query) -> @ir.Struct {
+  let struct_name = to_pascal_case(query.name) + "Row"
+  let mut s = @ir.Struct::new(struct_name)
+  for i, col in query.columns {
+    let field = column_to_ir_field(col, i + 1)
+    s = s.with_field(field)
+  }
+  s
+}
