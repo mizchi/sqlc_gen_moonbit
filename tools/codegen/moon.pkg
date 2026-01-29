@@ -1,6 +1,8 @@
 import {
   "moonbitlang/x/fs",
   "moonbitlang/x/sys",
+  "mizchi/codegen/ir" as @ir,
+  "mizchi/codegen/emit" as @emit,
 }
 
 options(
