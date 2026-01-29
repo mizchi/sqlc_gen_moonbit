@@ -11,10 +11,16 @@ pub fn generate_queries_postgres_js(
 
   // Generate helper functions for Int64 conversion
   buf.write_string("///| Convert JavaScript number to Int64\n")
-  buf.write_string("extern \"js\" fn js_number_to_int64(v : @core.Any) -> Int64 =\n")
-  buf.write_string("  #| (v) => { const n = Number(v); return { hi: Math.floor(n / 0x100000000), lo: n >>> 0 }; }\n\n")
+  buf.write_string(
+    "extern \"js\" fn js_number_to_int64(v : @core.Any) -> Int64 =\n",
+  )
+  buf.write_string(
+    "  #| (v) => { const n = Number(v); return { hi: Math.floor(n / 0x100000000), lo: n >>> 0 }; }\n\n",
+  )
   buf.write_string("///| Convert Int64 to JavaScript number\n")
-  buf.write_string("extern \"js\" fn int64_to_js_number(v : Int64) -> @core.Any =\n")
+  buf.write_string(
+    "extern \"js\" fn int64_to_js_number(v : Int64) -> @core.Any =\n",
+  )
   buf.write_string("  #| (v) => v.hi * 0x100000000 + (v.lo >>> 0)\n\n")
 
   // Generate query functions using pg Pool type
@@ -127,9 +133,7 @@ fn generate_query_function_postgres_js(
       buf.write_string("  }\n")
       buf.write_string("  results\n")
     }
-    ":execrows" => {
-      buf.write_string("  result.rowCount()\n")
-    }
+    ":execrows" => buf.write_string("  result.rowCount()\n")
     ":execlastid" => {
       // For INSERT RETURNING, get the returned id from first row
       buf.write_string("  let rows = result.rows()\n")
@@ -142,10 +146,9 @@ fn generate_query_function_postgres_js(
       buf.write_string("    0L\n")
       buf.write_string("  }\n")
     }
-    _ => {
+    _ =>
       // :exec
       buf.write_string("  ignore(result)\n")
-    }
   }
   buf.write_string("}\n\n")
 }
@@ -154,7 +157,10 @@ fn generate_query_function_postgres_js(
 fn postgres_js_param_to_any(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   let is_nullable = not(col.not_null)
-  let is_int64 = type_name == "INT8" ||
+  let is_int64 = type_name == "INTEGER" ||
+    type_name == "INT" ||
+    type_name == "INT4" ||
+    type_name == "INT8" ||
     type_name == "BIGINT" ||
     type_name == "SERIAL" ||
     type_name == "BIGSERIAL"
@@ -167,17 +173,18 @@ fn postgres_js_param_to_any(col : @plugin.Column, expr : String) -> String {
     } else {
       "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
     }
+  } else if is_int64 {
+    "int64_to_js_number(" + expr + ")"
   } else {
-    if is_int64 {
-      "int64_to_js_number(" + expr + ")"
-    } else {
-      "@core.any(" + expr + ")"
-    }
+    "@core.any(" + expr + ")"
   }
 }
 
 ///|
-fn postgres_js_column_from_any(col : @plugin.Column, obj_expr : String) -> String {
+fn postgres_js_column_from_any(
+  col : @plugin.Column,
+  obj_expr : String,
+) -> String {
   let type_name = col.type_.name.to_upper()
   let field_name = "\"" + col.name + "\""
   let field_access = obj_expr + "[" + field_name + "]"
@@ -186,7 +193,15 @@ fn postgres_js_column_from_any(col : @plugin.Column, obj_expr : String) -> Strin
   if not(col.not_null) {
     // For nullable columns, check for null/undefined first
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "INT2" | "SMALLINT" =>
+      "INTEGER" | "INT" | "INT4" =>
+        "(if @core.is_null(" +
+        field_access +
+        ") || @core.typeof_(" +
+        field_access +
+        ") == \"undefined\" { None } else { Some(js_number_to_int64(" +
+        field_access +
+        ")) })"
+      "INT2" | "SMALLINT" =>
         "(if @core.is_null(" +
         field_access +
         ") || @core.typeof_(" +
@@ -214,8 +229,8 @@ fn postgres_js_column_from_any(col : @plugin.Column, obj_expr : String) -> Strin
   } else {
     // Non-nullable columns
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "INT2" | "SMALLINT" =>
-        field_access + ".cast()"
+      "INTEGER" | "INT" | "INT4" => "js_number_to_int64(" + field_access + ")"
+      "INT2" | "SMALLINT" => field_access + ".cast()"
       "INT8" | "BIGINT" | "SERIAL" | "BIGSERIAL" =>
         "js_number_to_int64(" + field_access + ")"
       _ => field_access + ".cast()"

@@ -288,10 +288,10 @@ fn sql_type_to_moonbit(sql_type : String) -> String {
 ///|
 fn param_to_bind_call(sql_type : String, idx : String, expr : String) -> String {
   match sql_type.to_upper() {
-    "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-      "@sqlite.sqlite_bind_int(stmt, " + idx + ", " + expr + ".to_int())"
-    "INT8" | "BIGINT" =>
+    "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" =>
       "@sqlite.sqlite_bind_int64(stmt, " + idx + ", " + expr + ")"
+    "SMALLINT" =>
+      "@sqlite.sqlite_bind_int(stmt, " + idx + ", " + expr + ".to_int())"
     "REAL" | "FLOAT" | "DOUBLE" =>
       "@sqlite.sqlite_bind_double(stmt, " + idx + ", " + expr + ")"
     "TEXT" | "VARCHAR" | "CHAR" =>

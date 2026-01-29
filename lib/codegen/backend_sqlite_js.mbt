@@ -83,7 +83,9 @@ fn generate_query_function_sqlite_js(
       buf.write_string("  stmt.bind(")
       buf.write_string((i + 1).to_string())
       buf.write_string(", ")
-      buf.write_string(sqlite_js_param_to_sql_value(col, "params." + param_name))
+      buf.write_string(
+        sqlite_js_param_to_sql_value(col, "params." + param_name),
+      )
       buf.write_string(") |> ignore\n")
     }
   }
@@ -154,41 +156,57 @@ fn generate_query_function_sqlite_js(
 fn sqlite_js_param_to_sql_value(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   let is_nullable = not(col.not_null)
-
   if is_nullable {
     // For nullable types, handle Option
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "INT2" | "SMALLINT" =>
-        "(match " + expr + " { Some(v) => @sqlite.Int(v); None => @sqlite.Null })"
+      "INTEGER" | "INT" | "INT4" =>
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Int64(v); None => @sqlite.Null })"
+      "INT2" | "SMALLINT" =>
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Int(v); None => @sqlite.Null })"
       "INT8" | "BIGINT" =>
-        "(match " + expr + " { Some(v) => @sqlite.Int64(v); None => @sqlite.Null })"
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Int64(v); None => @sqlite.Null })"
       "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
-        "(match " + expr + " { Some(v) => @sqlite.Double(v); None => @sqlite.Null })"
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Double(v); None => @sqlite.Null })"
       "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
-        "(match " + expr + " { Some(v) => @sqlite.Text(@encoding.encode(@encoding.UTF8, v)); None => @sqlite.Null })"
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Text(@encoding.encode(@encoding.UTF8, v)); None => @sqlite.Null })"
       "BLOB" | "BYTEA" =>
-        "(match " + expr + " { Some(v) => @sqlite.Blob(v); None => @sqlite.Null })"
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Blob(v); None => @sqlite.Null })"
       "BOOLEAN" | "BOOL" =>
-        "(match " + expr + " { Some(v) => @sqlite.Int(if v { 1 } else { 0 }); None => @sqlite.Null })"
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Int(if v { 1 } else { 0 }); None => @sqlite.Null })"
       _ =>
-        "(match " + expr + " { Some(v) => @sqlite.Text(@encoding.encode(@encoding.UTF8, v.to_string())); None => @sqlite.Null })"
+        "(match " +
+        expr +
+        " { Some(v) => @sqlite.Text(@encoding.encode(@encoding.UTF8, v.to_string())); None => @sqlite.Null })"
     }
   } else {
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "INT2" | "SMALLINT" =>
-        "@sqlite.Int(" + expr + ")"
-      "INT8" | "BIGINT" =>
-        "@sqlite.Int64(" + expr + ")"
+      "INTEGER" | "INT" | "INT4" => "@sqlite.Int64(" + expr + ")"
+      "INT2" | "SMALLINT" => "@sqlite.Int(" + expr + ")"
+      "INT8" | "BIGINT" => "@sqlite.Int64(" + expr + ")"
       "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
         "@sqlite.Double(" + expr + ")"
       "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
         "@sqlite.Text(@encoding.encode(@encoding.UTF8, " + expr + "))"
-      "BLOB" | "BYTEA" =>
-        "@sqlite.Blob(" + expr + ")"
-      "BOOLEAN" | "BOOL" =>
-        "@sqlite.Int(if " + expr + " { 1 } else { 0 })"
+      "BLOB" | "BYTEA" => "@sqlite.Blob(" + expr + ")"
+      "BOOLEAN" | "BOOL" => "@sqlite.Int(if " + expr + " { 1 } else { 0 })"
       _ =>
-        "@sqlite.Text(@encoding.encode(@encoding.UTF8, " + expr + ".to_string()))"
+        "@sqlite.Text(@encoding.encode(@encoding.UTF8, " +
+        expr +
+        ".to_string()))"
     }
   }
 }
@@ -201,27 +219,30 @@ fn sqlite_js_column_from_sql_value(col : @plugin.Column, idx : Int) -> String {
 
   // Use high-level Statement::column which returns SqlValue
   let base_expr = match type_name {
-    "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
-      "stmt.column_int(" + idx_str + ")"
+    "INTEGER" | "INT" | "INT4" => "stmt.column_int(" + idx_str + ").to_int64()"
+    "INT2" | "SMALLINT" => "stmt.column_int(" + idx_str + ")"
     "INT8" | "BIGINT" =>
       // column_int returns Int, need to convert to Int64
       "stmt.column_int(" + idx_str + ").to_int64()"
     "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
       // Use column and extract Double from SqlValue
-      "(match stmt.column(" + idx_str + ") { @sqlite.Double(v) => v; @sqlite.Int(v) => v.to_double(); _ => 0.0 })"
+      "(match stmt.column(" +
+      idx_str +
+      ") { @sqlite.Double(v) => v; @sqlite.Int(v) => v.to_double(); _ => 0.0 })"
     "TEXT" | "VARCHAR" | "CHAR" | "CHARACTER" | "CLOB" =>
       "bytes_to_string(stmt.column_text(" + idx_str + "))"
-    "BLOB" | "BYTEA" =>
-      "stmt.column_text(" + idx_str + ")"
-    "BOOLEAN" | "BOOL" =>
-      "stmt.column_int(" + idx_str + ") != 0"
-    _ =>
-      "bytes_to_string(stmt.column_text(" + idx_str + "))"
+    "BLOB" | "BYTEA" => "stmt.column_text(" + idx_str + ")"
+    "BOOLEAN" | "BOOL" => "stmt.column_int(" + idx_str + ") != 0"
+    _ => "bytes_to_string(stmt.column_text(" + idx_str + "))"
   }
 
   // Wrap in Option if nullable
   if is_nullable {
-    "(match stmt.column(" + idx_str + ") { @sqlite.Null => None; _ => Some(" + base_expr + ") })"
+    "(match stmt.column(" +
+    idx_str +
+    ") { @sqlite.Null => None; _ => Some(" +
+    base_expr +
+    ") })"
   } else {
     base_expr
   }

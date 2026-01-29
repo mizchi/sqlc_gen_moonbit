@@ -172,7 +172,15 @@ fn d1_column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
   if not(col.not_null) {
     // For nullable columns, check for null/undefined first
     match type_name {
-      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
+      "INTEGER" | "INT" | "INT4" =>
+        "(if @core.is_null(" +
+        field_access +
+        ") || @core.typeof_(" +
+        field_access +
+        ") == \"undefined\" { None } else { Some(@cloudflare.js_number_to_int64(" +
+        field_access +
+        ")) })"
+      "SMALLINT" =>
         "(if @core.is_null(" +
         field_access +
         ") || @core.typeof_(" +
@@ -203,7 +211,9 @@ fn d1_column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
       // Use @cloudflare.js_number_to_int64 for INTEGER types
       // D1/SQLite returns JavaScript numbers which need conversion to MoonBit Int64 ({hi, lo} format)
       // For smaller integer types (INTEGER, INT, INT4, SMALLINT), convert to Int
-      "INTEGER" | "INT" | "INT4" | "SMALLINT" =>
+      "INTEGER" | "INT" | "INT4" =>
+        "@cloudflare.js_number_to_int64(" + field_access + ")"
+      "SMALLINT" =>
         "@cloudflare.js_number_to_int64(" + field_access + ").to_int()"
       "INT8" | "BIGINT" =>
         "@cloudflare.js_number_to_int64(" + field_access + ")"

@@ -202,7 +202,10 @@ async fn run_tests_inner() -> Unit {
   )
 
   // Create user (async, returns inserted id)
-  let user_id = @gen.create_user(pool, @gen.CreateUserParams::new("Alice", "alice@example.com"))
+  let user_id = @gen.create_user(
+    pool,
+    @gen.CreateUserParams::new("Alice", "alice@example.com"),
+  )
 
   // List users (async)
   let users = @gen.list_users(pool)
@@ -212,15 +215,12 @@ async fn run_tests_inner() -> Unit {
     Some(user) => println("Found: \{user.name}")
     None => println("Not found")
   }
-
   pool.end()
 }
 
 ///|
 async fn run_tests() -> Unit noraise {
-  try {
-    run_tests_inner()
-  } catch {
+  run_tests_inner() catch {
     e => println("Error: \{e}")
   }
 }

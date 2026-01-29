@@ -134,9 +134,15 @@ pub fn sql_type_to_moonbit(
       // Default type mapping
       let type_name = col.type_.name.to_upper()
       let base_type = match type_name {
-        // Integer types
-        "INTEGER" | "INT" | "INT4" | "INT2" | "SMALLINT" => "Int"
-        "INT8" | "BIGINT" | "SERIAL" | "BIGSERIAL" => "Int64"
+        // Integer types - SQLite INTEGER is 64bit, so use Int64 for consistency
+        "INTEGER"
+        | "INT"
+        | "INT4"
+        | "INT8"
+        | "BIGINT"
+        | "SERIAL"
+        | "BIGSERIAL" => "Int64"
+        "INT2" | "SMALLINT" => "Int"
         // Floating point types
         "REAL" | "FLOAT4" => "Double"
         "DOUBLE PRECISION" | "FLOAT8" | "FLOAT" | "NUMERIC" | "DECIMAL" =>

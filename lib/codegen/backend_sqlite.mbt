@@ -92,7 +92,9 @@ fn generate_query_function_sqlite(
         "p" + param.number.to_string()
       }
       buf.write_string("  ")
-      buf.write_string(sqlite_param_to_bind_call(col, i + 1, "params." + param_name))
+      buf.write_string(
+        sqlite_param_to_bind_call(col, i + 1, "params." + param_name),
+      )
       buf.write_string(" |> ignore\n")
     }
   }
@@ -177,12 +179,18 @@ fn generate_query_function_sqlite(
 }
 
 ///|
-fn sqlite_param_to_bind_call(col : @plugin.Column, idx : Int, expr : String) -> String {
+fn sqlite_param_to_bind_call(
+  col : @plugin.Column,
+  idx : Int,
+  expr : String,
+) -> String {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
   let is_nullable = not(col.not_null)
 
   // Get the base bind call expression
+  // Note: Using sqlite_bind_int with .to_int() for compatibility
+  // TODO: Investigate sqlite_bind_int64 SIGSEGV on Linux CI
   let base_bind = fn(val_expr : String) -> String {
     match type_name {
       "INTEGER" | "INT" | "INT4" | "SMALLINT" =>

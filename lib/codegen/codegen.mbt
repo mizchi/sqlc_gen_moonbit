@@ -77,9 +77,7 @@ fn generate_moon_pkg(options : Options) -> String {
       buf.write_string("  \"mizchi/js/core\",\n")
       buf.write_string("  \"mizchi/npm_typed/pg\",\n")
     }
-    MysqlJs => {
-      buf.write_string("  \"mizchi/js/core\",\n")
-    }
+    MysqlJs => buf.write_string("  \"mizchi/js/core\",\n")
   }
   buf.write_string("}\n\n")
 

@@ -18,9 +18,12 @@ pub fn generate_queries_mysql_js(
 
   // Pool::new with connection config
   buf.write_string("///| Create MySQL connection pool\n")
-  buf.write_string("extern \"js\" fn ffi_mysql_create_pool(config : @core.Any) -> MysqlPool =\n")
-  buf.write_string("  #| (config) => require(\"mysql2/promise\").createPool(config)\n\n")
-
+  buf.write_string(
+    "extern \"js\" fn ffi_mysql_create_pool(config : @core.Any) -> MysqlPool =\n",
+  )
+  buf.write_string(
+    "  #| (config) => require(\"mysql2/promise\").createPool(config)\n\n",
+  )
   buf.write_string("///| Create MySQL pool with labeled arguments\n")
   buf.write_string("pub fn MysqlPool::new(\n")
   buf.write_string("  host? : String,\n")
@@ -33,8 +36,12 @@ pub fn generate_queries_mysql_js(
   buf.write_string("  if host is Some(v) { config[\"host\"] = @core.any(v) }\n")
   buf.write_string("  if port is Some(v) { config[\"port\"] = @core.any(v) }\n")
   buf.write_string("  if user is Some(v) { config[\"user\"] = @core.any(v) }\n")
-  buf.write_string("  if password is Some(v) { config[\"password\"] = @core.any(v) }\n")
-  buf.write_string("  if database is Some(v) { config[\"database\"] = @core.any(v) }\n")
+  buf.write_string(
+    "  if password is Some(v) { config[\"password\"] = @core.any(v) }\n",
+  )
+  buf.write_string(
+    "  if database is Some(v) { config[\"database\"] = @core.any(v) }\n",
+  )
   buf.write_string("  ffi_mysql_create_pool(config)\n")
   buf.write_string("}\n\n")
 
@@ -45,15 +52,17 @@ pub fn generate_queries_mysql_js(
   buf.write_string("  sql : String,\n")
   buf.write_string("  params : Array[@core.Any],\n")
   buf.write_string(") -> @core.Promise[MysqlResult] =\n")
-  buf.write_string("  #| async (pool, sql, params) => { const [rows, fields] = await pool.execute(sql, params); return { rows, fields, insertId: rows.insertId, affectedRows: rows.affectedRows }; }\n\n")
-
+  buf.write_string(
+    "  #| async (pool, sql, params) => { const [rows, fields] = await pool.execute(sql, params); return { rows, fields, insertId: rows.insertId, affectedRows: rows.affectedRows }; }\n\n",
+  )
   buf.write_string("///| Execute query without parameters\n")
   buf.write_string("extern \"js\" fn ffi_mysql_execute_no_params(\n")
   buf.write_string("  pool : MysqlPool,\n")
   buf.write_string("  sql : String,\n")
   buf.write_string(") -> @core.Promise[MysqlResult] =\n")
-  buf.write_string("  #| async (pool, sql) => { const [rows, fields] = await pool.execute(sql); return { rows, fields, insertId: rows.insertId, affectedRows: rows.affectedRows }; }\n\n")
-
+  buf.write_string(
+    "  #| async (pool, sql) => { const [rows, fields] = await pool.execute(sql); return { rows, fields, insertId: rows.insertId, affectedRows: rows.affectedRows }; }\n\n",
+  )
   buf.write_string("///| Execute query\n")
   buf.write_string("pub async fn MysqlPool::execute(\n")
   buf.write_string("  self : MysqlPool,\n")
@@ -69,9 +78,10 @@ pub fn generate_queries_mysql_js(
 
   // Pool::end
   buf.write_string("///| Close pool\n")
-  buf.write_string("extern \"js\" fn ffi_mysql_pool_end(pool : MysqlPool) -> @core.Promise[Unit] =\n")
+  buf.write_string(
+    "extern \"js\" fn ffi_mysql_pool_end(pool : MysqlPool) -> @core.Promise[Unit] =\n",
+  )
   buf.write_string("  #| (pool) => pool.end()\n\n")
-
   buf.write_string("///| Close pool\n")
   buf.write_string("pub async fn MysqlPool::end(self : MysqlPool) -> Unit {\n")
   buf.write_string("  ffi_mysql_pool_end(self).wait()\n")
@@ -79,38 +89,51 @@ pub fn generate_queries_mysql_js(
 
   // Result accessors
   buf.write_string("///| Get rows from result\n")
-  buf.write_string("extern \"js\" fn ffi_mysql_result_rows(result : MysqlResult) -> @core.Any =\n")
+  buf.write_string(
+    "extern \"js\" fn ffi_mysql_result_rows(result : MysqlResult) -> @core.Any =\n",
+  )
   buf.write_string("  #| (result) => result.rows\n\n")
-
   buf.write_string("///| Get rows\n")
-  buf.write_string("pub fn MysqlResult::rows(self : MysqlResult) -> @core.Any {\n")
+  buf.write_string(
+    "pub fn MysqlResult::rows(self : MysqlResult) -> @core.Any {\n",
+  )
   buf.write_string("  ffi_mysql_result_rows(self)\n")
   buf.write_string("}\n\n")
-
   buf.write_string("///| Get insert ID\n")
-  buf.write_string("extern \"js\" fn ffi_mysql_result_insert_id(result : MysqlResult) -> @core.Any =\n")
+  buf.write_string(
+    "extern \"js\" fn ffi_mysql_result_insert_id(result : MysqlResult) -> @core.Any =\n",
+  )
   buf.write_string("  #| (result) => result.insertId\n\n")
-
   buf.write_string("///| Get insert ID\n")
-  buf.write_string("pub fn MysqlResult::insertId(self : MysqlResult) -> @core.Any {\n")
+  buf.write_string(
+    "pub fn MysqlResult::insertId(self : MysqlResult) -> @core.Any {\n",
+  )
   buf.write_string("  ffi_mysql_result_insert_id(self)\n")
   buf.write_string("}\n\n")
-
   buf.write_string("///| Get affected rows\n")
-  buf.write_string("extern \"js\" fn ffi_mysql_result_affected_rows(result : MysqlResult) -> Int =\n")
+  buf.write_string(
+    "extern \"js\" fn ffi_mysql_result_affected_rows(result : MysqlResult) -> Int =\n",
+  )
   buf.write_string("  #| (result) => result.affectedRows ?? 0\n\n")
-
   buf.write_string("///| Get affected rows\n")
-  buf.write_string("pub fn MysqlResult::affectedRows(self : MysqlResult) -> Int {\n")
+  buf.write_string(
+    "pub fn MysqlResult::affectedRows(self : MysqlResult) -> Int {\n",
+  )
   buf.write_string("  ffi_mysql_result_affected_rows(self)\n")
   buf.write_string("}\n\n")
 
   // Generate helper functions for Int64 conversion
   buf.write_string("///| Convert JavaScript number to Int64\n")
-  buf.write_string("extern \"js\" fn js_number_to_int64(v : @core.Any) -> Int64 =\n")
-  buf.write_string("  #| (v) => { const n = Number(v); return { hi: Math.floor(n / 0x100000000), lo: n >>> 0 }; }\n\n")
+  buf.write_string(
+    "extern \"js\" fn js_number_to_int64(v : @core.Any) -> Int64 =\n",
+  )
+  buf.write_string(
+    "  #| (v) => { const n = Number(v); return { hi: Math.floor(n / 0x100000000), lo: n >>> 0 }; }\n\n",
+  )
   buf.write_string("///| Convert Int64 to JavaScript number\n")
-  buf.write_string("extern \"js\" fn int64_to_js_number(v : Int64) -> @core.Any =\n")
+  buf.write_string(
+    "extern \"js\" fn int64_to_js_number(v : Int64) -> @core.Any =\n",
+  )
   buf.write_string("  #| (v) => v.hi * 0x100000000 + (v.lo >>> 0)\n\n")
 
   // Generate query functions
@@ -223,17 +246,13 @@ fn generate_query_function_mysql_js(
       buf.write_string("  }\n")
       buf.write_string("  results\n")
     }
-    ":execrows" => {
-      buf.write_string("  result.affectedRows()\n")
-    }
-    ":execlastid" => {
+    ":execrows" => buf.write_string("  result.affectedRows()\n")
+    ":execlastid" =>
       // MySQL uses insertId from result, not RETURNING
       buf.write_string("  js_number_to_int64(result.insertId())\n")
-    }
-    _ => {
+    _ =>
       // :exec
       buf.write_string("  ignore(result)\n")
-    }
   }
   buf.write_string("}\n\n")
 }
@@ -242,7 +261,9 @@ fn generate_query_function_mysql_js(
 fn mysql_js_param_to_any(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   let is_nullable = not(col.not_null)
-  let is_int64 = type_name == "BIGINT"
+  let is_int64 = type_name == "INT" ||
+    type_name == "INTEGER" ||
+    type_name == "BIGINT"
   if is_nullable {
     // For nullable types, handle Option - convert None to @core.null()
     if is_int64 {
@@ -252,12 +273,10 @@ fn mysql_js_param_to_any(col : @plugin.Column, expr : String) -> String {
     } else {
       "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
     }
+  } else if is_int64 {
+    "int64_to_js_number(" + expr + ")"
   } else {
-    if is_int64 {
-      "int64_to_js_number(" + expr + ")"
-    } else {
-      "@core.any(" + expr + ")"
-    }
+    "@core.any(" + expr + ")"
   }
 }
 
@@ -271,7 +290,15 @@ fn mysql_js_column_from_any(col : @plugin.Column, obj_expr : String) -> String {
   if not(col.not_null) {
     // For nullable columns, check for null/undefined first
     match type_name {
-      "INT" | "INTEGER" | "TINYINT" | "SMALLINT" | "MEDIUMINT" =>
+      "INT" | "INTEGER" =>
+        "(if @core.is_null(" +
+        field_access +
+        ") || @core.typeof_(" +
+        field_access +
+        ") == \"undefined\" { None } else { Some(js_number_to_int64(" +
+        field_access +
+        ")) })"
+      "TINYINT" | "SMALLINT" | "MEDIUMINT" =>
         "(if @core.is_null(" +
         field_access +
         ") || @core.typeof_(" +
@@ -299,10 +326,9 @@ fn mysql_js_column_from_any(col : @plugin.Column, obj_expr : String) -> String {
   } else {
     // Non-nullable columns
     match type_name {
-      "INT" | "INTEGER" | "TINYINT" | "SMALLINT" | "MEDIUMINT" =>
-        field_access + ".cast()"
-      "BIGINT" =>
-        "js_number_to_int64(" + field_access + ")"
+      "INT" | "INTEGER" => "js_number_to_int64(" + field_access + ")"
+      "TINYINT" | "SMALLINT" | "MEDIUMINT" => field_access + ".cast()"
+      "BIGINT" => "js_number_to_int64(" + field_access + ")"
       _ => field_access + ".cast()"
     }
   }
