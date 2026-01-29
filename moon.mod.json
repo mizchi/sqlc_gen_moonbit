@@ -7,7 +7,7 @@
     "mizchi/sqlite": "0.2.1",
     "BigOrangeQWQ/wasi-io": "0.2.6",
     "mattn/postgres": "0.10.4",
-    "mizchi/codegen": "0.1.0"
+    "mizchi/codegen": "0.2.2"
   },
   "readme": "README.mbt.md",
   "repository": "",
