@@ -336,7 +336,7 @@ Add `tasks/moon.pkg`:
 ```
 import {
   "moonbitlang/x/fs",
-  "mizchi/sqlc_gen_moonbit/lib/codegen" as @codegen,
+  "mizchi/sqlc_gen_moonbit/lib/codegen",
 }
 
 options(

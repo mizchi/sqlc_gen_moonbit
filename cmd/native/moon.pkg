@@ -1,5 +1,5 @@
 import {
-  "sqlc_gen_moonbit/lib/codegen" as @codegen,
+  "mizchi/sqlc_gen_moonbit/lib/codegen" as @codegen,
 }
 
 options(

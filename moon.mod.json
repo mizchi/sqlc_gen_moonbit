@@ -1,5 +1,5 @@
 {
-  "name": "sqlc_gen_moonbit",
+  "name": "mizchi/sqlc_gen_moonbit",
   "version": "0.1.0",
   "deps": {
     "moonbitlang/protobuf": "0.1.0",
