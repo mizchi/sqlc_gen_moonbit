@@ -1,0 +1,14 @@
+version: "2"
+plugins:
+  - name: moonbit
+    wasm:
+      url: "file://../../bin/sqlc-gen-moonbit.wasm"
+sql:
+  - engine: mysql
+    schema: "db/mysql/schema.sql"
+    queries: "db/mysql/query.sql"
+    codegen:
+      - plugin: moonbit
+        out: "db/gen"
+        options:
+          backend: "mysql_js"

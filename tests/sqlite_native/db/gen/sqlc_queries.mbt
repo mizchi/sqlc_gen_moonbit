@@ -24,7 +24,7 @@ fn check_sqlite_error(db : @sqlite.Sqlite3, rc : Int) -> Unit raise SqlError {
 ///  SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id = ?
 pub fn get_user_by_id(db : @sqlite.Sqlite3, params : GetUserByIdParams) -> GetUserByIdRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_user_by_id_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   if rc == @sqlite.SQLITE_ROW {
     let row : GetUserByIdRow = {
@@ -146,9 +146,9 @@ pub fn create_user(db : @sqlite.Sqlite3, params : CreateUserParams) -> Unit rais
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_user_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.email)) |> ignore
-  (match params.age { None => @sqlite.sqlite_bind_null(stmt, 3); Some(v) => @sqlite.sqlite_bind_int(stmt, 3, v.to_int()) }) |> ignore
+  (match params.age { None => @sqlite.sqlite_bind_null(stmt, 3); Some(v) => @sqlite.sqlite_bind_int64(stmt, 3, v) }) |> ignore
   (match params.balance { None => @sqlite.sqlite_bind_null(stmt, 4); Some(v) => @sqlite.sqlite_bind_double(stmt, 4, v) }) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 5, params.is_active.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 5, params.is_active) |> ignore
   (match params.bio { None => @sqlite.sqlite_bind_null(stmt, 6); Some(v) => @sqlite.sqlite_bind_text(stmt, 6, cstring(v)) }) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
@@ -161,9 +161,9 @@ pub fn create_user_returning_id(db : @sqlite.Sqlite3, params : CreateUserReturni
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_user_returning_id_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.email)) |> ignore
-  (match params.age { None => @sqlite.sqlite_bind_null(stmt, 3); Some(v) => @sqlite.sqlite_bind_int(stmt, 3, v.to_int()) }) |> ignore
+  (match params.age { None => @sqlite.sqlite_bind_null(stmt, 3); Some(v) => @sqlite.sqlite_bind_int64(stmt, 3, v) }) |> ignore
   (match params.balance { None => @sqlite.sqlite_bind_null(stmt, 4); Some(v) => @sqlite.sqlite_bind_double(stmt, 4, v) }) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 5, params.is_active.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 5, params.is_active) |> ignore
   (match params.bio { None => @sqlite.sqlite_bind_null(stmt, 6); Some(v) => @sqlite.sqlite_bind_text(stmt, 6, cstring(v)) }) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
@@ -175,7 +175,7 @@ pub fn create_user_returning_id(db : @sqlite.Sqlite3, params : CreateUserReturni
 /// DELETE FROM users WHERE id = ?
 pub fn delete_user_by_id(db : @sqlite.Sqlite3, params : DeleteUserByIdParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_user_by_id_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -187,7 +187,7 @@ pub fn delete_user_by_id(db : @sqlite.Sqlite3, params : DeleteUserByIdParams) ->
 pub fn update_user_name(db : @sqlite.Sqlite3, params : UpdateUserNameParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_name_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -199,7 +199,7 @@ pub fn update_user_name(db : @sqlite.Sqlite3, params : UpdateUserNameParams) -> 
 pub fn update_user_bio(db : @sqlite.Sqlite3, params : UpdateUserBioParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_bio_sql))
   (match params.bio { None => @sqlite.sqlite_bind_null(stmt, 1); Some(v) => @sqlite.sqlite_bind_text(stmt, 1, cstring(v)) }) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -273,7 +273,7 @@ pub fn get_users_without_bio(db : @sqlite.Sqlite3) -> Array[GetUsersWithoutBioRo
 pub fn update_user_balance(db : @sqlite.Sqlite3, params : UpdateUserBalanceParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_balance_sql))
   (match params.balance { None => @sqlite.sqlite_bind_null(stmt, 1); Some(v) => @sqlite.sqlite_bind_double(stmt, 1, v) }) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -315,7 +315,7 @@ pub fn get_users_with_positive_balance(db : @sqlite.Sqlite3) -> Array[GetUsersWi
 ///  UPDATE users SET is_active = 1 WHERE id = ?
 pub fn activate_user(db : @sqlite.Sqlite3, params : ActivateUserParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(activate_user_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -326,7 +326,7 @@ pub fn activate_user(db : @sqlite.Sqlite3, params : ActivateUserParams) -> Int r
 /// UPDATE users SET is_active = 0 WHERE id = ?
 pub fn deactivate_user(db : @sqlite.Sqlite3, params : DeactivateUserParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(deactivate_user_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -390,7 +390,7 @@ pub fn search_users_by_name(db : @sqlite.Sqlite3, params : SearchUsersByNamePara
 /// SELECT id, name, email, age, balance, is_active, bio, created_at FROM users ORDER BY id LIMIT ?
 pub fn list_users_with_limit(db : @sqlite.Sqlite3, params : ListUsersWithLimitParams) -> Array[ListUsersWithLimitRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_with_limit_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.limit.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.limit) |> ignore
   let results : Array[ListUsersWithLimitRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)
@@ -443,10 +443,10 @@ pub fn get_user_count(db : @sqlite.Sqlite3) -> GetUserCountRow? raise SqlError {
 ///  INSERT INTO posts (author_id, title, content, is_published) VALUES (?, ?, ?, ?)
 pub fn create_post(db : @sqlite.Sqlite3, params : CreatePostParams) -> Unit raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.author_id) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.title)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 3, cstring(params.content)) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 4, params.is_published.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 4, params.is_published) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -456,10 +456,10 @@ pub fn create_post(db : @sqlite.Sqlite3, params : CreatePostParams) -> Unit rais
 /// INSERT INTO posts (author_id, title, content, is_published) VALUES (?, ?, ?, ?)
 pub fn create_post_returning_id(db : @sqlite.Sqlite3, params : CreatePostReturningIdParams) -> Int64 raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_post_returning_id_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.author_id) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.title)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 3, cstring(params.content)) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 4, params.is_published.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 4, params.is_published) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -470,7 +470,7 @@ pub fn create_post_returning_id(db : @sqlite.Sqlite3, params : CreatePostReturni
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE id = ?
 pub fn get_post_by_id(db : @sqlite.Sqlite3, params : GetPostByIdParams) -> GetPostByIdRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_post_by_id_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   if rc == @sqlite.SQLITE_ROW {
     let row : GetPostByIdRow = {
@@ -499,7 +499,7 @@ pub fn get_post_by_id(db : @sqlite.Sqlite3, params : GetPostByIdParams) -> GetPo
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? ORDER BY created_at DESC
 pub fn list_posts_by_author(db : @sqlite.Sqlite3, params : ListPostsByAuthorParams) -> Array[ListPostsByAuthorRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_by_author_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.author_id) |> ignore
   let results : Array[ListPostsByAuthorRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)
@@ -531,7 +531,7 @@ pub fn list_posts_by_author(db : @sqlite.Sqlite3, params : ListPostsByAuthorPara
 /// UPDATE posts SET is_published = 1, published_at = datetime('now') WHERE id = ?
 pub fn publish_post(db : @sqlite.Sqlite3, params : PublishPostParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(publish_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -542,7 +542,7 @@ pub fn publish_post(db : @sqlite.Sqlite3, params : PublishPostParams) -> Int rai
 /// DELETE FROM posts WHERE id = ?
 pub fn delete_post(db : @sqlite.Sqlite3, params : DeletePostParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -553,7 +553,7 @@ pub fn delete_post(db : @sqlite.Sqlite3, params : DeletePostParams) -> Int raise
 /// UPDATE posts SET view_count = view_count + 1 WHERE id = ?
 pub fn increment_view_count(db : @sqlite.Sqlite3, params : IncrementViewCountParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(increment_view_count_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -564,7 +564,7 @@ pub fn increment_view_count(db : @sqlite.Sqlite3, params : IncrementViewCountPar
 ///  SELECT   p.id, p.title, p.content, p.view_count, p.is_published,   p.published_at, p.created_at,   u.id as author_id, u.name as author_name, u.email as author_email FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id = ?
 pub fn get_post_with_author(db : @sqlite.Sqlite3, params : GetPostWithAuthorParams) -> GetPostWithAuthorRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_post_with_author_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   if rc == @sqlite.SQLITE_ROW {
     let row : GetPostWithAuthorRow = {
@@ -625,7 +625,7 @@ pub fn list_posts_with_authors(db : @sqlite.Sqlite3) -> Array[ListPostsWithAutho
 ///  SELECT COUNT(*) as post_count FROM posts WHERE author_id = ?
 pub fn get_post_count_by_author(db : @sqlite.Sqlite3, params : GetPostCountByAuthorParams) -> GetPostCountByAuthorRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_post_count_by_author_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.author_id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   if rc == @sqlite.SQLITE_ROW {
     let row : GetPostCountByAuthorRow = {
@@ -647,7 +647,7 @@ pub fn get_post_count_by_author(db : @sqlite.Sqlite3, params : GetPostCountByAut
 /// SELECT   COUNT(*) as post_count,   COALESCE(SUM(view_count), 0) as total_views FROM posts WHERE author_id = ?
 pub fn get_author_stats(db : @sqlite.Sqlite3, params : GetAuthorStatsParams) -> GetAuthorStatsRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_author_stats_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.author_id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   if rc == @sqlite.SQLITE_ROW {
     let row : GetAuthorStatsRow = {
@@ -739,7 +739,7 @@ pub fn list_tags(db : @sqlite.Sqlite3) -> Array[ListTagsRow] raise SqlError {
 /// DELETE FROM tags WHERE id = ?
 pub fn delete_tag(db : @sqlite.Sqlite3, params : DeleteTagParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_tag_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -750,8 +750,8 @@ pub fn delete_tag(db : @sqlite.Sqlite3, params : DeleteTagParams) -> Int raise S
 ///  INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)
 pub fn add_tag_to_post(db : @sqlite.Sqlite3, params : AddTagToPostParams) -> Unit raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(add_tag_to_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.tag_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.post_id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.tag_id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -761,8 +761,8 @@ pub fn add_tag_to_post(db : @sqlite.Sqlite3, params : AddTagToPostParams) -> Uni
 /// DELETE FROM post_tags WHERE post_id = ? AND tag_id = ?
 pub fn remove_tag_from_post(db : @sqlite.Sqlite3, params : RemoveTagFromPostParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(remove_tag_from_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.tag_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.post_id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.tag_id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
   check_sqlite_error(db, rc)
@@ -773,7 +773,7 @@ pub fn remove_tag_from_post(db : @sqlite.Sqlite3, params : RemoveTagFromPostPara
 /// SELECT t.id, t.name FROM tags t INNER JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ? ORDER BY t.name
 pub fn list_tags_for_post(db : @sqlite.Sqlite3, params : ListTagsForPostParams) -> Array[ListTagsForPostRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_tags_for_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.post_id) |> ignore
   let results : Array[ListTagsForPostRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)
@@ -799,7 +799,7 @@ pub fn list_tags_for_post(db : @sqlite.Sqlite3, params : ListTagsForPostParams) 
 /// SELECT COUNT(*) as tag_count FROM post_tags WHERE post_id = ?
 pub fn get_tag_count_for_post(db : @sqlite.Sqlite3, params : GetTagCountForPostParams) -> GetTagCountForPostRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_tag_count_for_post_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.post_id.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.post_id) |> ignore
   let rc = @sqlite.sqlite_step(stmt)
   if rc == @sqlite.SQLITE_ROW {
     let row : GetTagCountForPostRow = {
@@ -821,8 +821,8 @@ pub fn get_tag_count_for_post(db : @sqlite.Sqlite3, params : GetTagCountForPostP
 ///  SELECT id, name, email, age, balance, is_active, bio, created_at FROM users WHERE id > ? ORDER BY id LIMIT ?
 pub fn list_users_paginated(db : @sqlite.Sqlite3, params : ListUsersPaginatedParams) -> Array[ListUsersPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_paginated_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.limit) |> ignore
   let results : Array[ListUsersPaginatedRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)
@@ -854,9 +854,9 @@ pub fn list_users_paginated(db : @sqlite.Sqlite3, params : ListUsersPaginatedPar
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE author_id = ? AND id > ? ORDER BY id LIMIT ?
 pub fn list_posts_by_author_paginated(db : @sqlite.Sqlite3, params : ListPostsByAuthorPaginatedParams) -> Array[ListPostsByAuthorPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_by_author_paginated_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.author_id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 3, params.limit.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.author_id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 3, params.limit) |> ignore
   let results : Array[ListPostsByAuthorPaginatedRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)
@@ -888,8 +888,8 @@ pub fn list_posts_by_author_paginated(db : @sqlite.Sqlite3, params : ListPostsBy
 /// SELECT   p.id, p.title, p.view_count, p.is_published, p.created_at,   u.id as author_id, u.name as author_name FROM posts p INNER JOIN users u ON p.author_id = u.id WHERE p.id > ? ORDER BY p.id LIMIT ?
 pub fn list_posts_with_authors_paginated(db : @sqlite.Sqlite3, params : ListPostsWithAuthorsPaginatedParams) -> Array[ListPostsWithAuthorsPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_posts_with_authors_paginated_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.limit) |> ignore
   let results : Array[ListPostsWithAuthorsPaginatedRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)
@@ -920,8 +920,8 @@ pub fn list_posts_with_authors_paginated(db : @sqlite.Sqlite3, params : ListPost
 /// SELECT id, author_id, title, content, view_count, is_published, published_at, created_at FROM posts WHERE is_published = 1 AND id > ? ORDER BY id LIMIT ?
 pub fn list_published_posts_paginated(db : @sqlite.Sqlite3, params : ListPublishedPostsPaginatedParams) -> Array[ListPublishedPostsPaginatedRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_published_posts_paginated_sql))
-  @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_bind_int(stmt, 2, params.limit.to_int()) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 1, params.id) |> ignore
+  @sqlite.sqlite_bind_int64(stmt, 2, params.limit) |> ignore
   let results : Array[ListPublishedPostsPaginatedRow] = []
   while true {
     let rc = @sqlite.sqlite_step(stmt)

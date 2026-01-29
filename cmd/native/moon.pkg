@@ -1,4 +1,6 @@
-import { "sqlc_gen_moonbit/lib/codegen" as @codegen }
+import {
+  "sqlc_gen_moonbit/lib/codegen" as @codegen,
+}
 
 options(
   "is-main": true,

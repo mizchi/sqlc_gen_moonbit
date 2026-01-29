@@ -2,7 +2,7 @@
   "name": "example_sqlite_js",
   "version": "0.0.1",
   "deps": {
-    "mizchi/sqlite": "0.2.0",
+    "mizchi/sqlite": "0.2.1",
     "moonbitlang/x": "0.4.38"
   },
   "supported-targets": ["js"]

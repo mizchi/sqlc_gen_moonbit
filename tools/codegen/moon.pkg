@@ -1,4 +1,7 @@
-import { "moonbitlang/x/fs", "moonbitlang/x/sys" }
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys",
+}
 
 options(
   "is-main": true,

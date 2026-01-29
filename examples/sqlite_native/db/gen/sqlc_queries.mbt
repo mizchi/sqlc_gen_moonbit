@@ -11,13 +11,22 @@ fn bytes_to_string(b : Bytes) -> String {
   decoder.decode_lossy(b[0:b.length()])
 }
 
+///|
+fn check_sqlite_error(db : @sqlite.Sqlite3, rc : Int) -> Unit raise SqlError {
+  if rc != @sqlite.SQLITE_ROW && rc != @sqlite.SQLITE_DONE {
+    let msg = bytes_to_string(@sqlite.sqlite_errmsg(db))
+    raise SqlError(msg)
+  }
+}
+
 // Query functions
 ///| GetUser
 /// SELECT id, name, email, created_at FROM users WHERE id = ?
-pub fn get_user(db : @sqlite.Sqlite3, params : GetUserParams) -> GetUserRow? {
+pub fn get_user(db : @sqlite.Sqlite3, params : GetUserParams) -> GetUserRow? raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(get_user_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
+  let rc = @sqlite.sqlite_step(stmt)
+  if rc == @sqlite.SQLITE_ROW {
     let row : GetUserRow = {
       id: @sqlite.sqlite_column_int64(stmt, 0),
       name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
@@ -26,25 +35,38 @@ pub fn get_user(db : @sqlite.Sqlite3, params : GetUserParams) -> GetUserRow? {
     }
     @sqlite.sqlite_finalize(stmt)
     Some(row)
+  } else if rc == @sqlite.SQLITE_DONE {
+    @sqlite.sqlite_finalize(stmt)
+    None
   } else {
     @sqlite.sqlite_finalize(stmt)
+    check_sqlite_error(db, rc)
     None
   }
 }
 
 ///| ListUsers
 /// SELECT id, name, email, created_at FROM users ORDER BY name
-pub fn list_users(db : @sqlite.Sqlite3) -> Array[ListUsersRow] {
+pub fn list_users(db : @sqlite.Sqlite3) -> Array[ListUsersRow] raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(list_users_sql))
   let results : Array[ListUsersRow] = []
-  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {
-    let row : ListUsersRow = {
-      id: @sqlite.sqlite_column_int64(stmt, 0),
-      name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
-      email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
-      created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+  while true {
+    let rc = @sqlite.sqlite_step(stmt)
+    if rc == @sqlite.SQLITE_ROW {
+      let row : ListUsersRow = {
+        id: @sqlite.sqlite_column_int64(stmt, 0),
+        name: bytes_to_string(@sqlite.sqlite_column_text(stmt, 1)),
+        email: bytes_to_string(@sqlite.sqlite_column_text(stmt, 2)),
+        created_at: bytes_to_string(@sqlite.sqlite_column_text(stmt, 3)),
+      }
+      results.push(row)
+    } else if rc == @sqlite.SQLITE_DONE {
+      break
+    } else {
+      @sqlite.sqlite_finalize(stmt)
+      check_sqlite_error(db, rc)
+      break
     }
-    results.push(row)
   }
   @sqlite.sqlite_finalize(stmt)
   results
@@ -52,34 +74,37 @@ pub fn list_users(db : @sqlite.Sqlite3) -> Array[ListUsersRow] {
 
 ///| CreateUser
 /// INSERT INTO users (name, email) VALUES (?, ?)
-pub fn create_user(db : @sqlite.Sqlite3, params : CreateUserParams) -> Int64 {
+pub fn create_user(db : @sqlite.Sqlite3, params : CreateUserParams) -> Int64 raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(create_user_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.email)) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_last_insert_rowid(db)
 }
 
 ///| UpdateUser
 /// UPDATE users SET name = ?, email = ? WHERE id = ?
-pub fn update_user(db : @sqlite.Sqlite3, params : UpdateUserParams) -> Int {
+pub fn update_user(db : @sqlite.Sqlite3, params : UpdateUserParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(update_user_sql))
   @sqlite.sqlite_bind_text(stmt, 1, cstring(params.name)) |> ignore
   @sqlite.sqlite_bind_text(stmt, 2, cstring(params.email)) |> ignore
   @sqlite.sqlite_bind_int(stmt, 3, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 
 ///| DeleteUser
 /// DELETE FROM users WHERE id = ?
-pub fn delete_user(db : @sqlite.Sqlite3, params : DeleteUserParams) -> Int {
+pub fn delete_user(db : @sqlite.Sqlite3, params : DeleteUserParams) -> Int raise SqlError {
   let stmt = @sqlite.sqlite_prepare(db, cstring(delete_user_sql))
   @sqlite.sqlite_bind_int(stmt, 1, params.id.to_int()) |> ignore
-  @sqlite.sqlite_step(stmt) |> ignore
+  let rc = @sqlite.sqlite_step(stmt)
   @sqlite.sqlite_finalize(stmt)
+  check_sqlite_error(db, rc)
   @sqlite.sqlite_changes(db)
 }
 

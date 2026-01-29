@@ -1,0 +1,15 @@
+import {
+  "mizchi/js/core",
+  "mizchi/npm_typed/pg",
+}
+
+options(
+  "supported-targets": [ "js" ],
+  "formatter": {
+    "ignore": [
+      "sqlc_types.mbt",
+      "sqlc_queries.mbt",
+      "sqlc_validators.mbt"
+    ]
+  },
+)
