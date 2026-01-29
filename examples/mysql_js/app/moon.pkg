@@ -1,0 +1,14 @@
+import {
+  "example_mysql_js/db/gen",
+  "mizchi/js/core",
+}
+
+options(
+  "is-main": true,
+  link: {
+    "js": {
+      "exports": ["main"],
+    },
+  },
+  "supported-targets": [ "js" ],
+)

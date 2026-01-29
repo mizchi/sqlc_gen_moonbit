@@ -1,1 +1,3 @@
-import { "moonbitlang/protobuf" }
+import {
+  "moonbitlang/protobuf",
+}
