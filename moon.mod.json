@@ -10,8 +10,8 @@
     "mizchi/codegen": "0.2.2"
   },
   "readme": "README.mbt.md",
-  "repository": "",
+  "repository": "https://github.com/mizchi/sqlc_gen_moonbit",
   "license": "Apache-2.0",
-  "keywords": [],
+  "keywords": ["sqlc", "codegen", "sqlite", "postgres", "d1"],
   "description": "sqlc plugin for MoonBit"
 }
