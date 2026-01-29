@@ -1,4 +1,6 @@
 import {
   "moonbitlang/protobuf",
   "sqlc_gen_moonbit/lib/proto/plugin" as @plugin,
+  "mizchi/codegen/ir" as @ir,
+  "mizchi/codegen/emit" as @emit,
 }
