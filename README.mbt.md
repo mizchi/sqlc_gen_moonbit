@@ -291,17 +291,56 @@ For each query, sqlc-gen-moonbit generates:
 
 ## Standalone Code Generation
 
-You can use the standalone API without sqlc:
+You can generate MoonBit code from SQL without sqlc using the CLI tool or the library API.
 
-### 1. Add dependency
+### CLI Tool
+
+Clone the repository and use the CLI tool:
 
 ```bash
-moon add mizchi/sqlc_gen_moonbit
+# Clone and build
+git clone https://github.com/mizchi/sqlc_gen_moonbit
+cd sqlc_gen_moonbit
+
+# Show help
+moon run tools/codegen --target native -- --help
+
+# Generate code (stdout)
+moon run tools/codegen --target native -- queries.sql
+
+# Generate to file with D1 backend
+moon run tools/codegen --target native -- -b d1 -o db/gen/sqlc_queries.mbt queries.sql
+
+# Check dependencies
+moon run tools/codegen --target native -- --check-deps -b d1 queries.sql
 ```
 
-### 2. Create SQL file with annotations
+CLI Options:
 
-`queries.sql`:
+| Option | Description |
+|--------|-------------|
+| `-o, --output <file>` | Output file (default: stdout) |
+| `-c, --config <file>` | Config file (JSON) |
+| `-b, --backend <type>` | Backend: sqlite, sqlite_js, d1, postgres, postgres_js, mysql_js |
+| `--validators` | Generate validation functions |
+| `--json-schema` | Generate JSON schema |
+| `--check-deps` | Check required dependencies in moon.mod.json |
+
+Config file format (`config.json`):
+
+```json
+{
+  "backend": "sqlite",
+  "validators": true,
+  "json_schema": false,
+  "overrides": [
+    { "column": "users.id", "moonbit_type": "UserId" },
+    { "db_type": "uuid", "moonbit_type": "@uuid.UUID" }
+  ]
+}
+```
+
+### SQL File Format
 
 ```sql
 -- @query GetUser :one
@@ -319,7 +358,13 @@ SELECT * FROM users ORDER BY name;
 INSERT INTO users (name, email) VALUES (?, ?);
 ```
 
-### 3. Generate code
+### Library API
+
+Add dependency and use the library directly:
+
+```bash
+moon add mizchi/sqlc_gen_moonbit
+```
 
 Create `tasks/main.mbt`:
 
