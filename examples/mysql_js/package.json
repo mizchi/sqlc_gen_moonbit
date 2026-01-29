@@ -1,0 +1,6 @@
+{
+  "name": "example-mysql-js",
+  "dependencies": {
+    "mysql2": "^3.11.0"
+  }
+}

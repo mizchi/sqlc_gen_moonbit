@@ -7,6 +7,7 @@ pub enum Backend {
   D1
   Postgres
   PostgresJs
+  MysqlJs
 }
 
 ///|
@@ -17,6 +18,7 @@ pub fn Backend::to_string(self : Backend) -> String {
     D1 => "d1"
     Postgres => "postgres"
     PostgresJs => "postgres_js"
+    MysqlJs => "mysql_js"
   }
 }
 
@@ -48,7 +50,9 @@ pub fn parse_plugin_options(data : Bytes) -> Options {
   }
   // Parse JSON-like format: {"backend":"d1","validators":true,"json_schema":true,"overrides":[...]}
   let json_str = bytes_to_string_simple(data)
-  let backend = if json_str.contains("\"postgres_js\"") {
+  let backend = if json_str.contains("\"mysql_js\"") {
+    MysqlJs
+  } else if json_str.contains("\"postgres_js\"") {
     PostgresJs
   } else if json_str.contains("\"postgres\"") {
     Postgres

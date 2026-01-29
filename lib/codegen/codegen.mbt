@@ -29,6 +29,7 @@ pub fn process_request(input : Bytes) -> Bytes {
     D1 => generate_queries_d1(request, options.overrides)
     Postgres => generate_queries_postgres(request, options.overrides)
     PostgresJs => generate_queries_postgres_js(request, options.overrides)
+    MysqlJs => generate_queries_mysql_js(request, options.overrides)
   }
   files.push(
     @plugin.File::new("sqlc_queries.mbt", string_to_utf8(queries_content)),
@@ -76,6 +77,9 @@ fn generate_moon_pkg(options : Options) -> String {
       buf.write_string("  \"mizchi/js/core\",\n")
       buf.write_string("  \"mizchi/npm_typed/pg\",\n")
     }
+    MysqlJs => {
+      buf.write_string("  \"mizchi/js/core\",\n")
+    }
   }
   buf.write_string("}\n\n")
 
@@ -84,7 +88,7 @@ fn generate_moon_pkg(options : Options) -> String {
 
   // Add supported-targets based on backend
   match options.backend {
-    D1 | SqliteJs | PostgresJs =>
+    D1 | SqliteJs | PostgresJs | MysqlJs =>
       buf.write_string("  \"supported-targets\": [ \"js\" ],\n")
     Postgres => buf.write_string("  \"supported-targets\": [ \"native\" ],\n")
     Sqlite => ()
@@ -116,7 +120,7 @@ fn generate_types(
   // Define error type only for SQLite backends
   // D1 backend uses @cloudflare.D1Error directly
   // Postgres native uses @postgres.PgError directly
-  // PostgresJs uses @pg.PgError directly
+  // PostgresJs/MysqlJs use JS errors directly
   match options.backend {
     Sqlite | SqliteJs => {
       buf.write_string("///| SQL execution error\n")
@@ -124,7 +128,7 @@ fn generate_types(
       buf.write_string("  SqlError(String)\n")
       buf.write_string("} derive(Show)\n\n")
     }
-    D1 | Postgres | PostgresJs => ()
+    D1 | Postgres | PostgresJs | MysqlJs => ()
   }
 
   // Collect unique result structs from queries

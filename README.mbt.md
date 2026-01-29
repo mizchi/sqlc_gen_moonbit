@@ -11,8 +11,11 @@
 | Backend | Target | Runtime | Dependencies |
 |---------|--------|---------|--------------|
 | `sqlite` | `native` | Native binary | `mizchi/sqlite` |
+| `sqlite_js` | `js` | Node.js / Browser | `mizchi/sqlite`, `mizchi/js` |
 | `d1` | `js` | Cloudflare Workers | `mizchi/cloudflare`, `mizchi/js` |
 | `postgres` | `native` | Native binary | `mattn/postgres` |
+| `postgres_js` | `js` | Node.js | `mizchi/npm_typed/pg`, `mizchi/js` |
+| `mysql_js` | `js` | Node.js | `mizchi/js` (mysql2 npm package) |
 
 ## Features
 
@@ -34,7 +37,7 @@ plugins:
   - name: moonbit
     wasm:
       url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.2.1/sqlc-gen-moonbit.wasm"
-      sha256: "c12dd1b4984b83b7ca97930c329779a9bd2c1505a650f7417638bdf00426e57f"
+      sha256: "26eb1d10957f0f4f0197ab204a4ef5a0c9052f10ac40bdf242ae9e223cb5b820"
 sql:
   - engine: sqlite
     schema: "schema.sql"
@@ -167,11 +170,72 @@ pub async fn handler(
 }
 ```
 
+**For PostgreSQL (JS target with Node.js):**
+
+Add dependencies to `moon.mod.json`:
+
+```json
+{
+  "deps": {
+    "mizchi/npm_typed": "0.1.2",
+    "mizchi/js": "0.10.10",
+    "moonbitlang/x": "0.4.38"
+  }
+}
+```
+
+Install npm dependencies:
+
+```bash
+npm install pg
+```
+
+```moonbit
+///|
+async fn run_tests_inner() -> Unit {
+  let pool = @pg.Pool::new(
+    host="localhost",
+    port=5432,
+    user="postgres",
+    password="postgres",
+    database="mydb",
+  )
+
+  // Create user (async, returns inserted id)
+  let user_id = @gen.create_user(pool, @gen.CreateUserParams::new("Alice", "alice@example.com"))
+
+  // List users (async)
+  let users = @gen.list_users(pool)
+
+  // Get user by ID (async)
+  match @gen.get_user(pool, @gen.GetUserParams::new(user_id)) {
+    Some(user) => println("Found: \{user.name}")
+    None => println("Not found")
+  }
+
+  pool.end()
+}
+
+///|
+async fn run_tests() -> Unit noraise {
+  try {
+    run_tests_inner()
+  } catch {
+    e => println("Error: \{e}")
+  }
+}
+
+///|
+fn main {
+  @core.run_async(run_tests)
+}
+```
+
 ## Plugin Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `backend` | `"sqlite"` \| `"d1"` | `"sqlite"` | Target backend |
+| `backend` | `"sqlite"` \| `"sqlite_js"` \| `"d1"` \| `"postgres"` \| `"postgres_js"` \| `"mysql_js"` | `"sqlite"` | Target backend |
 | `validators` | `bool` | `false` | Generate validation functions |
 | `json_schema` | `bool` | `false` | Generate JSON Schema |
 | `overrides` | `array` | `[]` | Custom type mappings |
@@ -222,12 +286,17 @@ For each query, sqlc-gen-moonbit generates:
 | `:one`     | `T?`        | Returns single row or None |
 | `:many`    | `Array[T]`  | Returns all matching rows |
 | `:exec`    | `Unit`      | Executes without returning data |
+| `:execrows`| `Int`       | Returns number of affected rows |
+| `:execlastid` | `Int64`  | Returns last inserted ID (for `INSERT ... RETURNING id`) |
 
 ## Examples
 
 - [`examples/sqlite_native`](./examples/sqlite_native) - SQLite with native binding
+- [`examples/sqlite_js`](./examples/sqlite_js) - SQLite with JS target (Node.js / Browser)
 - [`examples/d1`](./examples/d1) - Cloudflare Worker with D1
 - [`examples/postgres_native`](./examples/postgres_native) - PostgreSQL with native binding
+- [`examples/postgres_js`](./examples/postgres_js) - PostgreSQL with JS target (Node.js)
+- [`examples/mysql_js`](./examples/mysql_js) - MySQL with JS target (Node.js)
 
 ## Development
 
