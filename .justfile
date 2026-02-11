@@ -30,11 +30,11 @@ test-pg:
 
 # PostgreSQL JS tests (requires postgres on localhost:5432)
 test-postgres-js:
-    cd examples/postgres_js && moon build --target js && node target/js/release/build/app/app.js
+    cd examples/postgres_js && moon build --target js && node _build/js/release/build/app/app.js
 
 # MySQL JS tests (requires mysql on localhost:3306)
 test-mysql-js:
-    cd examples/mysql_js && moon build --target js && node target/js/release/build/app/app.js
+    cd examples/mysql_js && moon build --target js && node _build/js/release/build/app/app.js
 
 # Generate code for examples
 generate: build
