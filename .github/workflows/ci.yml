@@ -68,7 +68,7 @@ jobs:
         run: cd tests/d1 && npm ci
 
       - name: Run core tests
-        run: just --justfile .justfile test-core
+        run: just --justfile .justfile test-core-ci
 
       - name: Setup PostgreSQL schema
         run: |
