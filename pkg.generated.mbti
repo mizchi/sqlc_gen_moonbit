@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "mizchi/sqlc_gen_moonbit/cmd/wasm"
+package "mizchi/sqlc_gen_moonbit"
 
 // Values
 

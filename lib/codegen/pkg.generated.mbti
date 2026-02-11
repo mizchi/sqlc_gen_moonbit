@@ -1,22 +1,111 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "sqlc_gen_moonbit/lib/codegen"
+package "mizchi/sqlc_gen_moonbit/lib/codegen"
+
+import {
+  "mizchi/codegen/ir",
+  "mizchi/sqlc_gen_moonbit/lib/proto/plugin",
+}
 
 // Values
+pub fn bytes_to_string_simple(Bytes) -> String
+
+pub fn column_to_constraints(@plugin.Column) -> @ir.Constraints
+
+pub fn column_to_ir_field(@plugin.Column, Int) -> @ir.Field
+
+pub fn column_to_ir_field_with_override(@plugin.Column, Int, Array[TypeOverride]) -> @ir.Field
+
+pub fn column_to_ir_type(@plugin.Column) -> @ir.Type
+
+pub fn column_to_ir_type_with_override(@plugin.Column, Array[TypeOverride]) -> @ir.Type
+
+pub fn escape_string(String) -> String
+
+pub fn find_column_override(@plugin.Column, Array[TypeOverride]) -> TypeOverride?
+
+pub fn find_substring(String, String) -> Int?
+
+pub fn generate_from_queries(Array[QueryDef]) -> String
+
+pub fn generate_from_sql(String) -> String
+
+pub fn generate_json_schema(@plugin.GenerateRequest) -> String
+
+pub fn generate_params_struct(StringBuilder, String, Array[@plugin.Parameter], Array[TypeOverride], @plugin.Query) -> Unit
+
+pub fn generate_queries_d1(@plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn generate_queries_mysql_js(@plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn generate_queries_postgres(@plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn generate_queries_postgres_js(@plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn generate_queries_sqlite(@plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn generate_queries_sqlite_js(@plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn[B : BackendCodeGen] generate_queries_with_backend(B, @plugin.GenerateRequest, Array[TypeOverride]) -> String
+
+pub fn generate_result_struct(StringBuilder, String, Array[@plugin.Column], Array[TypeOverride], @plugin.Query) -> Unit
+
+pub fn generate_validators(@plugin.GenerateRequest) -> String
+
 pub fn parse_plugin_options(Bytes) -> Options
+
+pub fn parse_sql_queries(String) -> Array[QueryDef]
 
 pub fn process_request(Bytes) -> Bytes
 
+pub fn query_columns_to_ir_struct(@plugin.Query) -> @ir.Struct
+
+pub fn query_columns_to_ir_struct_full(@plugin.Query, Array[TypeOverride]) -> @ir.Struct
+
+pub fn query_params_to_ir_struct(@plugin.Query) -> @ir.Struct
+
+pub fn query_params_to_ir_struct_full(@plugin.Query, Array[TypeOverride]) -> @ir.Struct
+
+pub fn sanitize_newlines(String) -> String
+
+pub fn serialize_response(@plugin.GenerateResponse) -> Bytes
+
+pub fn sql_type_to_moonbit(@plugin.Column, Array[TypeOverride]) -> String
+
 pub fn string_to_utf8(String) -> Bytes
+
+pub fn substring(String, Int, Int) -> String
+
+pub fn to_pascal_case(String) -> String
+
+pub fn to_snake_case(String) -> String
 
 // Errors
 
 // Types and methods
 pub enum Backend {
   Sqlite
+  SqliteJs
   D1
   Postgres
+  PostgresJs
+  MysqlJs
 }
 pub fn Backend::to_string(Self) -> String
+
+pub struct BackendInfo {
+  name : String
+  db_type : String
+  error_type : String?
+  uses_result : Bool
+  is_async : Bool
+  target : String
+}
+pub fn BackendInfo::new(String, String, String?, Bool, Bool, String) -> Self
+
+pub struct D1Backend {
+  _placeholder : Unit
+}
+pub fn D1Backend::new() -> Self
 
 pub struct Options {
   backend : Backend
@@ -25,6 +114,29 @@ pub struct Options {
   overrides : Array[TypeOverride]
 }
 pub fn Options::default() -> Self
+
+pub struct PostgresBackend {
+  _placeholder : Unit
+}
+pub fn PostgresBackend::new() -> Self
+
+pub struct QueryDef {
+  name : String
+  cmd : String
+  params : Array[(String, String)]
+  returns : Array[(String, String)]
+  sql : String
+}
+
+pub struct SqliteBackend {
+  _placeholder : Unit
+}
+pub fn SqliteBackend::new() -> Self
+
+pub struct SqliteJsBackend {
+  _placeholder : Unit
+}
+pub fn SqliteJsBackend::new() -> Self
 
 pub struct TypeOverride {
   column : String?
@@ -36,4 +148,15 @@ pub struct TypeOverride {
 // Type aliases
 
 // Traits
+pub trait BackendCodeGen {
+  info(Self) -> BackendInfo
+  generate_helpers(Self, StringBuilder) -> Unit
+  param_bind_expr(Self, @plugin.Column, Int, String) -> String
+  column_read_expr(Self, @plugin.Column, Int, String) -> String
+  generate_one(Self, StringBuilder, @plugin.Query, Array[TypeOverride]) -> Unit
+  generate_many(Self, StringBuilder, @plugin.Query, Array[TypeOverride]) -> Unit
+  generate_exec(Self, StringBuilder, @plugin.Query, Array[TypeOverride]) -> Unit
+  generate_execrows(Self, StringBuilder, @plugin.Query, Array[TypeOverride]) -> Unit
+  generate_execlastid(Self, StringBuilder, @plugin.Query, Array[TypeOverride]) -> Unit
+}
 

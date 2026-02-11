@@ -1,17 +1,23 @@
 {
   "name": "mizchi/sqlc_gen_moonbit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "deps": {
-    "moonbitlang/protobuf": "0.1.0",
-    "moonbitlang/x": "0.4.38",
-    "mizchi/sqlite": "0.2.1",
+    "moonbitlang/protobuf": "0.1.1",
+    "moonbitlang/x": "0.4.40",
+    "mizchi/sqlite": "0.2.3",
     "BigOrangeQWQ/wasi-io": "0.2.6",
     "mattn/postgres": "0.10.4",
-    "mizchi/codegen": "0.2.2"
+    "mizchi/codegen": "0.2.3"
   },
   "readme": "README.mbt.md",
   "repository": "https://github.com/mizchi/sqlc_gen_moonbit",
   "license": "Apache-2.0",
-  "keywords": ["sqlc", "codegen", "sqlite", "postgres", "d1"],
+  "keywords": [
+    "sqlc",
+    "codegen",
+    "sqlite",
+    "postgres",
+    "d1"
+  ],
   "description": "sqlc plugin for MoonBit"
 }

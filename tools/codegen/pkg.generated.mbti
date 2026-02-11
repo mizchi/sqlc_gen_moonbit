@@ -1,11 +1,17 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "sqlc_gen_moonbit/tools/codegen"
+package "mizchi/sqlc_gen_moonbit/tools/codegen"
 
 // Values
 
 // Errors
 
 // Types and methods
+type CliArgs
+
+type Config
+
+type Override
+
 type QueryDef
 
 // Type aliases

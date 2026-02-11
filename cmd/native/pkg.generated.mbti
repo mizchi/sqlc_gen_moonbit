@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "sqlc_gen_moonbit/cmd/native"
+package "mizchi/sqlc_gen_moonbit/cmd/native"
 
 // Values
 
