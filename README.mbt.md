@@ -119,7 +119,7 @@ Add dependencies to `moon.mod.json`:
 }
 ```
 
-```moonbit
+```moonbit nocheck
 fn main {
   let db = @sqlite.sqlite_open_v2(...)
 
@@ -151,7 +151,7 @@ Add dependencies to `moon.mod.json`:
 }
 ```
 
-```moonbit
+```moonbit nocheck
 ///|
 pub async fn handler(
   db : @cloudflare.D1Database,
@@ -190,7 +190,7 @@ Install npm dependencies:
 npm install pg
 ```
 
-```moonbit
+```moonbit nocheck
 ///|
 async fn run_tests_inner() -> Unit {
   let pool = @pg.Pool::new(
@@ -368,9 +368,12 @@ moon add mizchi/sqlc_gen_moonbit
 
 Create `tasks/main.mbt`:
 
-```moonbit
+```moonbit nocheck
+///|
 fn main {
-  let sql_content = @fs.read_file_to_string("queries.sql") catch { e => panic() }
+  let sql_content = @fs.read_file_to_string("queries.sql") catch {
+    e => panic()
+  }
   let code = @codegen.generate_from_sql(sql_content)
   println(code)
 }

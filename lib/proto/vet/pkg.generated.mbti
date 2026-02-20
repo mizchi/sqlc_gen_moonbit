@@ -1,10 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "sqlc_gen_moonbit/lib/proto/vet"
+package "mizchi/sqlc_gen_moonbit/lib/proto/vet"
 
-import(
-  "moonbitlang/core/json"
-  "moonbitlang/protobuf"
-)
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/protobuf",
+}
 
 // Values
 

@@ -24,6 +24,7 @@ fn Config::default() -> Config {
   { backend: "sqlite", validators: false, json_schema: false, overrides: [] }
 }
 
+///|
 struct Override {
   column : String?
   db_type : String?
@@ -32,6 +33,8 @@ struct Override {
 }
 
 // Query definition parsed from comments
+
+///|
 struct QueryDef {
   name : String
   cmd : String // :one, :many, :exec
@@ -41,6 +44,8 @@ struct QueryDef {
 }
 
 // CLI arguments
+
+///|
 struct CliArgs {
   mut input_file : String?
   mut output_file : String?
@@ -144,13 +149,17 @@ fn main {
 fn print_help() -> Unit {
   println("sqlc-gen-moonbit standalone code generator")
   println("")
-  println("Usage: moon run tools/codegen --target native -- [options] <input.sql>")
+  println(
+    "Usage: moon run tools/codegen --target native -- [options] <input.sql>",
+  )
   println("")
   println("Options:")
   println("  -o, --output <file>   Output file (default: stdout)")
   println("  -c, --config <file>   Config file (JSON)")
   println("  -b, --backend <type>  Backend type (default: sqlite)")
-  println("                        sqlite, sqlite_js, d1, postgres, postgres_js, mysql_js")
+  println(
+    "                        sqlite, sqlite_js, d1, postgres, postgres_js, mysql_js",
+  )
   println("  --validators          Generate validation functions")
   println("  --json-schema         Generate JSON schema file")
   println("  --check-deps          Check required dependencies")
@@ -242,14 +251,13 @@ fn parse_config_json(content : String) -> Result[Config, String] {
         _ => ()
       }
       match obj.get("overrides") {
-        Some(Array(arr)) => {
+        Some(Array(arr)) =>
           for item in arr {
             match parse_override(item) {
               Ok(o) => config.overrides.push(o)
               Err(_) => ()
             }
           }
-        }
         _ => ()
       }
     }
@@ -306,14 +314,13 @@ fn check_dependencies(backend : String) -> Unit {
   match json {
     Object(obj) =>
       match obj.get("deps") {
-        Some(Object(deps_obj)) => {
+        Some(Object(deps_obj)) =>
           for entry in deps_obj {
             match entry.1 {
               String(v) => deps[entry.0] = v
               _ => ()
             }
           }
-        }
         _ => ()
       }
     _ => ()
@@ -441,7 +448,8 @@ fn generate_code(queries : Array[QueryDef], config : Config) -> String {
   // Generate structs using codegen.mbt
   for query in queries {
     // Generate Row struct for :one and :many
-    if (query.cmd == ":one" || query.cmd == ":many") && query.returns.length() > 0 {
+    if (query.cmd == ":one" || query.cmd == ":many") &&
+      query.returns.length() > 0 {
       let row_struct = query_to_row_struct(query, config.overrides)
       buf.write_string(emitter.emit_struct(row_struct))
       buf.write_string("\n")
@@ -473,7 +481,9 @@ fn generate_code(queries : Array[QueryDef], config : Config) -> String {
 fn generate_helpers(buf : StringBuilder, backend : String) -> Unit {
   match backend {
     "sqlite" | "sqlite_js" => {
-      buf.write_string("// Required: import { \"mizchi/sqlite\", \"moonbitlang/x/encoding\" }\n\n")
+      buf.write_string(
+        "// Required: import { \"mizchi/sqlite\", \"moonbitlang/x/encoding\" }\n\n",
+      )
       buf.write_string("///|\nfn cstring(s : String) -> Bytes {\n")
       buf.write_string("  @encoding.encode(@encoding.UTF8, s)\n")
       buf.write_string("}\n\n")
@@ -492,13 +502,17 @@ fn generate_helpers(buf : StringBuilder, backend : String) -> Unit {
       buf.write_string(
         "// Required: import { \"mizchi/npm_typed/pg\", \"mizchi/js/core\" }\n\n",
       )
-    "mysql_js" => buf.write_string("// Required: import { \"mizchi/js/core\" }\n\n")
+    "mysql_js" =>
+      buf.write_string("// Required: import { \"mizchi/js/core\" }\n\n")
     _ => ()
   }
 }
 
 ///|
-fn query_to_row_struct(query : QueryDef, overrides : Array[Override]) -> @ir.Struct {
+fn query_to_row_struct(
+  query : QueryDef,
+  overrides : Array[Override],
+) -> @ir.Struct {
   let struct_name = query.name + "Row"
   let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
   for ret in query.returns {
@@ -640,7 +654,10 @@ fn generate_query_function(
 }
 
 ///|
-fn generate_query_function_sqlite(buf : StringBuilder, query : QueryDef) -> Unit {
+fn generate_query_function_sqlite(
+  buf : StringBuilder,
+  query : QueryDef,
+) -> Unit {
   let func_name = to_snake_case(query.name)
   let row_type = query.name + "Row"
   let params_type = query.name + "Params"
@@ -689,7 +706,9 @@ fn generate_query_function_sqlite(buf : StringBuilder, query : QueryDef) -> Unit
   // Execute based on cmd
   match query.cmd {
     ":one" => {
-      buf.write_string("  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n")
+      buf.write_string(
+        "  if @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n",
+      )
       buf.write_string("    let row : ")
       buf.write_string(row_type)
       buf.write_string(" = {\n")
@@ -712,7 +731,9 @@ fn generate_query_function_sqlite(buf : StringBuilder, query : QueryDef) -> Unit
       buf.write_string("  let results : Array[")
       buf.write_string(row_type)
       buf.write_string("] = []\n")
-      buf.write_string("  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n")
+      buf.write_string(
+        "  while @sqlite.sqlite_step(stmt) == @sqlite.SQLITE_ROW {\n",
+      )
       buf.write_string("    let row : ")
       buf.write_string(row_type)
       buf.write_string(" = {\n")
@@ -779,7 +800,9 @@ fn generate_query_function_d1(buf : StringBuilder, query : QueryDef) -> Unit {
         buf.write_string(",\n")
       }
       buf.write_string("    ")
-      buf.write_string(param_to_js_value(param.1, "params." + to_snake_case(param.0)))
+      buf.write_string(
+        param_to_js_value(param.1, "params." + to_snake_case(param.0)),
+      )
     }
     buf.write_string("\n  ])")
   }
@@ -820,7 +843,10 @@ fn generate_query_function_d1(buf : StringBuilder, query : QueryDef) -> Unit {
 }
 
 ///|
-fn generate_query_function_postgres(buf : StringBuilder, query : QueryDef) -> Unit {
+fn generate_query_function_postgres(
+  buf : StringBuilder,
+  query : QueryDef,
+) -> Unit {
   let func_name = to_snake_case(query.name)
   let row_type = query.name + "Row"
   let params_type = query.name + "Params"
@@ -859,7 +885,9 @@ fn generate_query_function_postgres(buf : StringBuilder, query : QueryDef) -> Un
       if i > 0 {
         buf.write_string(", ")
       }
-      buf.write_string(param_to_pg_value(param.1, "params." + to_snake_case(param.0)))
+      buf.write_string(
+        param_to_pg_value(param.1, "params." + to_snake_case(param.0)),
+      )
     }
     buf.write_string("]")
   }
@@ -948,7 +976,9 @@ fn generate_query_function_postgres_js(
         buf.write_string(",\n")
       }
       buf.write_string("    ")
-      buf.write_string(param_to_js_value(param.1, "params." + to_snake_case(param.0)))
+      buf.write_string(
+        param_to_js_value(param.1, "params." + to_snake_case(param.0)),
+      )
     }
     buf.write_string("\n  ]")
   }
@@ -989,7 +1019,10 @@ fn generate_query_function_postgres_js(
 }
 
 ///|
-fn generate_query_function_mysql_js(buf : StringBuilder, query : QueryDef) -> Unit {
+fn generate_query_function_mysql_js(
+  buf : StringBuilder,
+  query : QueryDef,
+) -> Unit {
   let func_name = to_snake_case(query.name)
   let row_type = query.name + "Row"
   let params_type = query.name + "Params"
@@ -1081,8 +1114,7 @@ fn param_to_js_value(sql_type : String, expr : String) -> String {
   match sql_type.to_upper() {
     "INTEGER" | "INT" | "INT4" | "INT8" | "BIGINT" | "SMALLINT" =>
       "@core.JsValue::from_int64(" + expr + ")"
-    "REAL" | "FLOAT" | "DOUBLE" =>
-      "@core.JsValue::from_double(" + expr + ")"
+    "REAL" | "FLOAT" | "DOUBLE" => "@core.JsValue::from_double(" + expr + ")"
     "TEXT" | "VARCHAR" | "CHAR" => "@core.JsValue::from_string(" + expr + ")"
     "BOOLEAN" | "BOOL" => "@core.JsValue::from_bool(" + expr + ")"
     _ => "@core.JsValue::from_string(" + expr + ")"

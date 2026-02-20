@@ -1,9 +1,13 @@
 import {
-  "mizchi/sqlc_gen_moonbit/lib/codegen" as @codegen,
+  "mizchi/sqlc_gen_moonbit/lib/codegen" @codegen,
 }
 
 options(
   "is-main": true,
   "native-stub": [ "stub.c" ],
   "supported-targets": [ "native" ],
+  targets: {
+    "ffi_native.mbt": [ "native" ],
+    "ffi_stub.mbt": [ "wasm-gc", "wasm", "js" ],
+  },
 )
