@@ -3,7 +3,7 @@ plugins:
   - name: moonbit
     wasm:
       url: "file://../../bin/sqlc-gen-moonbit.wasm"
-      sha256: "26eb1d10957f0f4f0197ab204a4ef5a0c9052f10ac40bdf242ae9e223cb5b820"
+      sha256: "5ce58b1fbea168c2eeca87be5a68f63da573bc73c4febdb76669f6a6e1b71909"
 sql:
   - engine: sqlite
     schema: "db/sqlite_js/schema.sql"

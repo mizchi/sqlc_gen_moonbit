@@ -81,24 +81,22 @@ fn generate_moon_pkg(options : Options) -> String {
   }
   buf.write_string("}\n\n")
 
-  // Options block
-  buf.write_string("options(\n")
-
   // Add supported-targets based on backend
   match options.backend {
     D1 | SqliteJs | PostgresJs | MysqlJs =>
-      buf.write_string("  \"supported-targets\": [ \"js\" ],\n")
-    Postgres => buf.write_string("  \"supported-targets\": [ \"native\" ],\n")
+      buf.write_string("supported_targets = \"js\"\n\n")
+    Postgres => buf.write_string("supported_targets = \"native\"\n\n")
     Sqlite => ()
   }
 
+  // Options block
+  buf.write_string("options(\n")
+
   // Exclude generated files from formatter
-  buf.write_string("  \"formatter\": {\n")
-  buf.write_string("    \"ignore\": [\n")
-  buf.write_string("      \"sqlc_types.mbt\",\n")
-  buf.write_string("      \"sqlc_queries.mbt\",\n")
-  buf.write_string("      \"sqlc_validators.mbt\"\n")
-  buf.write_string("    ]\n")
+  buf.write_string("  formatter: {\n")
+  buf.write_string(
+    "    \"ignore\": [ \"sqlc_types.mbt\", \"sqlc_queries.mbt\", \"sqlc_validators.mbt\" ],\n",
+  )
   buf.write_string("  },\n")
   buf.write_string(")\n")
   buf.to_string()

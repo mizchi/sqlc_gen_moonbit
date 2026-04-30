@@ -3,13 +3,10 @@ import {
   "mizchi/cloudflare",
 }
 
+supported_targets = "js"
+
 options(
-  "supported-targets": [ "js" ],
-  "formatter": {
-    "ignore": [
-      "sqlc_types.mbt",
-      "sqlc_queries.mbt",
-      "sqlc_validators.mbt"
-    ]
+  formatter: {
+    "ignore": [ "sqlc_types.mbt", "sqlc_queries.mbt", "sqlc_validators.mbt" ],
   },
 )
