@@ -147,10 +147,12 @@ fn generate_query_function_d1(
         } else {
           "p" + param.number.to_string()
         }
-        buf.write_string("  sql_text = sql_text.replace(\"/*SLICE:")
+        // MoonBit's String::replace takes labelled `old~` / `new~`
+        // args; the positional form trips type error 4086.
+        buf.write_string("  sql_text = sql_text.replace(old=\"/*SLICE:")
         buf.write_string(col.name)
         buf.write_string(
-          "*/?\", sqlc_slice_placeholders(params.",
+          "*/?\", new=sqlc_slice_placeholders(params.",
         )
         buf.write_string(param_name)
         buf.write_string(".length()))\n")

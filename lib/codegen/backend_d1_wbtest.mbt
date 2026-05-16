@@ -128,7 +128,7 @@ test "generate_queries_d1 - slice param triggers dynamic SQL + bind loop" {
   assert_true(out.contains("let mut sql_text = list_by_ids_sql"))
   assert_true(
     out.contains(
-      "sql_text = sql_text.replace(\"/*SLICE:ids*/?\", sqlc_slice_placeholders(params.ids.length()))",
+      "sql_text = sql_text.replace(old=\"/*SLICE:ids*/?\", new=sqlc_slice_placeholders(params.ids.length()))",
     ),
   )
   // bind list built dynamically.
