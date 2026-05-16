@@ -289,6 +289,25 @@ For each query, sqlc-gen-moonbit generates:
 | `:execrows`| `Int`       | Returns number of affected rows |
 | `:execlastid` | `Int64`  | Returns last inserted ID (for `INSERT ... RETURNING id`) |
 
+### `Int64` parameters bind as `BigInt` on JS targets
+
+On the JS-target backends (`d1`, `sqlite_js`, `postgres_js`,
+`mysql_js`), `Int64` parameters — `limit`, `offset`, any `BIGINT`
+column, etc. — reach the underlying `D1PreparedStatement.bind(...)`
+or driver as a JavaScript `BigInt`. Real D1 and the JS drivers
+accept it, but tests that introspect bound params need to compare
+against `BigInt` literals rather than plain `Number`:
+
+```js
+// recording mock comparing the bound params
+assert.deepEqual(call.params, ["mizchi", 100, 0]);     // ❌ fails
+assert.deepEqual(call.params, ["mizchi", 100n, 0n]);   // ✅ passes
+```
+
+This catches callers migrating from hand-rolled `db.prepare(...)`
+code that used to bind plain `Number`. Tracking as [#6](https://github.com/mizchi/sqlc_gen_moonbit/issues/6)
+in case a future opt-in option narrows safe values back to `Number`.
+
 ## Standalone Code Generation
 
 You can generate MoonBit code from SQL without sqlc using the CLI tool or the library API.
