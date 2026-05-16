@@ -22,11 +22,11 @@ jobs:
         run: moon update
 
       - name: Build WASM plugin
-        run: moon build --target wasm ./cmd/wasm
+        run: moon build --target wasm --release ./cmd/wasm
 
       - name: Prepare release assets
         run: |
-          cp target/wasm/release/build/cmd/wasm/wasm.wasm sqlc-gen-moonbit.wasm
+          cp _build/wasm/release/build/cmd/wasm/wasm.wasm sqlc-gen-moonbit.wasm
           SHA256=$(shasum -a 256 sqlc-gen-moonbit.wasm | cut -d ' ' -f 1)
           echo "$SHA256  sqlc-gen-moonbit.wasm" > sqlc-gen-moonbit.wasm.sha256
           echo "SHA256=$SHA256" >> $GITHUB_ENV
