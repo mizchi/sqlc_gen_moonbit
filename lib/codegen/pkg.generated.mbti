@@ -19,6 +19,8 @@ pub fn column_to_ir_type(@plugin.Column) -> @ir.Type
 
 pub fn column_to_ir_type_with_override(@plugin.Column, Array[TypeOverride]) -> @ir.Type
 
+pub fn emit_sql_doc_lines(StringBuilder, String) -> Unit
+
 pub fn escape_string(String) -> String
 
 pub fn find_column_override(@plugin.Column, Array[TypeOverride]) -> TypeOverride?

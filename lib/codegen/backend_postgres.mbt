@@ -36,13 +36,8 @@ fn generate_query_function_postgres(
     _ => "Result[Unit, @postgres.PgError]"
   }
 
-  // Doc comment
-  buf.write_string("///| ")
-  buf.write_string(query.name)
-  buf.write_string("\n")
-  buf.write_string("/// ")
-  buf.write_string(sanitize_newlines(query.text))
-  buf.write_string("\n")
+  // Doc comment — preserves the original line breaks from query.sql.
+  backend_write_doc_comment(buf, query)
 
   // Function signature - sync with Connection type from mattn/postgres
   buf.write_string("pub fn ")

@@ -77,6 +77,56 @@ pub fn sanitize_newlines(s : String) -> String {
 }
 
 ///|
+/// Emit a multi-line SQL string as a sequence of `/// ` doc-comment
+/// lines, preserving newlines from `query.sql`. Each line has its
+/// trailing whitespace trimmed so the generator output stays
+/// formatter-stable regardless of how the source SQL was indented.
+///
+/// `\r\n` and bare `\r` are normalised to `\n`. Empty trailing lines
+/// (caused by a final newline in `query.sql`) are dropped so the
+/// emitted block doesn't end with a dangling `/// `.
+pub fn emit_sql_doc_lines(buf : StringBuilder, sql : String) -> Unit {
+  // Normalise CR/CRLF → LF first so the split below sees one shape.
+  let normalised = StringBuilder::new()
+  let mut prev_cr = false
+  for c in sql {
+    match c {
+      '\r' => {
+        normalised.write_char('\n')
+        prev_cr = true
+      }
+      '\n' => {
+        if !prev_cr {
+          normalised.write_char('\n')
+        }
+        prev_cr = false
+      }
+      _ => {
+        normalised.write_char(c)
+        prev_cr = false
+      }
+    }
+  }
+  let text = normalised.to_string()
+  // Collect into an array so we can drop trailing-empty entries.
+  let lines : Array[String] = []
+  for view in text.split("\n") {
+    lines.push(view.to_owned())
+  }
+  while lines.length() > 0 &&
+        lines[lines.length() - 1].view().trim(chars=" \t").length() == 0 {
+    let _ = lines.pop()
+
+  }
+  for line in lines {
+    let trimmed = line.view().trim_end(chars=" \t")
+    buf.write_string("/// ")
+    buf.write_string(trimmed.to_owned())
+    buf.write_string("\n")
+  }
+}
+
+///|
 pub fn escape_string(s : String) -> String {
   let buf = StringBuilder::new()
   buf.write_char('"')

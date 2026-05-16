@@ -23,3 +23,46 @@ test "INTEGER mapping uses Int64 conversions" {
   assert_true(d1_expr.contains("js_number_to_int64"))
   assert_true(!d1_expr.contains("to_int("))
 }
+
+///|
+test "emit_sql_doc_lines preserves newlines from query.sql" {
+  let buf = StringBuilder::new()
+  let sql =
+    #|SELECT id, name
+    #|FROM users
+    #|WHERE id = ?
+  emit_sql_doc_lines(buf, sql)
+  let out = buf.to_string()
+  let expected =
+    #|/// SELECT id, name
+    #|/// FROM users
+    #|/// WHERE id = ?
+    #|
+  assert_eq(out, expected)
+}
+
+///|
+test "emit_sql_doc_lines normalises CRLF and drops trailing blank lines" {
+  let buf = StringBuilder::new()
+  emit_sql_doc_lines(buf, "SELECT 1\r\nFROM t\r\nWHERE x = ?\r\n\r\n")
+  let out = buf.to_string()
+  let expected =
+    #|/// SELECT 1
+    #|/// FROM t
+    #|/// WHERE x = ?
+    #|
+  assert_eq(out, expected)
+}
+
+///|
+test "emit_sql_doc_lines trims trailing whitespace per line" {
+  let buf = StringBuilder::new()
+  emit_sql_doc_lines(buf, "SELECT id   \nFROM users\t \nWHERE id = ?")
+  let out = buf.to_string()
+  let expected =
+    #|/// SELECT id
+    #|/// FROM users
+    #|/// WHERE id = ?
+    #|
+  assert_eq(out, expected)
+}

@@ -92,7 +92,12 @@ pub fn[B : BackendCodeGen] generate_queries_with_backend(
 // ============================================================
 
 ///|
-/// Generate doc comment for a query function
+/// Generate doc comment for a query function. The first doc-comment
+/// line carries the query name (and is consumed by MoonBit's `///|`
+/// section marker); the remaining lines reproduce `query.sql`
+/// verbatim — newlines included — so IDE hover and `moon ide
+/// peek-def` show the original query layout instead of a single
+/// space-joined line.
 fn backend_write_doc_comment(
   buf : StringBuilder,
   query : @plugin.Query,
@@ -100,9 +105,7 @@ fn backend_write_doc_comment(
   buf.write_string("///| ")
   buf.write_string(query.name)
   buf.write_string("\n")
-  buf.write_string("/// ")
-  buf.write_string(sanitize_newlines(query.text))
-  buf.write_string("\n")
+  emit_sql_doc_lines(buf, query.text)
 }
 
 ///|
