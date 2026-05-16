@@ -144,7 +144,7 @@ fn generate_query_function_d1(
 fn d1_param_to_core_any(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
   // For nullable types, we need to handle Option
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
   if is_nullable {
     // For nullable params, use match to handle None - @core.null() for null value
     "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
@@ -169,7 +169,7 @@ fn d1_column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
   let field_access = obj_expr + "[" + field_name + "]"
 
   // Handle nullable columns
-  if !(col.not_null) {
+  if !col.not_null {
     // For nullable columns, check for null/undefined first
     match type_name {
       "INTEGER" | "INT" | "INT4" =>

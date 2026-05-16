@@ -5,8 +5,8 @@ default:
 
 # Build plugins and copy to bin/
 build:
-    moon build --target native ./cmd/native
-    moon build --target wasm ./cmd/wasm
+    moon build --target native --release ./cmd/native
+    moon build --target wasm --release ./cmd/wasm
     mkdir -p bin
     cp _build/native/release/build/cmd/native/native.exe bin/sqlc-gen-moonbit
     cp _build/wasm/release/build/cmd/wasm/wasm.wasm bin/sqlc-gen-moonbit.wasm

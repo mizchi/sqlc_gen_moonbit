@@ -113,7 +113,7 @@ pub fn column_to_ir_type_with_override(
       let base_type = @ir.Type::named(override_.moonbit_type)
       let is_nullable = match override_.nullable {
         Some(n) => n
-        None => !(col.not_null)
+        None => !col.not_null
       }
       if is_nullable {
         @ir.Type::optional(base_type)
@@ -149,7 +149,7 @@ pub fn query_params_to_ir_struct_full(
   overrides : Array[TypeOverride],
 ) -> @ir.Struct {
   let struct_name = to_pascal_case(query.name) + "Params"
-  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Debug", "Eq"])
   for param in query.params {
     let field = column_to_ir_field_with_override(
       param.column,
@@ -168,7 +168,7 @@ pub fn query_columns_to_ir_struct_full(
   overrides : Array[TypeOverride],
 ) -> @ir.Struct {
   let struct_name = to_pascal_case(query.name) + "Row"
-  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Debug", "Eq"])
   for i, col in query.columns {
     let field = column_to_ir_field_with_override(col, i + 1, overrides)
     s = s.with_field(field)

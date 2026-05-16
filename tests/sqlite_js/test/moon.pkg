@@ -3,3 +3,5 @@ import {
   "moonbitlang/x/encoding",
   "backend_sqlite_js_test/db/gen",
 }
+
+supported_targets = "js"

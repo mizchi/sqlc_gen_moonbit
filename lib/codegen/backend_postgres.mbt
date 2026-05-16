@@ -159,7 +159,7 @@ fn generate_query_function_postgres(
 ///|
 fn postgres_param_to_value(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // Check type category using contains matching (handles VARCHAR(255), pg_catalog.varchar, etc.)
   let is_string_type = type_name.contains("TEXT") ||
@@ -215,7 +215,7 @@ fn postgres_param_to_value(col : @plugin.Column, expr : String) -> String {
 fn postgres_column_from_row(col : @plugin.Column, idx : Int) -> String {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // mattn/postgres returns Array[Array[String]], so we access row[idx]
   // and convert from String to the appropriate type

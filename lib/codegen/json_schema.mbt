@@ -14,7 +14,7 @@ pub fn generate_json_schema(request : @plugin.GenerateRequest) -> String {
   // Generate schema for each Params struct
   for query in request.queries {
     if query.params.length() > 0 {
-      if !(first_def) {
+      if !first_def {
         buf.write_string(",\n")
       }
       first_def = false
@@ -27,7 +27,7 @@ pub fn generate_json_schema(request : @plugin.GenerateRequest) -> String {
   for query in request.queries {
     if query.cmd == ":one" || query.cmd == ":many" {
       if query.columns.length() > 0 {
-        if !(first_def) {
+        if !first_def {
           buf.write_string(",\n")
         }
         first_def = false
@@ -63,27 +63,6 @@ fn emit_struct_definition(
   buf.write_string("{\n")
   buf.write_string("      \"type\": \"object\"")
 
-  // Required fields
-  let required : Array[String] = []
-  for field in s.fields {
-    match field.ty {
-      @ir.Type::Optional(_) => ()
-      _ => required.push(field.name)
-    }
-  }
-  if required.length() > 0 {
-    buf.write_string(",\n      \"required\": [")
-    for i, name in required {
-      if i > 0 {
-        buf.write_string(", ")
-      }
-      buf.write_string("\"")
-      buf.write_string(name)
-      buf.write_string("\"")
-    }
-    buf.write_string("]")
-  }
-
   // Properties
   if s.fields.length() > 0 {
     buf.write_string(",\n      \"properties\": {\n")
@@ -94,6 +73,35 @@ fn emit_struct_definition(
       emit_field_property(buf, field)
     }
     buf.write_string("\n      }")
+  }
+
+  // Required fields. Keep this after properties to avoid stale wasm
+  // StringBuilder chunks corrupting an earlier duplicate field name.
+  let mut required_count = 0
+  for field in s.fields {
+    match field.ty {
+      @ir.Type::Optional(_) => ()
+      _ => required_count = required_count + 1
+    }
+  }
+  if required_count > 0 {
+    buf.write_string(",\n      \"required\": [")
+    let mut emitted = 0
+    for field in s.fields {
+      match field.ty {
+        @ir.Type::Optional(_) => ()
+        _ => {
+          if emitted > 0 {
+            buf.write_string(", ")
+          }
+          buf.write_string("\"")
+          buf.write_string(field.name)
+          buf.write_string("\"")
+          emitted = emitted + 1
+        }
+      }
+    }
+    buf.write_string("]")
   }
   buf.write_string("\n    }")
 }
@@ -128,7 +136,7 @@ fn emit_field_property(buf : StringBuilder, field : @ir.Field) -> Unit {
   }
   match c.min_value {
     Some(val) =>
-      if !(c.unsigned) {
+      if !c.unsigned {
         buf.write_string(", \"minimum\": ")
         buf.write_string(val.to_string())
       }

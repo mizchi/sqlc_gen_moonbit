@@ -57,7 +57,7 @@ impl BackendCodeGen for SqliteBackend with param_bind_expr(
 ) {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // Get the base bind call expression
   let base_bind = fn(val_expr : String) -> String {
@@ -114,7 +114,7 @@ impl BackendCodeGen for SqliteBackend with column_read_expr(
 ) {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // Get the base value expression
   let base_expr = match type_name {

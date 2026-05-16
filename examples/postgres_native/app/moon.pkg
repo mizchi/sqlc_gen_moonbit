@@ -3,6 +3,8 @@ import {
   "mattn/postgres",
 }
 
+supported_targets = "native"
+
 options(
   "is-main": true,
   link: {

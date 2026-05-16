@@ -2,6 +2,7 @@
 package "mizchi/sqlc_gen_moonbit/lib/proto/plugin"
 
 import {
+  "moonbitlang/core/debug",
   "moonbitlang/core/json",
   "moonbitlang/protobuf",
 }
@@ -16,11 +17,9 @@ pub(all) struct Catalog {
   mut default_schema : String
   mut name : String
   mut schemas : Array[Schema]
-}
+} derive(Eq, @debug.Debug)
 pub fn Catalog::new(String, String, String, Array[Schema]) -> Self
 pub impl Default for Catalog
-pub impl Eq for Catalog
-pub impl Show for Catalog
 pub impl ToJson for Catalog
 pub impl @json.FromJson for Catalog
 pub impl @protobuf.AsyncRead for Catalog
@@ -36,11 +35,9 @@ pub(all) struct Codegen {
   mut env : Array[String]
   mut process : Codegen_Process
   mut wasm : Codegen_WASM
-}
+} derive(Eq, @debug.Debug)
 pub fn Codegen::new(String, String, Bytes, Array[String], Codegen_Process, Codegen_WASM) -> Self
 pub impl Default for Codegen
-pub impl Eq for Codegen
-pub impl Show for Codegen
 pub impl ToJson for Codegen
 pub impl @json.FromJson for Codegen
 pub impl @protobuf.AsyncRead for Codegen
@@ -51,11 +48,9 @@ pub impl @protobuf.Write for Codegen
 
 pub(all) struct Codegen_Process {
   mut cmd : String
-}
+} derive(Eq, @debug.Debug)
 pub fn Codegen_Process::new(String) -> Self
 pub impl Default for Codegen_Process
-pub impl Eq for Codegen_Process
-pub impl Show for Codegen_Process
 pub impl ToJson for Codegen_Process
 pub impl @json.FromJson for Codegen_Process
 pub impl @protobuf.AsyncRead for Codegen_Process
@@ -67,11 +62,9 @@ pub impl @protobuf.Write for Codegen_Process
 pub(all) struct Codegen_WASM {
   mut url : String
   mut sha256 : String
-}
+} derive(Eq, @debug.Debug)
 pub fn Codegen_WASM::new(String, String) -> Self
 pub impl Default for Codegen_WASM
-pub impl Eq for Codegen_WASM
-pub impl Show for Codegen_WASM
 pub impl ToJson for Codegen_WASM
 pub impl @json.FromJson for Codegen_WASM
 pub impl @protobuf.AsyncRead for Codegen_WASM
@@ -97,11 +90,9 @@ pub(all) struct Column {
   mut original_name : String
   mut unsigned : Bool
   mut array_dims : Int
-}
+} derive(Eq, @debug.Debug)
 pub fn Column::new(String, Bool, Bool, String, Int, Bool, Bool, String, Identifier, String, Identifier, Bool, Identifier, String, Bool, Int) -> Self
 pub impl Default for Column
-pub impl Eq for Column
-pub impl Show for Column
 pub impl ToJson for Column
 pub impl @json.FromJson for Column
 pub impl @protobuf.AsyncRead for Column
@@ -113,11 +104,9 @@ pub impl @protobuf.Write for Column
 pub(all) struct CompositeType {
   mut name : String
   mut comment : String
-}
+} derive(Eq, @debug.Debug)
 pub fn CompositeType::new(String, String) -> Self
 pub impl Default for CompositeType
-pub impl Eq for CompositeType
-pub impl Show for CompositeType
 pub impl ToJson for CompositeType
 pub impl @json.FromJson for CompositeType
 pub impl @protobuf.AsyncRead for CompositeType
@@ -130,11 +119,9 @@ pub(all) struct Enum {
   mut name : String
   mut vals : Array[String]
   mut comment : String
-}
+} derive(Eq, @debug.Debug)
 pub fn Enum::new(String, Array[String], String) -> Self
 pub impl Default for Enum
-pub impl Eq for Enum
-pub impl Show for Enum
 pub impl ToJson for Enum
 pub impl @json.FromJson for Enum
 pub impl @protobuf.AsyncRead for Enum
@@ -146,11 +133,9 @@ pub impl @protobuf.Write for Enum
 pub(all) struct File {
   mut name : String
   mut contents : Bytes
-}
+} derive(Eq, @debug.Debug)
 pub fn File::new(String, Bytes) -> Self
 pub impl Default for File
-pub impl Eq for File
-pub impl Show for File
 pub impl ToJson for File
 pub impl @json.FromJson for File
 pub impl @protobuf.AsyncRead for File
@@ -166,11 +151,9 @@ pub(all) struct GenerateRequest {
   mut sqlc_version : String
   mut plugin_options : Bytes
   mut global_options : Bytes
-}
+} derive(Eq, @debug.Debug)
 pub fn GenerateRequest::new(Settings, Catalog, Array[Query], String, Bytes, Bytes) -> Self
 pub impl Default for GenerateRequest
-pub impl Eq for GenerateRequest
-pub impl Show for GenerateRequest
 pub impl ToJson for GenerateRequest
 pub impl @json.FromJson for GenerateRequest
 pub impl @protobuf.AsyncRead for GenerateRequest
@@ -181,11 +164,9 @@ pub impl @protobuf.Write for GenerateRequest
 
 pub(all) struct GenerateResponse {
   mut files : Array[File]
-}
+} derive(Eq, @debug.Debug)
 pub fn GenerateResponse::new(Array[File]) -> Self
 pub impl Default for GenerateResponse
-pub impl Eq for GenerateResponse
-pub impl Show for GenerateResponse
 pub impl ToJson for GenerateResponse
 pub impl @json.FromJson for GenerateResponse
 pub impl @protobuf.AsyncRead for GenerateResponse
@@ -198,11 +179,9 @@ pub(all) struct Identifier {
   mut catalog : String
   mut schema : String
   mut name : String
-}
+} derive(Eq, @debug.Debug)
 pub fn Identifier::new(String, String, String) -> Self
 pub impl Default for Identifier
-pub impl Eq for Identifier
-pub impl Show for Identifier
 pub impl ToJson for Identifier
 pub impl @json.FromJson for Identifier
 pub impl @protobuf.AsyncRead for Identifier
@@ -214,11 +193,9 @@ pub impl @protobuf.Write for Identifier
 pub(all) struct Parameter {
   mut number : Int
   mut column : Column
-}
+} derive(Eq, @debug.Debug)
 pub fn Parameter::new(Int, Column) -> Self
 pub impl Default for Parameter
-pub impl Eq for Parameter
-pub impl Show for Parameter
 pub impl ToJson for Parameter
 pub impl @json.FromJson for Parameter
 pub impl @protobuf.AsyncRead for Parameter
@@ -236,11 +213,9 @@ pub(all) struct Query {
   mut comments : Array[String]
   mut filename : String
   mut insert_into_table : Identifier
-}
+} derive(Eq, @debug.Debug)
 pub fn Query::new(String, String, String, Array[Column], Array[Parameter], Array[String], String, Identifier) -> Self
 pub impl Default for Query
-pub impl Eq for Query
-pub impl Show for Query
 pub impl ToJson for Query
 pub impl @json.FromJson for Query
 pub impl @protobuf.AsyncRead for Query
@@ -255,11 +230,9 @@ pub(all) struct Schema {
   mut tables : Array[Table]
   mut enums : Array[Enum]
   mut composite_types : Array[CompositeType]
-}
+} derive(Eq, @debug.Debug)
 pub fn Schema::new(String, String, Array[Table], Array[Enum], Array[CompositeType]) -> Self
 pub impl Default for Schema
-pub impl Eq for Schema
-pub impl Show for Schema
 pub impl ToJson for Schema
 pub impl @json.FromJson for Schema
 pub impl @protobuf.AsyncRead for Schema
@@ -274,11 +247,9 @@ pub(all) struct Settings {
   mut schema : Array[String]
   mut queries : Array[String]
   mut codegen : Codegen
-}
+} derive(Eq, @debug.Debug)
 pub fn Settings::new(String, String, Array[String], Array[String], Codegen) -> Self
 pub impl Default for Settings
-pub impl Eq for Settings
-pub impl Show for Settings
 pub impl ToJson for Settings
 pub impl @json.FromJson for Settings
 pub impl @protobuf.AsyncRead for Settings
@@ -291,11 +262,9 @@ pub(all) struct Table {
   mut rel : Identifier
   mut columns : Array[Column]
   mut comment : String
-}
+} derive(Eq, @debug.Debug)
 pub fn Table::new(Identifier, Array[Column], String) -> Self
 pub impl Default for Table
-pub impl Eq for Table
-pub impl Show for Table
 pub impl ToJson for Table
 pub impl @json.FromJson for Table
 pub impl @protobuf.AsyncRead for Table

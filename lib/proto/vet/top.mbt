@@ -1,7 +1,7 @@
 ///|
 pub(all) struct Parameter {
   mut number : Int
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Parameter with size_of(self) {
@@ -26,7 +26,7 @@ pub impl @protobuf.Read for Parameter with read_with_limit(
 ) -> Parameter raise {
   let msg = Parameter::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.number = reader |> @protobuf.read_int32()
         (_, wire) => reader |> @protobuf.read_unknown(wire)
@@ -81,7 +81,7 @@ pub impl @protobuf.AsyncRead for Parameter with read_with_limit(
 ) -> Parameter raise {
   let msg = Parameter::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.number = reader |> @protobuf.async_read_int32()
         (_, wire) => reader |> @protobuf.async_read_unknown(wire)
@@ -109,21 +109,21 @@ pub(all) struct Config {
   mut engine : String
   mut schema : Array[String]
   mut queries : Array[String]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Config with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.version)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.engine)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.schema {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -161,7 +161,7 @@ pub impl @protobuf.Read for Config with read_with_limit(
 ) -> Config raise {
   let msg = Config::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.version = reader |> @protobuf.read_string()
         (2, _) => msg.engine = reader |> @protobuf.read_string()
@@ -243,7 +243,7 @@ pub impl @protobuf.AsyncRead for Config with read_with_limit(
 ) -> Config raise {
   let msg = Config::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.version = reader |> @protobuf.async_read_string()
         (2, _) => msg.engine = reader |> @protobuf.async_read_string()
@@ -284,26 +284,26 @@ pub(all) struct Query {
   mut name : String
   mut cmd : String
   mut params : Array[Parameter]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Query with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.sql)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.cmd)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.params {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -337,7 +337,7 @@ pub impl @protobuf.Read for Query with read_with_limit(
 ) -> Query raise {
   let msg = Query::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.sql = reader |> @protobuf.read_string()
         (2, _) => msg.name = reader |> @protobuf.read_string()
@@ -418,7 +418,7 @@ pub impl @protobuf.AsyncRead for Query with read_with_limit(
 ) -> Query raise {
   let msg = Query::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.sql = reader |> @protobuf.async_read_string()
         (2, _) => msg.name = reader |> @protobuf.async_read_string()
@@ -458,16 +458,16 @@ pub impl @protobuf.AsyncWrite for Query with write(
 ///|
 pub(all) struct PostgreSQL {
   mut explain : PostgreSQLExplain
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for PostgreSQL with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.explain)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -487,7 +487,7 @@ pub impl @protobuf.Read for PostgreSQL with read_with_limit(
 ) -> PostgreSQL raise {
   let msg = PostgreSQL::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) =>
           msg.explain = (reader |> @protobuf.read_message() : PostgreSQLExplain)
@@ -544,7 +544,7 @@ pub impl @protobuf.AsyncRead for PostgreSQL with read_with_limit(
 ) -> PostgreSQL raise {
   let msg = PostgreSQL::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.explain = (
@@ -573,21 +573,21 @@ pub impl @protobuf.AsyncWrite for PostgreSQL with write(
 pub(all) struct PostgreSQLExplain_SettingsEntry {
   mut key : String
   mut value : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for PostgreSQLExplain_SettingsEntry with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.key)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.value)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -613,7 +613,7 @@ pub impl @protobuf.Read for PostgreSQLExplain_SettingsEntry with read_with_limit
 ) -> PostgreSQLExplain_SettingsEntry raise {
   let msg = PostgreSQLExplain_SettingsEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.read_string()
         (2, _) => msg.value = reader |> @protobuf.read_string()
@@ -677,7 +677,7 @@ pub impl @protobuf.AsyncRead for PostgreSQLExplain_SettingsEntry with read_with_
 ) -> PostgreSQLExplain_SettingsEntry raise {
   let msg = PostgreSQLExplain_SettingsEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.async_read_string()
         (2, _) => msg.value = reader |> @protobuf.async_read_string()
@@ -734,36 +734,36 @@ pub(all) struct PostgreSQLExplain_Plan {
   mut index_name : String
   mut scan_direction : String
   mut index_cond : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for PostgreSQLExplain_Plan with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.node_type)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.parent_relationship)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.relation_name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.schema)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.alias_)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U + @protobuf.size_of(self.parallel_aware)
   size += 1U + @protobuf.size_of(self.async_capable)
   size += 1U + 4U
@@ -793,31 +793,31 @@ pub impl @protobuf.Sized for PostgreSQLExplain_Plan with size_of(self) {
     size += 2U + @protobuf.size_of(s) + s
   }
   size += 2U +
-    {
+    ({
       let size = @protobuf.size_of(self.join_type)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 2U + @protobuf.size_of(self.inner_unique)
   size += 2U +
-    {
+    ({
       let size = @protobuf.size_of(self.hash_cond)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 2U +
-    {
+    ({
       let size = @protobuf.size_of(self.index_name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 2U +
-    {
+    ({
       let size = @protobuf.size_of(self.scan_direction)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 2U +
-    {
+    ({
       let size = @protobuf.size_of(self.index_cond)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -930,7 +930,7 @@ pub impl @protobuf.Read for PostgreSQLExplain_Plan with read_with_limit(
 ) -> PostgreSQLExplain_Plan raise {
   let msg = PostgreSQLExplain_Plan::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.node_type = reader |> @protobuf.read_string()
         (2, _) => msg.parent_relationship = reader |> @protobuf.read_string()
@@ -1224,7 +1224,7 @@ pub impl @protobuf.AsyncRead for PostgreSQLExplain_Plan with read_with_limit(
 ) -> PostgreSQLExplain_Plan raise {
   let msg = PostgreSQLExplain_Plan::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.node_type = reader |> @protobuf.async_read_string()
         (2, _) =>
@@ -1366,7 +1366,7 @@ pub(all) struct PostgreSQLExplain_Planning {
   mut local_written_blocks : UInt64
   mut temp_read_blocks : UInt64
   mut temp_written_blocks : UInt64
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for PostgreSQLExplain_Planning with size_of(self) {
@@ -1433,7 +1433,7 @@ pub impl @protobuf.Read for PostgreSQLExplain_Planning with read_with_limit(
 ) -> PostgreSQLExplain_Planning raise {
   let msg = PostgreSQLExplain_Planning::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.shared_hit_blocks = reader |> @protobuf.read_uint64()
         (2, _) => msg.shared_read_blocks = reader |> @protobuf.read_uint64()
@@ -1563,7 +1563,7 @@ pub impl @protobuf.AsyncRead for PostgreSQLExplain_Planning with read_with_limit
 ) -> PostgreSQLExplain_Planning raise {
   let msg = PostgreSQLExplain_Planning::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.shared_hit_blocks = reader |> @protobuf.async_read_uint64()
@@ -1625,37 +1625,37 @@ pub(all) struct PostgreSQLExplain {
   mut plan : PostgreSQLExplain_Plan
   mut settings : Map[String, String]
   mut planning : PostgreSQLExplain_Planning
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for PostgreSQLExplain with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.plan)
       @protobuf.size_of(size) + size
-    }
+    })
   for k, v in self.settings {
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     size += 1U +
       @protobuf.size_of(key_size + value_size) +
       key_size +
       value_size
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.planning)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -1683,7 +1683,7 @@ pub impl @protobuf.Read for PostgreSQLExplain with read_with_limit(
 ) -> PostgreSQLExplain raise {
   let msg = PostgreSQLExplain::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) =>
           msg.plan = (
@@ -1720,15 +1720,15 @@ pub impl @protobuf.Write for PostgreSQLExplain with write(
     let v = self.settings.get(k).unwrap()
     writer |> @protobuf.write_varint(18UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.write_uint32(key_size + value_size)
     writer |> @protobuf.write_varint(10UL)
     writer |> @protobuf.write_string(k)
@@ -1783,7 +1783,7 @@ pub impl @protobuf.AsyncRead for PostgreSQLExplain with read_with_limit(
 ) -> PostgreSQLExplain raise {
   let msg = PostgreSQLExplain::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.plan = (
@@ -1822,15 +1822,15 @@ pub impl @protobuf.AsyncWrite for PostgreSQLExplain with write(
     let v = self.settings.get(k).unwrap()
     writer |> @protobuf.async_write_varint(18UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.async_write_uint32(key_size + value_size)
     writer |> @protobuf.async_write_varint(10UL)
     writer |> @protobuf.async_write_string(k)
@@ -1845,16 +1845,16 @@ pub impl @protobuf.AsyncWrite for PostgreSQLExplain with write(
 ///|
 pub(all) struct MySQL {
   mut explain : MySQLExplain
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQL with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.explain)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -1874,7 +1874,7 @@ pub impl @protobuf.Read for MySQL with read_with_limit(
 ) -> MySQL raise {
   let msg = MySQL::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) =>
           msg.explain = (reader |> @protobuf.read_message() : MySQLExplain)
@@ -1931,7 +1931,7 @@ pub impl @protobuf.AsyncRead for MySQL with read_with_limit(
 ) -> MySQL raise {
   let msg = MySQL::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.explain = (reader |> @protobuf.async_read_message() : MySQLExplain)
@@ -1959,7 +1959,7 @@ pub impl @protobuf.AsyncWrite for MySQL with write(
 pub(all) struct MySQLExplain_QueryBlock_CostInfoEntry {
   mut key : String
   mut value : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_QueryBlock_CostInfoEntry with size_of(
@@ -1967,15 +1967,15 @@ pub impl @protobuf.Sized for MySQLExplain_QueryBlock_CostInfoEntry with size_of(
 ) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.key)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.value)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -2001,7 +2001,7 @@ pub impl @protobuf.Read for MySQLExplain_QueryBlock_CostInfoEntry with read_with
 ) -> MySQLExplain_QueryBlock_CostInfoEntry raise {
   let msg = MySQLExplain_QueryBlock_CostInfoEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.read_string()
         (2, _) => msg.value = reader |> @protobuf.read_string()
@@ -2065,7 +2065,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_QueryBlock_CostInfoEntry with read
 ) -> MySQLExplain_QueryBlock_CostInfoEntry raise {
   let msg = MySQLExplain_QueryBlock_CostInfoEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.async_read_string()
         (2, _) => msg.value = reader |> @protobuf.async_read_string()
@@ -2098,43 +2098,43 @@ pub(all) struct MySQLExplain_QueryBlock {
   mut table : MySQLExplain_Table
   mut ordering_operation : MySQLExplain_OrderingOperation
   mut nested_loop : Array[MySQLExplain_NestedLoopObj]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_QueryBlock with size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.select_id)
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.message)
       @protobuf.size_of(size) + size
-    }
+    })
   for k, v in self.cost_info {
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     size += 1U +
       @protobuf.size_of(key_size + value_size) +
       key_size +
       value_size
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.table)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.ordering_operation)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.nested_loop {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -2179,7 +2179,7 @@ pub impl @protobuf.Read for MySQLExplain_QueryBlock with read_with_limit(
 ) -> MySQLExplain_QueryBlock raise {
   let msg = MySQLExplain_QueryBlock::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.select_id = reader |> @protobuf.read_uint64()
         (2, _) => msg.message = reader |> @protobuf.read_string()
@@ -2223,15 +2223,15 @@ pub impl @protobuf.Write for MySQLExplain_QueryBlock with write(
     let v = self.cost_info.get(k).unwrap()
     writer |> @protobuf.write_varint(26UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.write_uint32(key_size + value_size)
     writer |> @protobuf.write_varint(10UL)
     writer |> @protobuf.write_string(k)
@@ -2308,7 +2308,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_QueryBlock with read_with_limit(
 ) -> MySQLExplain_QueryBlock raise {
   let msg = MySQLExplain_QueryBlock::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.select_id = reader |> @protobuf.async_read_uint64()
         (2, _) => msg.message = reader |> @protobuf.async_read_string()
@@ -2356,15 +2356,15 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_QueryBlock with write(
     let v = self.cost_info.get(k).unwrap()
     writer |> @protobuf.async_write_varint(26UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.async_write_uint32(key_size + value_size)
     writer |> @protobuf.async_write_varint(10UL)
     writer |> @protobuf.async_write_string(k)
@@ -2389,21 +2389,21 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_QueryBlock with write(
 pub(all) struct MySQLExplain_Table_CostInfoEntry {
   mut key : String
   mut value : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_Table_CostInfoEntry with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.key)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.value)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -2429,7 +2429,7 @@ pub impl @protobuf.Read for MySQLExplain_Table_CostInfoEntry with read_with_limi
 ) -> MySQLExplain_Table_CostInfoEntry raise {
   let msg = MySQLExplain_Table_CostInfoEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.read_string()
         (2, _) => msg.value = reader |> @protobuf.read_string()
@@ -2493,7 +2493,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_Table_CostInfoEntry with read_with
 ) -> MySQLExplain_Table_CostInfoEntry raise {
   let msg = MySQLExplain_Table_CostInfoEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.async_read_string()
         (2, _) => msg.value = reader |> @protobuf.async_read_string()
@@ -2533,39 +2533,39 @@ pub(all) struct MySQLExplain_Table {
   mut used_key_parts : Array[String]
   mut key_length : String
   mut ref_ : Array[String]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_Table with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.table_name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.access_type)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U + @protobuf.size_of(self.rows_examined_per_scan)
   size += 1U + @protobuf.size_of(self.rows_produced_per_join)
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.filtered)
       @protobuf.size_of(size) + size
-    }
+    })
   for k, v in self.cost_info {
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     size += 1U +
       @protobuf.size_of(key_size + value_size) +
       key_size +
@@ -2581,19 +2581,19 @@ pub impl @protobuf.Sized for MySQLExplain_Table with size_of(self) {
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.key)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.used_key_parts {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.key_length)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.ref_ {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -2659,7 +2659,7 @@ pub impl @protobuf.Read for MySQLExplain_Table with read_with_limit(
 ) -> MySQLExplain_Table raise {
   let msg = MySQLExplain_Table::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.table_name = reader |> @protobuf.read_string()
         (2, _) => msg.access_type = reader |> @protobuf.read_string()
@@ -2710,15 +2710,15 @@ pub impl @protobuf.Write for MySQLExplain_Table with write(
     let v = self.cost_info.get(k).unwrap()
     writer |> @protobuf.write_varint(50UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.write_uint32(key_size + value_size)
     writer |> @protobuf.write_varint(10UL)
     writer |> @protobuf.write_string(k)
@@ -2839,7 +2839,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_Table with read_with_limit(
 ) -> MySQLExplain_Table raise {
   let msg = MySQLExplain_Table::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.table_name = reader |> @protobuf.async_read_string()
         (2, _) => msg.access_type = reader |> @protobuf.async_read_string()
@@ -2894,15 +2894,15 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_Table with write(
     let v = self.cost_info.get(k).unwrap()
     writer |> @protobuf.async_write_varint(50UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.async_write_uint32(key_size + value_size)
     writer |> @protobuf.async_write_varint(10UL)
     writer |> @protobuf.async_write_string(k)
@@ -2936,16 +2936,16 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_Table with write(
 ///|
 pub(all) struct MySQLExplain_NestedLoopObj {
   mut table : MySQLExplain_Table
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_NestedLoopObj with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.table)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -2967,7 +2967,7 @@ pub impl @protobuf.Read for MySQLExplain_NestedLoopObj with read_with_limit(
 ) -> MySQLExplain_NestedLoopObj raise {
   let msg = MySQLExplain_NestedLoopObj::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) =>
           msg.table = (reader |> @protobuf.read_message() : MySQLExplain_Table)
@@ -3026,7 +3026,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_NestedLoopObj with read_with_limit
 ) -> MySQLExplain_NestedLoopObj raise {
   let msg = MySQLExplain_NestedLoopObj::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.table = (
@@ -3055,7 +3055,7 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_NestedLoopObj with write(
 pub(all) struct MySQLExplain_OrderingOperation_CostInfoEntry {
   mut key : String
   mut value : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_OrderingOperation_CostInfoEntry with size_of(
@@ -3063,15 +3063,15 @@ pub impl @protobuf.Sized for MySQLExplain_OrderingOperation_CostInfoEntry with s
 ) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.key)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.value)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -3097,7 +3097,7 @@ pub impl @protobuf.Read for MySQLExplain_OrderingOperation_CostInfoEntry with re
 ) -> MySQLExplain_OrderingOperation_CostInfoEntry raise {
   let msg = MySQLExplain_OrderingOperation_CostInfoEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.read_string()
         (2, _) => msg.value = reader |> @protobuf.read_string()
@@ -3165,7 +3165,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_OrderingOperation_CostInfoEntry wi
 ) -> MySQLExplain_OrderingOperation_CostInfoEntry raise {
   let msg = MySQLExplain_OrderingOperation_CostInfoEntry::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.key = reader |> @protobuf.async_read_string()
         (2, _) => msg.value = reader |> @protobuf.async_read_string()
@@ -3196,7 +3196,7 @@ pub(all) struct MySQLExplain_OrderingOperation {
   mut cost_info : Map[String, String]
   mut table : MySQLExplain_Table
   mut nested_loop : Array[MySQLExplain_NestedLoopObj]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain_OrderingOperation with size_of(self) {
@@ -3204,25 +3204,25 @@ pub impl @protobuf.Sized for MySQLExplain_OrderingOperation with size_of(self) {
   size += 1U + @protobuf.size_of(self.using_filesort)
   for k, v in self.cost_info {
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     size += 1U +
       @protobuf.size_of(key_size + value_size) +
       key_size +
       value_size
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.table)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.nested_loop {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -3261,7 +3261,7 @@ pub impl @protobuf.Read for MySQLExplain_OrderingOperation with read_with_limit(
 ) -> MySQLExplain_OrderingOperation raise {
   let msg = MySQLExplain_OrderingOperation::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.using_filesort = reader |> @protobuf.read_bool()
         (2, _) => {
@@ -3299,15 +3299,15 @@ pub impl @protobuf.Write for MySQLExplain_OrderingOperation with write(
     let v = self.cost_info.get(k).unwrap()
     writer |> @protobuf.write_varint(18UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.write_uint32(key_size + value_size)
     writer |> @protobuf.write_varint(10UL)
     writer |> @protobuf.write_string(k)
@@ -3373,7 +3373,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_OrderingOperation with read_with_l
 ) -> MySQLExplain_OrderingOperation raise {
   let msg = MySQLExplain_OrderingOperation::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.using_filesort = reader |> @protobuf.async_read_bool()
         (2, _) => {
@@ -3414,15 +3414,15 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_OrderingOperation with write(
     let v = self.cost_info.get(k).unwrap()
     writer |> @protobuf.async_write_varint(18UL)
     let key_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(k)
         @protobuf.size_of(size) + size
-      }
+      })
     let value_size = 1U +
-      {
+      ({
         let size = @protobuf.size_of(v)
         @protobuf.size_of(size) + size
-      }
+      })
     writer |> @protobuf.async_write_uint32(key_size + value_size)
     writer |> @protobuf.async_write_varint(10UL)
     writer |> @protobuf.async_write_string(k)
@@ -3442,16 +3442,16 @@ pub impl @protobuf.AsyncWrite for MySQLExplain_OrderingOperation with write(
 ///|
 pub(all) struct MySQLExplain {
   mut query_block : MySQLExplain_QueryBlock
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for MySQLExplain with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.query_block)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -3471,7 +3471,7 @@ pub impl @protobuf.Read for MySQLExplain with read_with_limit(
 ) -> MySQLExplain raise {
   let msg = MySQLExplain::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) =>
           msg.query_block = (
@@ -3530,7 +3530,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain with read_with_limit(
 ) -> MySQLExplain raise {
   let msg = MySQLExplain::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.query_block = (

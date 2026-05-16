@@ -2,6 +2,7 @@
 package "mizchi/sqlc_gen_moonbit/lib/proto/analysis"
 
 import {
+  "moonbitlang/core/debug",
   "moonbitlang/core/json",
   "moonbitlang/protobuf",
 }
@@ -14,11 +15,9 @@ import {
 pub(all) struct Analysis {
   mut columns : Array[Column]
   mut params : Array[Parameter]
-}
+} derive(Eq, @debug.Debug)
 pub fn Analysis::new(Array[Column], Array[Parameter]) -> Self
 pub impl Default for Analysis
-pub impl Eq for Analysis
-pub impl Show for Analysis
 pub impl ToJson for Analysis
 pub impl @json.FromJson for Analysis
 pub impl @protobuf.AsyncRead for Analysis
@@ -45,11 +44,9 @@ pub(all) struct Column {
   mut type_ : Identifier
   mut embed_table : Identifier
   mut is_sqlc_slice : Bool
-}
+} derive(Eq, @debug.Debug)
 pub fn Column::new(String, String, String, Bool, Bool, Bool, Int, String, Int, Bool, Bool, String, Identifier, String, Identifier, Identifier, Bool) -> Self
 pub impl Default for Column
-pub impl Eq for Column
-pub impl Show for Column
 pub impl ToJson for Column
 pub impl @json.FromJson for Column
 pub impl @protobuf.AsyncRead for Column
@@ -62,11 +59,9 @@ pub(all) struct Identifier {
   mut catalog : String
   mut schema : String
   mut name : String
-}
+} derive(Eq, @debug.Debug)
 pub fn Identifier::new(String, String, String) -> Self
 pub impl Default for Identifier
-pub impl Eq for Identifier
-pub impl Show for Identifier
 pub impl ToJson for Identifier
 pub impl @json.FromJson for Identifier
 pub impl @protobuf.AsyncRead for Identifier
@@ -78,11 +73,9 @@ pub impl @protobuf.Write for Identifier
 pub(all) struct Parameter {
   mut number : Int
   mut column : Column
-}
+} derive(Eq, @debug.Debug)
 pub fn Parameter::new(Int, Column) -> Self
 pub impl Default for Parameter
-pub impl Eq for Parameter
-pub impl Show for Parameter
 pub impl ToJson for Parameter
 pub impl @json.FromJson for Parameter
 pub impl @protobuf.AsyncRead for Parameter

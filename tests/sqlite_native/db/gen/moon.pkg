@@ -3,6 +3,8 @@ import {
   "moonbitlang/x/encoding",
 }
 
+supported_targets = "native"
+
 options(
   "formatter": {
     "ignore": [

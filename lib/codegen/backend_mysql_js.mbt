@@ -260,7 +260,7 @@ fn generate_query_function_mysql_js(
 ///|
 fn mysql_js_param_to_any(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
   let is_int64 = type_name == "INT" ||
     type_name == "INTEGER" ||
     type_name == "BIGINT"
@@ -287,7 +287,7 @@ fn mysql_js_column_from_any(col : @plugin.Column, obj_expr : String) -> String {
   let field_access = obj_expr + "[" + field_name + "]"
 
   // Handle nullable columns
-  if !(col.not_null) {
+  if !col.not_null {
     // For nullable columns, check for null/undefined first
     match type_name {
       "INT" | "INTEGER" =>

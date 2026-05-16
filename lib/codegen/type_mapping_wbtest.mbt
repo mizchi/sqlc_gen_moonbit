@@ -21,5 +21,5 @@ test "INTEGER mapping uses Int64 conversions" {
   assert_true(sqlite_js_expr.contains("to_int64"))
   let d1_expr = d1_column_from_core_any(col, "row")
   assert_true(d1_expr.contains("js_number_to_int64"))
-  assert_true(!(d1_expr.contains("to_int(")))
+  assert_true(!d1_expr.contains("to_int("))
 }

@@ -16,11 +16,11 @@ pub fn process_request(input : Bytes) -> Bytes {
 
   // Generate moon.pkg (package config)
   let moon_pkg_content = generate_moon_pkg(options)
-  files.push(@plugin.File::new("moon.pkg", string_to_utf8(moon_pkg_content)))
+  files.push(generated_file("moon.pkg", moon_pkg_content))
 
   // Generate types (backend-specific for error types)
   let types_content = generate_types(request, options)
-  files.push(@plugin.File::new("sqlc_types.mbt", string_to_utf8(types_content)))
+  files.push(generated_file("sqlc_types.mbt", types_content))
 
   // Generate queries (backend-specific)
   let queries_content = match options.backend {
@@ -31,32 +31,42 @@ pub fn process_request(input : Bytes) -> Bytes {
     PostgresJs => generate_queries_postgres_js(request, options.overrides)
     MysqlJs => generate_queries_mysql_js(request, options.overrides)
   }
-  files.push(
-    @plugin.File::new("sqlc_queries.mbt", string_to_utf8(queries_content)),
-  )
+  files.push(generated_file("sqlc_queries.mbt", queries_content))
 
-  // Generate JSON Schema (optional) - moved before validators to avoid serialization bug
-  if options.json_schema {
-    let schema_content = generate_json_schema(request)
-    files.push(
-      @plugin.File::new("sqlc_schema.json", string_to_utf8(schema_content)),
-    )
-  }
-
-  // Generate validators (optional) - last to avoid first-byte corruption
+  // Generate validators (optional)
   if options.validators {
     let validators_content = generate_validators(request)
-    files.push(
-      @plugin.File::new(
-        "sqlc_validators.mbt",
-        string_to_utf8(validators_content),
-      ),
-    )
+    files.push(generated_file("sqlc_validators.mbt", validators_content))
+  }
+
+  // Generate JSON Schema (optional). Keep it last so no following file can
+  // expose stale wasm/protobuf response-size bugs as content corruption.
+  if options.json_schema {
+    let schema_content = generate_json_schema(request)
+    files.push(generated_file("sqlc_schema.json", schema_content))
   }
   let response = @plugin.GenerateResponse::new(files)
 
   // Serialize response to protobuf
   serialize_response(response)
+}
+
+///|
+fn generated_file(name : String, content : String) -> @plugin.File {
+  @plugin.File::new(name, string_to_utf8(trim_trailing_blank_lines(content)))
+}
+
+///|
+fn trim_trailing_blank_lines(content : String) -> String {
+  let mut end = content.length()
+  while end >= 2 && content[end - 1] == '\n' && content[end - 2] == '\n' {
+    end = end - 1
+  }
+  if end == content.length() {
+    content
+  } else {
+    substring(content, 0, end)
+  }
 }
 
 ///|
@@ -85,8 +95,7 @@ fn generate_moon_pkg(options : Options) -> String {
   match options.backend {
     D1 | SqliteJs | PostgresJs | MysqlJs =>
       buf.write_string("supported_targets = \"js\"\n\n")
-    Postgres => buf.write_string("supported_targets = \"native\"\n\n")
-    Sqlite => ()
+    Sqlite | Postgres => buf.write_string("supported_targets = \"native\"\n\n")
   }
 
   // Options block
@@ -122,7 +131,7 @@ fn generate_types(
       buf.write_string("///| SQL execution error\n")
       buf.write_string("pub suberror SqlError {\n")
       buf.write_string("  SqlError(String)\n")
-      buf.write_string("} derive(Show)\n\n")
+      buf.write_string("} derive(Debug)\n\n")
     }
     D1 | Postgres | PostgresJs | MysqlJs => ()
   }
@@ -134,8 +143,7 @@ fn generate_types(
   for query in request.queries {
     if query.cmd == ":one" || query.cmd == ":many" {
       let struct_name = to_pascal_case(query.name) + "Row"
-      if !(generated_structs.contains(struct_name)) &&
-        query.columns.length() > 0 {
+      if !generated_structs.contains(struct_name) && query.columns.length() > 0 {
         generated_structs[struct_name] = true
         generate_result_struct(
           buf,

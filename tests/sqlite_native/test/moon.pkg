@@ -4,6 +4,8 @@ import {
   "backend_sqlite_native_test/db/gen",
 }
 
+supported_targets = "native"
+
 options(
   link: {
     "native": {

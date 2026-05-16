@@ -35,7 +35,7 @@ impl BackendCodeGen for PostgresBackend with param_bind_expr(
   expr,
 ) {
   let type_name = col.type_.name.to_upper()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // Check type category using contains matching
   let is_string_type = type_name.contains("TEXT") ||
@@ -93,7 +93,7 @@ impl BackendCodeGen for PostgresBackend with column_read_expr(
 ) {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // mattn/postgres returns Array[Array[String]], so we access row[idx]
   let conversion = match type_name {

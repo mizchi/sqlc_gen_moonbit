@@ -31,7 +31,7 @@ impl BackendCodeGen for D1Backend with generate_helpers(_self, buf) {
 ///|
 impl BackendCodeGen for D1Backend with param_bind_expr(_self, col, _idx, expr) {
   let type_name = col.type_.name.to_upper()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
   if is_nullable {
     // For nullable params, use match to handle None - @core.null() for null value
     "(match " + expr + " { Some(v) => @core.any(v); None => @core.null() })"
@@ -72,7 +72,7 @@ impl BackendCodeGen for D1Backend with column_read_expr(
   let field_access = obj_expr + "[" + field_name + "]"
 
   // Handle nullable columns
-  if !(col.not_null) {
+  if !col.not_null {
     // For nullable columns, check for null/undefined first
     match type_name {
       "INTEGER" | "INT" | "INT4" =>

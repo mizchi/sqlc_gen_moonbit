@@ -39,7 +39,7 @@ impl BackendCodeGen for SqliteJsBackend with param_bind_expr(
   expr,
 ) {
   let type_name = col.type_.name.to_upper()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
   if is_nullable {
     // For nullable types, handle Option
     match type_name {
@@ -104,7 +104,7 @@ impl BackendCodeGen for SqliteJsBackend with column_read_expr(
 ) {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // Use high-level Statement::column which returns SqlValue
   let base_expr = match type_name {

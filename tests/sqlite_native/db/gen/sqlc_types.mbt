@@ -4,7 +4,7 @@
 ///| SQL execution error
 pub suberror SqlError {
   SqlError(String)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub struct GetUserByIdRow {
@@ -16,7 +16,7 @@ pub struct GetUserByIdRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUserByEmailRow {
@@ -28,7 +28,7 @@ pub struct GetUserByEmailRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListUsersRow {
@@ -40,7 +40,7 @@ pub struct ListUsersRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListActiveUsersRow {
@@ -52,7 +52,7 @@ pub struct ListActiveUsersRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUsersWithBioRow {
@@ -64,7 +64,7 @@ pub struct GetUsersWithBioRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUsersWithoutBioRow {
@@ -76,7 +76,7 @@ pub struct GetUsersWithoutBioRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUsersWithPositiveBalanceRow {
@@ -88,12 +88,12 @@ pub struct GetUsersWithPositiveBalanceRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct CountActiveUsersRow {
   count : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct SearchUsersByNameRow {
@@ -105,7 +105,7 @@ pub struct SearchUsersByNameRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListUsersWithLimitRow {
@@ -117,12 +117,12 @@ pub struct ListUsersWithLimitRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUserCountRow {
   count : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetPostByIdRow {
@@ -134,7 +134,7 @@ pub struct GetPostByIdRow {
   is_published : Int64
   published_at : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListPostsByAuthorRow {
@@ -146,7 +146,7 @@ pub struct ListPostsByAuthorRow {
   is_published : Int64
   published_at : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetPostWithAuthorRow {
@@ -160,7 +160,7 @@ pub struct GetPostWithAuthorRow {
   author_id : Int64
   author_name : String
   author_email : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListPostsWithAuthorsRow {
@@ -171,41 +171,41 @@ pub struct ListPostsWithAuthorsRow {
   created_at : String
   author_id : Int64
   author_name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetPostCountByAuthorRow {
   post_count : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetAuthorStatsRow {
   post_count : Int64
   total_views : String?
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetTagByNameRow {
   id : Int64
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListTagsRow {
   id : Int64
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListTagsForPostRow {
   id : Int64
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetTagCountForPostRow {
   tag_count : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListUsersPaginatedRow {
@@ -217,7 +217,7 @@ pub struct ListUsersPaginatedRow {
   is_active : Int64
   bio : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListPostsByAuthorPaginatedRow {
@@ -229,7 +229,7 @@ pub struct ListPostsByAuthorPaginatedRow {
   is_published : Int64
   published_at : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListPostsWithAuthorsPaginatedRow {
@@ -240,7 +240,7 @@ pub struct ListPostsWithAuthorsPaginatedRow {
   created_at : String
   author_id : Int64
   author_name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListPublishedPostsPaginatedRow {
@@ -252,12 +252,12 @@ pub struct ListPublishedPostsPaginatedRow {
   is_published : Int64
   published_at : String?
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUserByIdParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetUserByIdParams::new(id : Int64) -> GetUserByIdParams {
@@ -267,7 +267,7 @@ pub fn GetUserByIdParams::new(id : Int64) -> GetUserByIdParams {
 ///|
 pub struct GetUserByEmailParams {
   email : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetUserByEmailParams::new(email : String) -> GetUserByEmailParams {
@@ -282,7 +282,7 @@ pub struct CreateUserParams {
   balance : Double?
   is_active : Int64
   bio : String?
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreateUserParams::new(name : String, email : String, age : Int64?, balance : Double?, is_active : Int64, bio : String?) -> CreateUserParams {
@@ -297,7 +297,7 @@ pub struct CreateUserReturningIdParams {
   balance : Double?
   is_active : Int64
   bio : String?
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreateUserReturningIdParams::new(name : String, email : String, age : Int64?, balance : Double?, is_active : Int64, bio : String?) -> CreateUserReturningIdParams {
@@ -307,7 +307,7 @@ pub fn CreateUserReturningIdParams::new(name : String, email : String, age : Int
 ///|
 pub struct DeleteUserByIdParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn DeleteUserByIdParams::new(id : Int64) -> DeleteUserByIdParams {
@@ -318,7 +318,7 @@ pub fn DeleteUserByIdParams::new(id : Int64) -> DeleteUserByIdParams {
 pub struct UpdateUserNameParams {
   name : String
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn UpdateUserNameParams::new(name : String, id : Int64) -> UpdateUserNameParams {
@@ -329,7 +329,7 @@ pub fn UpdateUserNameParams::new(name : String, id : Int64) -> UpdateUserNamePar
 pub struct UpdateUserBioParams {
   bio : String?
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn UpdateUserBioParams::new(bio : String?, id : Int64) -> UpdateUserBioParams {
@@ -340,7 +340,7 @@ pub fn UpdateUserBioParams::new(bio : String?, id : Int64) -> UpdateUserBioParam
 pub struct UpdateUserBalanceParams {
   balance : Double?
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn UpdateUserBalanceParams::new(balance : Double?, id : Int64) -> UpdateUserBalanceParams {
@@ -350,7 +350,7 @@ pub fn UpdateUserBalanceParams::new(balance : Double?, id : Int64) -> UpdateUser
 ///|
 pub struct ActivateUserParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ActivateUserParams::new(id : Int64) -> ActivateUserParams {
@@ -360,7 +360,7 @@ pub fn ActivateUserParams::new(id : Int64) -> ActivateUserParams {
 ///|
 pub struct DeactivateUserParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn DeactivateUserParams::new(id : Int64) -> DeactivateUserParams {
@@ -370,7 +370,7 @@ pub fn DeactivateUserParams::new(id : Int64) -> DeactivateUserParams {
 ///|
 pub struct SearchUsersByNameParams {
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn SearchUsersByNameParams::new(name : String) -> SearchUsersByNameParams {
@@ -380,7 +380,7 @@ pub fn SearchUsersByNameParams::new(name : String) -> SearchUsersByNameParams {
 ///|
 pub struct ListUsersWithLimitParams {
   limit : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListUsersWithLimitParams::new(limit : Int64) -> ListUsersWithLimitParams {
@@ -393,7 +393,7 @@ pub struct CreatePostParams {
   title : String
   content : String
   is_published : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreatePostParams::new(author_id : Int64, title : String, content : String, is_published : Int64) -> CreatePostParams {
@@ -406,7 +406,7 @@ pub struct CreatePostReturningIdParams {
   title : String
   content : String
   is_published : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreatePostReturningIdParams::new(author_id : Int64, title : String, content : String, is_published : Int64) -> CreatePostReturningIdParams {
@@ -416,7 +416,7 @@ pub fn CreatePostReturningIdParams::new(author_id : Int64, title : String, conte
 ///|
 pub struct GetPostByIdParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetPostByIdParams::new(id : Int64) -> GetPostByIdParams {
@@ -426,7 +426,7 @@ pub fn GetPostByIdParams::new(id : Int64) -> GetPostByIdParams {
 ///|
 pub struct ListPostsByAuthorParams {
   author_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListPostsByAuthorParams::new(author_id : Int64) -> ListPostsByAuthorParams {
@@ -436,7 +436,7 @@ pub fn ListPostsByAuthorParams::new(author_id : Int64) -> ListPostsByAuthorParam
 ///|
 pub struct PublishPostParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn PublishPostParams::new(id : Int64) -> PublishPostParams {
@@ -446,7 +446,7 @@ pub fn PublishPostParams::new(id : Int64) -> PublishPostParams {
 ///|
 pub struct DeletePostParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn DeletePostParams::new(id : Int64) -> DeletePostParams {
@@ -456,7 +456,7 @@ pub fn DeletePostParams::new(id : Int64) -> DeletePostParams {
 ///|
 pub struct IncrementViewCountParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn IncrementViewCountParams::new(id : Int64) -> IncrementViewCountParams {
@@ -466,7 +466,7 @@ pub fn IncrementViewCountParams::new(id : Int64) -> IncrementViewCountParams {
 ///|
 pub struct GetPostWithAuthorParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetPostWithAuthorParams::new(id : Int64) -> GetPostWithAuthorParams {
@@ -476,7 +476,7 @@ pub fn GetPostWithAuthorParams::new(id : Int64) -> GetPostWithAuthorParams {
 ///|
 pub struct GetPostCountByAuthorParams {
   author_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetPostCountByAuthorParams::new(author_id : Int64) -> GetPostCountByAuthorParams {
@@ -486,7 +486,7 @@ pub fn GetPostCountByAuthorParams::new(author_id : Int64) -> GetPostCountByAutho
 ///|
 pub struct GetAuthorStatsParams {
   author_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetAuthorStatsParams::new(author_id : Int64) -> GetAuthorStatsParams {
@@ -496,7 +496,7 @@ pub fn GetAuthorStatsParams::new(author_id : Int64) -> GetAuthorStatsParams {
 ///|
 pub struct CreateTagParams {
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreateTagParams::new(name : String) -> CreateTagParams {
@@ -506,7 +506,7 @@ pub fn CreateTagParams::new(name : String) -> CreateTagParams {
 ///|
 pub struct CreateTagReturningIdParams {
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreateTagReturningIdParams::new(name : String) -> CreateTagReturningIdParams {
@@ -516,7 +516,7 @@ pub fn CreateTagReturningIdParams::new(name : String) -> CreateTagReturningIdPar
 ///|
 pub struct GetTagByNameParams {
   name : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetTagByNameParams::new(name : String) -> GetTagByNameParams {
@@ -526,7 +526,7 @@ pub fn GetTagByNameParams::new(name : String) -> GetTagByNameParams {
 ///|
 pub struct DeleteTagParams {
   id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn DeleteTagParams::new(id : Int64) -> DeleteTagParams {
@@ -537,7 +537,7 @@ pub fn DeleteTagParams::new(id : Int64) -> DeleteTagParams {
 pub struct AddTagToPostParams {
   post_id : Int64
   tag_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn AddTagToPostParams::new(post_id : Int64, tag_id : Int64) -> AddTagToPostParams {
@@ -548,7 +548,7 @@ pub fn AddTagToPostParams::new(post_id : Int64, tag_id : Int64) -> AddTagToPostP
 pub struct RemoveTagFromPostParams {
   post_id : Int64
   tag_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn RemoveTagFromPostParams::new(post_id : Int64, tag_id : Int64) -> RemoveTagFromPostParams {
@@ -558,7 +558,7 @@ pub fn RemoveTagFromPostParams::new(post_id : Int64, tag_id : Int64) -> RemoveTa
 ///|
 pub struct ListTagsForPostParams {
   post_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListTagsForPostParams::new(post_id : Int64) -> ListTagsForPostParams {
@@ -568,7 +568,7 @@ pub fn ListTagsForPostParams::new(post_id : Int64) -> ListTagsForPostParams {
 ///|
 pub struct GetTagCountForPostParams {
   post_id : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetTagCountForPostParams::new(post_id : Int64) -> GetTagCountForPostParams {
@@ -579,7 +579,7 @@ pub fn GetTagCountForPostParams::new(post_id : Int64) -> GetTagCountForPostParam
 pub struct ListUsersPaginatedParams {
   id : Int64
   limit : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListUsersPaginatedParams::new(id : Int64, limit : Int64) -> ListUsersPaginatedParams {
@@ -591,7 +591,7 @@ pub struct ListPostsByAuthorPaginatedParams {
   author_id : Int64
   id : Int64
   limit : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListPostsByAuthorPaginatedParams::new(author_id : Int64, id : Int64, limit : Int64) -> ListPostsByAuthorPaginatedParams {
@@ -602,7 +602,7 @@ pub fn ListPostsByAuthorPaginatedParams::new(author_id : Int64, id : Int64, limi
 pub struct ListPostsWithAuthorsPaginatedParams {
   id : Int64
   limit : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListPostsWithAuthorsPaginatedParams::new(id : Int64, limit : Int64) -> ListPostsWithAuthorsPaginatedParams {
@@ -613,7 +613,7 @@ pub fn ListPostsWithAuthorsPaginatedParams::new(id : Int64, limit : Int64) -> Li
 pub struct ListPublishedPostsPaginatedParams {
   id : Int64
   limit : Int64
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn ListPublishedPostsPaginatedParams::new(id : Int64, limit : Int64) -> ListPublishedPostsPaginatedParams {

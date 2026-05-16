@@ -10,8 +10,9 @@ pub fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     // Tag for files field (field 1, wire type 2 = length-delimited)
     bytes.push(b'\x0a')
 
-    // Calculate file message size
-    let file_size = @protobuf.size_of(file)
+    // Calculate file message size from actual bytes. Generated size_of can lag
+    // behind runtime Bytes semantics and corrupt large sqlc plugin responses.
+    let file_size = file_message_size(file)
 
     // Write file size as varint
     let mut sz = file_size
@@ -50,4 +51,27 @@ pub fn serialize_response(response : @plugin.GenerateResponse) -> Bytes {
     }
   }
   Bytes::from_array(bytes)
+}
+
+///|
+fn file_message_size(file : @plugin.File) -> UInt {
+  let name_len = string_to_utf8(file.name).length().reinterpret_as_uint()
+  let contents_len = file.contents.length().reinterpret_as_uint()
+  1U +
+  varint_size(name_len) +
+  name_len +
+  1U +
+  varint_size(contents_len) +
+  contents_len
+}
+
+///|
+fn varint_size(value : UInt) -> UInt {
+  let mut size = 1U
+  let mut v = value
+  while v >= 0x80U {
+    size = size + 1U
+    v = v >> 7
+  }
+  size
 }

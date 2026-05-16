@@ -155,7 +155,7 @@ fn generate_query_function_sqlite_js(
 ///|
 fn sqlite_js_param_to_sql_value(col : @plugin.Column, expr : String) -> String {
   let type_name = col.type_.name.to_upper()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
   if is_nullable {
     // For nullable types, handle Option
     match type_name {
@@ -215,7 +215,7 @@ fn sqlite_js_param_to_sql_value(col : @plugin.Column, expr : String) -> String {
 fn sqlite_js_column_from_sql_value(col : @plugin.Column, idx : Int) -> String {
   let type_name = col.type_.name.to_upper()
   let idx_str = idx.to_string()
-  let is_nullable = !(col.not_null)
+  let is_nullable = !col.not_null
 
   // Use high-level Statement::column which returns SqlValue
   let base_expr = match type_name {

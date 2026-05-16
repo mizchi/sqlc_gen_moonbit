@@ -170,7 +170,7 @@ fn backend_write_fn_signature_start(
   // Add error handling
   match info.error_type {
     Some(err) =>
-      if !(info.uses_result) {
+      if !info.uses_result {
         buf.write_string(" raise ")
         buf.write_string(err)
       }

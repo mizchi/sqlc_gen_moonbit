@@ -60,7 +60,6 @@ fn alloc(size : Int) -> Int {
   let current_pages = wasm_memory_size()
   if pages_needed > current_pages {
     let _ = wasm_memory_grow(pages_needed - current_pages)
-
   }
   ptr
 }

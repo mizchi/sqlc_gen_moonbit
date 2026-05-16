@@ -4,7 +4,7 @@
 ///| SQL execution error
 pub suberror SqlError {
   SqlError(String)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub struct GetUserRow {
@@ -12,7 +12,7 @@ pub struct GetUserRow {
   name : String
   email : String
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct ListUsersRow {
@@ -20,12 +20,12 @@ pub struct ListUsersRow {
   name : String
   email : String
   created_at : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub struct GetUserParams {
   id : Int
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn GetUserParams::new(id : Int) -> GetUserParams {
@@ -36,7 +36,7 @@ pub fn GetUserParams::new(id : Int) -> GetUserParams {
 pub struct CreateUserParams {
   name : String
   email : String
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn CreateUserParams::new(name : String, email : String) -> CreateUserParams {
@@ -48,7 +48,7 @@ pub struct UpdateUserParams {
   name : String
   email : String
   id : Int
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn UpdateUserParams::new(name : String, email : String, id : Int) -> UpdateUserParams {
@@ -58,7 +58,7 @@ pub fn UpdateUserParams::new(name : String, email : String, id : Int) -> UpdateU
 ///|
 pub struct DeleteUserParams {
   id : Int
-} derive(Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub fn DeleteUserParams::new(id : Int) -> DeleteUserParams {

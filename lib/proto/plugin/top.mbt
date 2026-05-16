@@ -2,21 +2,21 @@
 pub(all) struct File {
   mut name : String
   mut contents : Bytes
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for File with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.contents)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -36,7 +36,7 @@ pub impl @protobuf.Read for File with read_with_limit(
 ) -> File raise {
   let msg = File::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.read_string()
         (2, _) => msg.contents = reader |> @protobuf.read_bytes()
@@ -99,7 +99,7 @@ pub impl @protobuf.AsyncRead for File with read_with_limit(
 ) -> File raise {
   let msg = File::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.async_read_string()
         (2, _) => msg.contents = reader |> @protobuf.async_read_bytes()
@@ -131,21 +131,21 @@ pub(all) struct Settings {
   mut schema : Array[String]
   mut queries : Array[String]
   mut codegen : Codegen
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Settings with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.version)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.engine)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.schema {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -155,10 +155,10 @@ pub impl @protobuf.Sized for Settings with size_of(self) {
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.codegen)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -190,7 +190,7 @@ pub impl @protobuf.Read for Settings with read_with_limit(
 ) -> Settings raise {
   let msg = Settings::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.version = reader |> @protobuf.read_string()
         (2, _) => msg.engine = reader |> @protobuf.read_string()
@@ -280,7 +280,7 @@ pub impl @protobuf.AsyncRead for Settings with read_with_limit(
 ) -> Settings raise {
   let msg = Settings::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.version = reader |> @protobuf.async_read_string()
         (2, _) => msg.engine = reader |> @protobuf.async_read_string()
@@ -323,16 +323,16 @@ pub impl @protobuf.AsyncWrite for Settings with write(
 ///|
 pub(all) struct Codegen_Process {
   mut cmd : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Codegen_Process with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.cmd)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -352,7 +352,7 @@ pub impl @protobuf.Read for Codegen_Process with read_with_limit(
 ) -> Codegen_Process raise {
   let msg = Codegen_Process::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.cmd = reader |> @protobuf.read_string()
         (_, wire) => reader |> @protobuf.read_unknown(wire)
@@ -409,7 +409,7 @@ pub impl @protobuf.AsyncRead for Codegen_Process with read_with_limit(
 ) -> Codegen_Process raise {
   let msg = Codegen_Process::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.cmd = reader |> @protobuf.async_read_string()
         (_, wire) => reader |> @protobuf.async_read_unknown(wire)
@@ -435,21 +435,21 @@ pub impl @protobuf.AsyncWrite for Codegen_Process with write(
 pub(all) struct Codegen_WASM {
   mut url : String
   mut sha256 : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Codegen_WASM with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.url)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.sha256)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -469,7 +469,7 @@ pub impl @protobuf.Read for Codegen_WASM with read_with_limit(
 ) -> Codegen_WASM raise {
   let msg = Codegen_WASM::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.url = reader |> @protobuf.read_string()
         (2, _) => msg.sha256 = reader |> @protobuf.read_string()
@@ -531,7 +531,7 @@ pub impl @protobuf.AsyncRead for Codegen_WASM with read_with_limit(
 ) -> Codegen_WASM raise {
   let msg = Codegen_WASM::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.url = reader |> @protobuf.async_read_string()
         (2, _) => msg.sha256 = reader |> @protobuf.async_read_string()
@@ -564,40 +564,40 @@ pub(all) struct Codegen {
   mut env : Array[String]
   mut process : Codegen_Process
   mut wasm : Codegen_WASM
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Codegen with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.out)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.plugin)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.options)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.env {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.process)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.wasm)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -631,7 +631,7 @@ pub impl @protobuf.Read for Codegen with read_with_limit(
 ) -> Codegen raise {
   let msg = Codegen::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.out = reader |> @protobuf.read_string()
         (2, _) => msg.plugin = reader |> @protobuf.read_string()
@@ -728,7 +728,7 @@ pub impl @protobuf.AsyncRead for Codegen with read_with_limit(
 ) -> Codegen raise {
   let msg = Codegen::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.out = reader |> @protobuf.async_read_string()
         (2, _) => msg.plugin = reader |> @protobuf.async_read_string()
@@ -778,26 +778,26 @@ pub(all) struct Catalog {
   mut default_schema : String
   mut name : String
   mut schemas : Array[Schema]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Catalog with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.comment)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.default_schema)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.schemas {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -831,7 +831,7 @@ pub impl @protobuf.Read for Catalog with read_with_limit(
 ) -> Catalog raise {
   let msg = Catalog::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.comment = reader |> @protobuf.read_string()
         (2, _) => msg.default_schema = reader |> @protobuf.read_string()
@@ -913,7 +913,7 @@ pub impl @protobuf.AsyncRead for Catalog with read_with_limit(
 ) -> Catalog raise {
   let msg = Catalog::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.comment = reader |> @protobuf.async_read_string()
         (2, _) => msg.default_schema = reader |> @protobuf.async_read_string()
@@ -955,21 +955,21 @@ pub(all) struct Schema {
   mut tables : Array[Table]
   mut enums : Array[Enum]
   mut composite_types : Array[CompositeType]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Schema with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.comment)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.tables {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -1013,7 +1013,7 @@ pub impl @protobuf.Read for Schema with read_with_limit(
 ) -> Schema raise {
   let msg = Schema::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.comment = reader |> @protobuf.read_string()
         (2, _) => msg.name = reader |> @protobuf.read_string()
@@ -1111,7 +1111,7 @@ pub impl @protobuf.AsyncRead for Schema with read_with_limit(
 ) -> Schema raise {
   let msg = Schema::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.comment = reader |> @protobuf.async_read_string()
         (2, _) => msg.name = reader |> @protobuf.async_read_string()
@@ -1163,21 +1163,21 @@ pub impl @protobuf.AsyncWrite for Schema with write(
 pub(all) struct CompositeType {
   mut name : String
   mut comment : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for CompositeType with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.comment)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -1197,7 +1197,7 @@ pub impl @protobuf.Read for CompositeType with read_with_limit(
 ) -> CompositeType raise {
   let msg = CompositeType::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.read_string()
         (2, _) => msg.comment = reader |> @protobuf.read_string()
@@ -1259,7 +1259,7 @@ pub impl @protobuf.AsyncRead for CompositeType with read_with_limit(
 ) -> CompositeType raise {
   let msg = CompositeType::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.async_read_string()
         (2, _) => msg.comment = reader |> @protobuf.async_read_string()
@@ -1289,25 +1289,25 @@ pub(all) struct Enum {
   mut name : String
   mut vals : Array[String]
   mut comment : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Enum with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.vals {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.comment)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -1327,7 +1327,7 @@ pub impl @protobuf.Read for Enum with read_with_limit(
 ) -> Enum raise {
   let msg = Enum::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.read_string()
         (2, _) => msg.vals.push(reader |> @protobuf.read_string())
@@ -1399,7 +1399,7 @@ pub impl @protobuf.AsyncRead for Enum with read_with_limit(
 ) -> Enum raise {
   let msg = Enum::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.async_read_string()
         (2, _) => msg.vals.push(reader |> @protobuf.async_read_string())
@@ -1434,25 +1434,25 @@ pub(all) struct Table {
   mut rel : Identifier
   mut columns : Array[Column]
   mut comment : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Table with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.rel)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.columns {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.comment)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -1476,7 +1476,7 @@ pub impl @protobuf.Read for Table with read_with_limit(
 ) -> Table raise {
   let msg = Table::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.rel = (reader |> @protobuf.read_message() : Identifier)
         (2, _) =>
@@ -1551,7 +1551,7 @@ pub impl @protobuf.AsyncRead for Table with read_with_limit(
 ) -> Table raise {
   let msg = Table::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.rel = (reader |> @protobuf.async_read_message() : Identifier)
@@ -1590,26 +1590,26 @@ pub(all) struct Identifier {
   mut catalog : String
   mut schema : String
   mut name : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Identifier with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.catalog)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.schema)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -1637,7 +1637,7 @@ pub impl @protobuf.Read for Identifier with read_with_limit(
 ) -> Identifier raise {
   let msg = Identifier::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.catalog = reader |> @protobuf.read_string()
         (2, _) => msg.schema = reader |> @protobuf.read_string()
@@ -1706,7 +1706,7 @@ pub impl @protobuf.AsyncRead for Identifier with read_with_limit(
 ) -> Identifier raise {
   let msg = Identifier::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.catalog = reader |> @protobuf.async_read_string()
         (2, _) => msg.schema = reader |> @protobuf.async_read_string()
@@ -1752,57 +1752,57 @@ pub(all) struct Column {
   mut original_name : String
   mut unsigned : Bool
   mut array_dims : Int
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Column with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U + @protobuf.size_of(self.not_null)
   size += 1U + @protobuf.size_of(self.is_array)
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.comment)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U + @protobuf.size_of(self.length)
   size += 1U + @protobuf.size_of(self.is_named_param)
   size += 1U + @protobuf.size_of(self.is_func_call)
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.scope)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.table)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.table_alias)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.type_)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U + @protobuf.size_of(self.is_sqlc_slice)
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.embed_table)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.original_name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 2U + @protobuf.size_of(self.unsigned)
   size += 2U + @protobuf.size_of(self.array_dims)
   size
@@ -1875,7 +1875,7 @@ pub impl @protobuf.Read for Column with read_with_limit(
 ) -> Column raise {
   let msg = Column::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.read_string()
         (3, _) => msg.not_null = reader |> @protobuf.read_bool()
@@ -2045,7 +2045,7 @@ pub impl @protobuf.AsyncRead for Column with read_with_limit(
 ) -> Column raise {
   let msg = Column::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.name = reader |> @protobuf.async_read_string()
         (3, _) => msg.not_null = reader |> @protobuf.async_read_bool()
@@ -2129,26 +2129,26 @@ pub(all) struct Query {
   mut comments : Array[String]
   mut filename : String
   mut insert_into_table : Identifier
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Query with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.text)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.name)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.cmd)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.columns {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
@@ -2162,15 +2162,15 @@ pub impl @protobuf.Sized for Query with size_of(self) {
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.filename)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.insert_into_table)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -2217,7 +2217,7 @@ pub impl @protobuf.Read for Query with read_with_limit(
 ) -> Query raise {
   let msg = Query::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.text = reader |> @protobuf.read_string()
         (2, _) => msg.name = reader |> @protobuf.read_string()
@@ -2338,7 +2338,7 @@ pub impl @protobuf.AsyncRead for Query with read_with_limit(
 ) -> Query raise {
   let msg = Query::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.text = reader |> @protobuf.async_read_string()
         (2, _) => msg.name = reader |> @protobuf.async_read_string()
@@ -2401,17 +2401,17 @@ pub impl @protobuf.AsyncWrite for Query with write(
 pub(all) struct Parameter {
   mut number : Int
   mut column : Column
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for Parameter with size_of(self) {
   let mut size = 0U
   size += 1U + @protobuf.size_of(self.number)
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.column)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -2431,7 +2431,7 @@ pub impl @protobuf.Read for Parameter with read_with_limit(
 ) -> Parameter raise {
   let msg = Parameter::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.number = reader |> @protobuf.read_int32()
         (2, _) => msg.column = (reader |> @protobuf.read_message() : Column)
@@ -2494,7 +2494,7 @@ pub impl @protobuf.AsyncRead for Parameter with read_with_limit(
 ) -> Parameter raise {
   let msg = Parameter::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.number = reader |> @protobuf.async_read_int32()
         (2, _) =>
@@ -2529,40 +2529,40 @@ pub(all) struct GenerateRequest {
   mut sqlc_version : String
   mut plugin_options : Bytes
   mut global_options : Bytes
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for GenerateRequest with size_of(self) {
   let mut size = 0U
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.settings)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.catalog)
       @protobuf.size_of(size) + size
-    }
+    })
   for s in self.queries {
     let s = @protobuf.size_of(s)
     size += 1U + @protobuf.size_of(s) + s
   }
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.sqlc_version)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.plugin_options)
       @protobuf.size_of(size) + size
-    }
+    })
   size += 1U +
-    {
+    ({
       let size = @protobuf.size_of(self.global_options)
       @protobuf.size_of(size) + size
-    }
+    })
   size
 }
 
@@ -2603,7 +2603,7 @@ pub impl @protobuf.Read for GenerateRequest with read_with_limit(
 ) -> GenerateRequest raise {
   let msg = GenerateRequest::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.settings = (reader |> @protobuf.read_message() : Settings)
         (2, _) => msg.catalog = (reader |> @protobuf.read_message() : Catalog)
@@ -2704,7 +2704,7 @@ pub impl @protobuf.AsyncRead for GenerateRequest with read_with_limit(
 ) -> GenerateRequest raise {
   let msg = GenerateRequest::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.settings = (reader |> @protobuf.async_read_message() : Settings)
@@ -2752,7 +2752,7 @@ pub impl @protobuf.AsyncWrite for GenerateRequest with write(
 ///|
 pub(all) struct GenerateResponse {
   mut files : Array[File]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl @protobuf.Sized for GenerateResponse with size_of(self) {
@@ -2780,7 +2780,7 @@ pub impl @protobuf.Read for GenerateResponse with read_with_limit(
 ) -> GenerateResponse raise {
   let msg = GenerateResponse::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.files.push((reader |> @protobuf.read_message() : File))
         (_, wire) => reader |> @protobuf.read_unknown(wire)
@@ -2841,7 +2841,7 @@ pub impl @protobuf.AsyncRead for GenerateResponse with read_with_limit(
 ) -> GenerateResponse raise {
   let msg = GenerateResponse::default()
   try {
-    for {
+    for ;; {
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) =>
           msg.files.push((reader |> @protobuf.async_read_message() : File))

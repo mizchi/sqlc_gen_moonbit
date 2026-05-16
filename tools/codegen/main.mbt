@@ -212,7 +212,7 @@ fn parse_cli_args(args : Array[String]) -> CliArgs {
       result.json_schema = true
     } else if arg == "--check-deps" {
       result.check_deps = true
-    } else if !(arg.has_prefix("-")) {
+    } else if !arg.has_prefix("-") {
       result.input_file = Some(arg)
     }
     i = i + 1
@@ -328,7 +328,7 @@ fn check_dependencies(backend : String) -> Unit {
   let required = get_required_deps(backend)
   let missing : Array[String] = []
   for dep in required {
-    if !(deps.contains(dep)) {
+    if !deps.contains(dep) {
       missing.push(dep)
     }
   }
@@ -412,7 +412,7 @@ fn parse_queries(content : String) -> Array[QueryDef] {
             }
           } else if next_line.has_prefix("-- @query ") {
             break
-          } else if next_line.length() > 0 && !(next_line.has_prefix("--")) {
+          } else if next_line.length() > 0 && !next_line.has_prefix("--") {
             sql_lines.push(next_line)
             if next_line.has_suffix(";") {
               i = i + 1
@@ -514,7 +514,7 @@ fn query_to_row_struct(
   overrides : Array[Override],
 ) -> @ir.Struct {
   let struct_name = query.name + "Row"
-  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Debug", "Eq"])
   for ret in query.returns {
     let ty = sql_type_to_ir_with_override(ret.0, ret.1, overrides)
     let field = @ir.Field::new(to_snake_case(ret.0), ty)
@@ -529,7 +529,7 @@ fn query_to_params_struct(
   overrides : Array[Override],
 ) -> @ir.Struct {
   let struct_name = query.name + "Params"
-  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Debug", "Eq"])
   for param in query.params {
     let ty = sql_type_to_ir_with_override(param.0, param.1, overrides)
     let mut field = @ir.Field::new(to_snake_case(param.0), ty)
@@ -587,7 +587,7 @@ fn is_string_sql_type(sql_type : String) -> Bool {
 ///|
 fn has_validatable_fields(s : @ir.Struct) -> Bool {
   for field in s.fields {
-    if !(field.constraints.is_empty()) {
+    if !field.constraints.is_empty() {
       return true
     }
   }

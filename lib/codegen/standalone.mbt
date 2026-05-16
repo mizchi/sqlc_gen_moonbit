@@ -50,7 +50,7 @@ pub fn parse_sql_queries(content : String) -> Array[QueryDef] {
             }
           } else if next_line.has_prefix("-- @query ") {
             break
-          } else if next_line.length() > 0 && !(next_line.has_prefix("--")) {
+          } else if next_line.length() > 0 && !next_line.has_prefix("--") {
             sql_lines.push(next_line)
             if next_line.has_suffix(";") {
               i = i + 1
@@ -83,7 +83,6 @@ pub fn generate_from_queries(queries : Array[QueryDef]) -> String {
   buf.write_string("  let decoder = @encoding.decoder(@encoding.UTF8)\n")
   buf.write_string("  decoder.decode_lossy(b[0:b.length()])\n")
   buf.write_string("}\n\n")
-  let emitter = @emit.MoonBitEmitter::new()
   let validator_emitter = @emit.ValidatorEmitter::new()
 
   // Generate structs
@@ -91,12 +90,12 @@ pub fn generate_from_queries(queries : Array[QueryDef]) -> String {
     if (query.cmd == ":one" || query.cmd == ":many") &&
       query.returns.length() > 0 {
       let row_struct = standalone_query_to_row_struct(query)
-      buf.write_string(emitter.emit_struct(row_struct))
+      standalone_emit_moonbit_struct(buf, row_struct)
       buf.write_string("\n")
     }
     if query.params.length() > 0 {
       let params_struct = standalone_query_to_params_struct(query)
-      buf.write_string(emitter.emit_struct(params_struct))
+      standalone_emit_moonbit_struct(buf, params_struct)
       buf.write_string("\n")
       standalone_generate_constructor(buf, params_struct)
       if standalone_has_validatable_fields(params_struct) {
@@ -114,6 +113,80 @@ pub fn generate_from_queries(queries : Array[QueryDef]) -> String {
 }
 
 ///|
+fn standalone_emit_moonbit_struct(buf : StringBuilder, s : @ir.Struct) -> Unit {
+  buf.write_string("///|\n")
+  match s.doc {
+    Some(doc) => {
+      buf.write_string("/// ")
+      buf.write_string(doc)
+      buf.write_string("\n")
+    }
+    None => ()
+  }
+  standalone_emit_visibility(buf, s.visibility)
+  buf.write_string("struct ")
+  buf.write_string(s.name)
+  if s.type_params.length() > 0 {
+    buf.write_string("[")
+    for i, param in s.type_params {
+      if i > 0 {
+        buf.write_string(", ")
+      }
+      buf.write_string(param)
+    }
+    buf.write_string("]")
+  }
+  buf.write_string(" {\n")
+  for field in s.fields {
+    match field.doc {
+      Some(doc) => {
+        buf.write_string("  /// ")
+        buf.write_string(doc)
+        buf.write_string("\n")
+      }
+      None => ()
+    }
+    buf.write_string("  ")
+    if field.is_mutable {
+      buf.write_string("mut ")
+    }
+    buf.write_string(field.name)
+    buf.write_string(" : ")
+    standalone_emit_ir_type(buf, field.ty)
+    buf.write_string("\n")
+  }
+  buf.write_string("}")
+  if s.derives.length() > 0 {
+    buf.write_string(" derive(")
+    for i, derive_name in s.derives {
+      if i > 0 {
+        buf.write_string(", ")
+      }
+      buf.write_string(derive_name)
+    }
+    buf.write_string(")")
+  }
+  buf.write_string("\n")
+}
+
+///|
+fn standalone_emit_visibility(
+  buf : StringBuilder,
+  vis : @ir.Visibility,
+) -> Unit {
+  match vis {
+    @ir.Visibility::Public => buf.write_string("pub ")
+    @ir.Visibility::Private => buf.write_string("priv ")
+    @ir.Visibility::ReadOnly => buf.write_string("pub(readonly) ")
+    @ir.Visibility::Package(pkg) => {
+      buf.write_string("pub(")
+      buf.write_string(pkg)
+      buf.write_string(") ")
+    }
+  }
+}
+
+///|
 /// Generate MoonBit code from SQL file content
 pub fn generate_from_sql(sql_content : String) -> String {
   let queries = parse_sql_queries(sql_content)
@@ -125,7 +198,7 @@ pub fn generate_from_sql(sql_content : String) -> String {
 ///|
 fn standalone_query_to_row_struct(query : QueryDef) -> @ir.Struct {
   let struct_name = query.name + "Row"
-  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Debug", "Eq"])
   for ret in query.returns {
     let field = @ir.Field::new(
       to_snake_case(ret.0),
@@ -139,7 +212,7 @@ fn standalone_query_to_row_struct(query : QueryDef) -> @ir.Struct {
 ///|
 fn standalone_query_to_params_struct(query : QueryDef) -> @ir.Struct {
   let struct_name = query.name + "Params"
-  let mut s = @ir.Struct::new(struct_name).with_derives(["Show", "Eq"])
+  let mut s = @ir.Struct::new(struct_name).with_derives(["Debug", "Eq"])
   for param in query.params {
     let ty = standalone_sql_type_to_ir(param.1)
     let mut field = @ir.Field::new(to_snake_case(param.0), ty)
@@ -175,7 +248,7 @@ fn standalone_is_string_sql_type(sql_type : String) -> Bool {
 ///|
 fn standalone_has_validatable_fields(s : @ir.Struct) -> Bool {
   for field in s.fields {
-    if !(field.constraints.is_empty()) {
+    if !field.constraints.is_empty() {
       return true
     }
   }
@@ -203,6 +276,9 @@ fn standalone_generate_constructor(buf : StringBuilder, s : @ir.Struct) -> Unit 
       buf.write_string(", ")
     }
     buf.write_string(field.name)
+  }
+  if s.fields.length() == 1 {
+    buf.write_string(",")
   }
   buf.write_string(" }\n}\n\n")
 }

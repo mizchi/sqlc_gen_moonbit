@@ -4,6 +4,8 @@ import {
   "example_sqlite_js/db/gen",
 }
 
+supported_targets = "js"
+
 options(
   "is-main": true,
 )
