@@ -13,22 +13,22 @@ pub fn generate_queries_d1(
   // D1 cell that is `NULL` or `undefined` would propagate into a
   // MoonBit `String` via `cast()` and only crash later at the
   // first downstream use (JSON serialisation, string concat, etc).
-  // Surfacing a D1Error at the read boundary makes the cause
-  // obvious and keeps the rest of the row read sites unchanged.
+  // `abort` (rather than `raise @cloudflare.D1Error`) is used here
+  // because `@cloudflare.D1Error` is declared `pub suberror` in an
+  // upstream package and its variant constructor isn't externally
+  // callable. A NULL on a NOT NULL column is a schema/DB invariant
+  // violation, so aborting the request rather than asking callers
+  // to handle it is a defensible default.
   buf.write_string(
     #|///| Read a required (NOT NULL) column from a D1 result row.
-    #|/// Raises D1Error if the cell is null or missing — surfacing
-    #|/// the bad row at the read site instead of letting `undefined`
-    #|/// propagate through `cast()` into a MoonBit value.
-    #|fn d1_require_field(
-    #|  row : @core.Any,
-    #|  field : String,
-    #|) -> @core.Any raise @cloudflare.D1Error {
+    #|/// Aborts the request with a clear message if the cell is
+    #|/// null or missing — surfacing the bad row at the read site
+    #|/// instead of letting `undefined` propagate through `cast()`
+    #|/// into a MoonBit value.
+    #|fn d1_require_field(row : @core.Any, field : String) -> @core.Any {
     #|  let value = row[field]
     #|  if @core.is_null(value) || @core.typeof_(value) == "undefined" {
-    #|    raise @cloudflare.D1Error(
-    #|      "D1 row missing required column \"" + field + "\"",
-    #|    )
+    #|    abort("D1 row missing required column \"" + field + "\"")
     #|  }
     #|  value
     #|}
