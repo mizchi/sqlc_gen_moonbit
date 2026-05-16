@@ -29,6 +29,13 @@ pub fn column_to_ir_type(col : @plugin.Column) -> @ir.Type {
       // Default to String for unknown types
       @ir.Type::string()
   }
+  // `sqlc.slice('name')` params arrive as a variable-length array
+  // bound at call time; the param type is Array[T] regardless of the
+  // column's NULL constraint (nullability of a slice item isn't a
+  // shape that sqlc exposes).
+  if col.is_sqlc_slice {
+    return @ir.Type::array(base_type)
+  }
   // Wrap in Optional if nullable
   if col.not_null {
     base_type
@@ -111,6 +118,9 @@ pub fn column_to_ir_type_with_override(
   match find_column_override(col, overrides) {
     Some(override_) => {
       let base_type = @ir.Type::named(override_.moonbit_type)
+      if col.is_sqlc_slice {
+        return @ir.Type::array(base_type)
+      }
       let is_nullable = match override_.nullable {
         Some(n) => n
         None => !col.not_null

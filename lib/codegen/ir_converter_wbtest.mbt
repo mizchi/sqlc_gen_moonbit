@@ -57,6 +57,63 @@ test "column_to_ir_type - text nullable" {
 }
 
 ///|
+test "column_to_ir_type - sqlc.slice text param wraps in Array" {
+  let col = @plugin.Column::{
+    name: "ids",
+    not_null: true,
+    is_array: false,
+    comment: "",
+    length: -1,
+    is_named_param: false,
+    is_func_call: false,
+    scope: "",
+    table: @plugin.Identifier::default(),
+    table_alias: "",
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT" },
+    is_sqlc_slice: true,
+    embed_table: @plugin.Identifier::default(),
+    original_name: "",
+    unsigned: false,
+    array_dims: 0,
+  }
+  let ty = column_to_ir_type(col)
+  // sqlc.slice always becomes Array[T] regardless of the column's
+  // NOT NULL flag — the slice itself is what gets bound, not a
+  // single nullable scalar.
+  match ty {
+    @ir.Type::Array(@ir.Type::Primitive(name)) => assert_eq(name, "String")
+    _ => fail("Expected Array(Primitive) type for sqlc.slice param")
+  }
+}
+
+///|
+test "column_to_ir_type - sqlc.slice integer param wraps in Array" {
+  let col = @plugin.Column::{
+    name: "user_ids",
+    not_null: true,
+    is_array: false,
+    comment: "",
+    length: -1,
+    is_named_param: false,
+    is_func_call: false,
+    scope: "",
+    table: @plugin.Identifier::default(),
+    table_alias: "",
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER" },
+    is_sqlc_slice: true,
+    embed_table: @plugin.Identifier::default(),
+    original_name: "",
+    unsigned: false,
+    array_dims: 0,
+  }
+  let ty = column_to_ir_type(col)
+  match ty {
+    @ir.Type::Array(@ir.Type::Primitive(name)) => assert_eq(name, "Int64")
+    _ => fail("Expected Array(Primitive) type for sqlc.slice param")
+  }
+}
+
+///|
 test "column_to_constraints - required string" {
   let col = @plugin.Column::{
     name: "name",

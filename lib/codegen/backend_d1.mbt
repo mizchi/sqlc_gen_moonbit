@@ -33,6 +33,24 @@ pub fn generate_queries_d1(
     #|  value
     #|}
     #|
+    #|///| Expand a sqlc.slice('name') placeholder to a comma-separated
+    #|/// list of `?` placeholders matching the slice length. An empty
+    #|/// slice expands to `NULL` so `WHERE col IN (NULL)` short-circuits
+    #|/// to no rows — saner than emitting an invalid `IN ()` clause.
+    #|fn sqlc_slice_placeholders(n : Int) -> String {
+    #|  if n <= 0 {
+    #|    return "NULL"
+    #|  }
+    #|  let buf = StringBuilder::new()
+    #|  for i = 0; i < n; i = i + 1 {
+    #|    if i > 0 {
+    #|      buf.write_string(",")
+    #|    }
+    #|    buf.write_string("?")
+    #|  }
+    #|  buf.to_string()
+    #|}
+    #|
     #|
   )
 
@@ -81,13 +99,26 @@ fn generate_query_function_d1(
   buf.write_string(return_type)
   buf.write_string(" raise @cloudflare.D1Error {\n")
 
-  // Prepare and bind statement using cloudflare.mbt API
-  // Errors from cloudflare.mbt D1 methods propagate directly
-  buf.write_string("  let stmt = db.prepare(")
-  buf.write_string(sql_const)
-  buf.write_string(")")
-  if param_count > 0 {
-    buf.write_string(".bind([")
+  // Detect whether any param uses `sqlc.slice('name')`. Slice params
+  // require runtime SQL substitution (`/*SLICE:name*/?` -> `?,?,?`)
+  // and a dynamically-built bind array; the static `bind([...])`
+  // shape only works when every placeholder is scalar.
+  let mut has_slice = false
+  for param in query.params {
+    if param.column.is_sqlc_slice {
+      has_slice = true
+      break
+    }
+  }
+  if param_count == 0 {
+    buf.write_string("  let stmt = db.prepare(")
+    buf.write_string(sql_const)
+    buf.write_string(")\n")
+  } else if !has_slice {
+    // Original static path — array literal, no dynamic SQL.
+    buf.write_string("  let stmt = db.prepare(")
+    buf.write_string(sql_const)
+    buf.write_string(").bind([")
     for i, param in query.params {
       let col = param.column
       let param_name = if col.name.length() > 0 {
@@ -100,9 +131,51 @@ fn generate_query_function_d1(
       }
       buf.write_string(d1_param_to_core_any(col, "params." + param_name))
     }
-    buf.write_string("])")
+    buf.write_string("])\n")
+  } else {
+    // Dynamic SQL: rewrite every /*SLICE:name*/? marker before
+    // calling prepare(), then push scalars + slice elements into a
+    // mutable bind list in declaration order.
+    buf.write_string("  let mut sql_text = ")
+    buf.write_string(sql_const)
+    buf.write_string("\n")
+    for param in query.params {
+      let col = param.column
+      if col.is_sqlc_slice {
+        let param_name = if col.name.length() > 0 {
+          to_snake_case(col.name)
+        } else {
+          "p" + param.number.to_string()
+        }
+        buf.write_string("  sql_text = sql_text.replace(\"/*SLICE:")
+        buf.write_string(col.name)
+        buf.write_string(
+          "*/?\", sqlc_slice_placeholders(params.",
+        )
+        buf.write_string(param_name)
+        buf.write_string(".length()))\n")
+      }
+    }
+    buf.write_string("  let bind_args : Array[@core.Any] = []\n")
+    for param in query.params {
+      let col = param.column
+      let param_name = if col.name.length() > 0 {
+        to_snake_case(col.name)
+      } else {
+        "p" + param.number.to_string()
+      }
+      if col.is_sqlc_slice {
+        buf.write_string("  for slice_item in params.")
+        buf.write_string(param_name)
+        buf.write_string(" {\n    bind_args.push(@core.any(slice_item))\n  }\n")
+      } else {
+        buf.write_string("  bind_args.push(")
+        buf.write_string(d1_param_to_core_any(col, "params." + param_name))
+        buf.write_string(")\n")
+      }
+    }
+    buf.write_string("  let stmt = db.prepare(sql_text).bind(bind_args)\n")
   }
-  buf.write_string("\n")
 
   // Execute based on command type
   match query.cmd {
