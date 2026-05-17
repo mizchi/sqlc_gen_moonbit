@@ -19,6 +19,8 @@ pub fn column_to_ir_type(@plugin.Column) -> @ir.Type
 
 pub fn column_to_ir_type_with_override(@plugin.Column, Array[TypeOverride]) -> @ir.Type
 
+pub fn count_substring(String, String) -> Int
+
 pub fn emit_sql_doc_lines(StringBuilder, String) -> Unit
 
 pub fn escape_string(String) -> String
@@ -80,6 +82,8 @@ pub fn substring(String, Int, Int) -> String
 pub fn to_pascal_case(String) -> String
 
 pub fn to_snake_case(String) -> String
+
+pub fn validate_no_control_chars(String, String) -> String?
 
 // Errors
 

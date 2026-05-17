@@ -20,38 +20,40 @@ pub fn generate_queries_d1(
   // violation, so aborting the request rather than asking callers
   // to handle it is a defensible default.
   buf.write_string(
-    #|///| Read a required (NOT NULL) column from a D1 result row.
-    #|/// Aborts the request with a clear message if the cell is
-    #|/// null or missing — surfacing the bad row at the read site
-    #|/// instead of letting `undefined` propagate through `cast()`
-    #|/// into a MoonBit value.
-    #|fn d1_require_field(row : @core.Any, field : String) -> @core.Any {
-    #|  let value = row[field]
-    #|  if @core.is_null(value) || @core.typeof_(value) == "undefined" {
-    #|    abort("D1 row missing required column \"" + field + "\"")
-    #|  }
-    #|  value
-    #|}
-    #|
-    #|///| Expand a sqlc.slice('name') placeholder to a comma-separated
-    #|/// list of `?` placeholders matching the slice length. An empty
-    #|/// slice expands to `NULL` so `WHERE col IN (NULL)` short-circuits
-    #|/// to no rows — saner than emitting an invalid `IN ()` clause.
-    #|fn sqlc_slice_placeholders(n : Int) -> String {
-    #|  if n <= 0 {
-    #|    return "NULL"
-    #|  }
-    #|  let buf = StringBuilder::new()
-    #|  for i = 0; i < n; i = i + 1 {
-    #|    if i > 0 {
-    #|      buf.write_string(",")
-    #|    }
-    #|    buf.write_string("?")
-    #|  }
-    #|  buf.to_string()
-    #|}
-    #|
-    #|
+    (
+      #|///| Read a required (NOT NULL) column from a D1 result row.
+      #|/// Aborts the request with a clear message if the cell is
+      #|/// null or missing — surfacing the bad row at the read site
+      #|/// instead of letting `undefined` propagate through `cast()`
+      #|/// into a MoonBit value.
+      #|fn d1_require_field(row : @core.Any, field : String) -> @core.Any {
+      #|  let value = row[field]
+      #|  if @core.is_null(value) || @core.typeof_(value) == "undefined" {
+      #|    abort("D1 row missing required column \"" + field + "\"")
+      #|  }
+      #|  value
+      #|}
+      #|
+      #|///| Expand a sqlc.slice('name') placeholder to a comma-separated
+      #|/// list of `?` placeholders matching the slice length. An empty
+      #|/// slice expands to `NULL` so `WHERE col IN (NULL)` short-circuits
+      #|/// to no rows — saner than emitting an invalid `IN ()` clause.
+      #|fn sqlc_slice_placeholders(n : Int) -> String {
+      #|  if n <= 0 {
+      #|    return "NULL"
+      #|  }
+      #|  let buf = StringBuilder::new()
+      #|  for i = 0; i < n; i = i + 1 {
+      #|    if i > 0 {
+      #|      buf.write_string(",")
+      #|    }
+      #|    buf.write_string("?")
+      #|  }
+      #|  buf.to_string()
+      #|}
+      #|
+      #|
+    ),
   )
 
   // Generate query functions using cloudflare.mbt D1 types
@@ -107,7 +109,26 @@ fn generate_query_function_d1(
   for param in query.params {
     if param.column.is_sqlc_slice {
       has_slice = true
-      break
+      // The current bind-loop emits exactly one for-loop per slice
+      // param and pushes the values once. If the same slice name is
+      // referenced more than once in the SQL the placeholder count
+      // doubles but the bind count stays at one slice-length —
+      // runtime fails with "Bind parameter count" mismatch.
+      // See issue #20. Fail fast at codegen time instead of letting
+      // the silent runtime failure ship.
+      let marker = "/*SLICE:" + param.column.name + "*/?"
+      let occurrences = count_substring(query.text, marker)
+      if occurrences > 1 {
+        abort(
+          "sqlc.slice('" +
+          param.column.name +
+          "') is referenced " +
+          occurrences.to_string() +
+          " times in query '" +
+          query.name +
+          "', but the current sqlc-gen-moonbit slice runtime only supports a single occurrence per query. Split the query into siblings, or rewrite the SQL so the slice appears once. (See https://github.com/mizchi/sqlc_gen_moonbit/issues/20)",
+        )
+      }
     }
   }
   if param_count == 0 {
@@ -151,9 +172,7 @@ fn generate_query_function_d1(
         // args; the positional form trips type error 4086.
         buf.write_string("  sql_text = sql_text.replace(old=\"/*SLICE:")
         buf.write_string(col.name)
-        buf.write_string(
-          "*/?\", new=sqlc_slice_placeholders(params.",
-        )
+        buf.write_string("*/?\", new=sqlc_slice_placeholders(params.")
         buf.write_string(param_name)
         buf.write_string(".length()))\n")
       }
@@ -313,8 +332,7 @@ fn d1_column_from_core_any(col : @plugin.Column, obj_expr : String) -> String {
       // For smaller integer types (INTEGER, INT, INT4, SMALLINT), convert to Int
       "INTEGER" | "INT" | "INT4" =>
         "@cloudflare.js_number_to_int64(" + required + ")"
-      "SMALLINT" =>
-        "@cloudflare.js_number_to_int64(" + required + ").to_int()"
+      "SMALLINT" => "@cloudflare.js_number_to_int64(" + required + ").to_int()"
       "INT8" | "BIGINT" => "@cloudflare.js_number_to_int64(" + required + ")"
       "REAL" | "FLOAT" | "DOUBLE" | "NUMERIC" | "DECIMAL" =>
         required + ".cast()"

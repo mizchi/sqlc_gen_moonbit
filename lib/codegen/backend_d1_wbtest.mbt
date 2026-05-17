@@ -168,11 +168,13 @@ test "generate_queries_d1 - mixed scalar + slice params bind in order" {
   }
   let out = generate_queries_d1(req, [])
   // Scalar pushed before slice, in declaration order.
-  let scalar_push_idx = match find_substring(out, "bind_args.push(@core.any(params.owner_id))") {
+  let scalar_push_idx = match
+    find_substring(out, "bind_args.push(@core.any(params.owner_id))") {
     Some(idx) => idx
     None => -1
   }
-  let slice_loop_idx = match find_substring(out, "for slice_item in params.ids") {
+  let slice_loop_idx = match
+    find_substring(out, "for slice_item in params.ids") {
     Some(idx) => idx
     None => -1
   }

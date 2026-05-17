@@ -116,7 +116,6 @@ pub fn emit_sql_doc_lines(buf : StringBuilder, sql : String) -> Unit {
   while lines.length() > 0 &&
         lines[lines.length() - 1].view().trim(chars=" \t").length() == 0 {
     let _ = lines.pop()
-
   }
   for line in lines {
     let trimmed = line.view().trim_end(chars=" \t")
@@ -200,6 +199,86 @@ pub fn find_substring(haystack : String, needle : String) -> Int? {
     }
   }
   None
+}
+
+///|
+/// Validate that a generated MoonBit source string contains no C0 control
+/// characters other than `\t` (U+0009) and `\n` (U+000A). The wasm-host
+/// boundary in sqlc has been observed to insert stray `\x1f` (unit
+/// separator) bytes into the output, producing source like `id\x1f: String`
+/// or `pub\x1ffn` that won't compile (issue #17). This pass catches that
+/// class of corruption before the bytes leave the plugin, so the user sees
+/// a clear "regen produced corrupted output, please rerun" message instead
+/// of an inscrutable lex error in the generated file.
+///
+/// Returns `Some(reason)` on the first violation found, `None` if clean.
+/// Single-character substitution corruption (e.g. `String` -> `Strhng`)
+/// is not detected here — those produce valid ASCII and need a full
+/// MoonBit lexer to catch.
+pub fn validate_no_control_chars(
+  filename : String,
+  content : String,
+) -> String? {
+  for i = 0; i < content.length(); i = i + 1 {
+    let c = content[i].to_int()
+    // Allow \t (9), \n (10), \r (13); reject other C0 controls (0-31).
+    if c < 32 && c != 9 && c != 10 && c != 13 {
+      // Find the start of the line containing the offending char.
+      let mut line = 1
+      let mut last_nl = -1
+      for j = 0; j < i; j = j + 1 {
+        if content[j].to_int() == 10 {
+          line = line + 1
+          last_nl = j
+        }
+      }
+      let col = i - last_nl
+      return Some(
+        filename +
+        ":" +
+        line.to_string() +
+        ":" +
+        col.to_string() +
+        ": control character U+" +
+        c.to_string() +
+        " in generated output. This is a known sporadic codegen corruption " +
+        "(issue #17). Rerun `sqlc generate`; if the corruption reproduces, " +
+        "report it with the surrounding bytes.",
+      )
+    }
+  }
+  None
+}
+
+///|
+/// Count non-overlapping occurrences of `needle` in `haystack`. Used by the
+/// D1 backend to detect when the same `sqlc.slice('x')` appears in a query
+/// at more than one position — a configuration the current bind-loop does
+/// not support (see issue #20).
+pub fn count_substring(haystack : String, needle : String) -> Int {
+  let h_len = haystack.length()
+  let n_len = needle.length()
+  if n_len == 0 || n_len > h_len {
+    return 0
+  }
+  let mut count = 0
+  let mut i = 0
+  while i <= h_len - n_len {
+    let mut found = true
+    for j = 0; j < n_len; j = j + 1 {
+      if haystack[i + j] != needle[j] {
+        found = false
+        break
+      }
+    }
+    if found {
+      count = count + 1
+      i = i + n_len
+    } else {
+      i = i + 1
+    }
+  }
+  count
 }
 
 ///|

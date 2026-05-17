@@ -45,6 +45,37 @@ pub fn process_request(input : Bytes) -> Bytes {
     let schema_content = generate_json_schema(request)
     files.push(generated_file("sqlc_schema.json", schema_content))
   }
+
+  // Self-validation: scan every generated MoonBit file for U+001F / other
+  // C0 control characters that have been observed leaking into the output
+  // through the wasm-host boundary (issue #17). The JSON schema file is
+  // excluded — JSON does permit a wider character set and isn't compiled.
+  for f in files {
+    let name = f.name
+    if name.has_suffix(".mbt") {
+      // Reconstruct String from the file bytes. The bytes are already UTF-8
+      // (string_to_utf8 above), so a plain ASCII subset round-trips cleanly
+      // for the validation purpose — we only inspect C0 control bytes.
+      let buf = StringBuilder::new()
+      let contents = f.contents
+      for i = 0; i < contents.length(); i = i + 1 {
+        let b = contents[i].to_int()
+        if b < 128 {
+          buf.write_char(b.unsafe_to_char())
+        } else {
+          // Multi-byte UTF-8 sequence — emit as space for validation
+          // purposes (we only care about C0 controls in the ASCII range).
+          buf.write_char(' ')
+        }
+      }
+      let view = buf.to_string()
+      match validate_no_control_chars(name, view) {
+        Some(reason) => abort(reason)
+        None => ()
+      }
+    }
+  }
+
   let response = @plugin.GenerateResponse::new(files)
 
   // Serialize response to protobuf
