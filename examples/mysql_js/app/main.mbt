@@ -17,7 +17,10 @@ async fn run_tests_inner() -> Unit {
 
   // Test CreateUser
   println("\n[Test] CreateUser")
-  let user_id = @gen.create_user(pool, @gen.CreateUserParams::new("Alice", "alice@example.com"))
+  let user_id = @gen.create_user(
+    pool,
+    @gen.CreateUserParams::new("Alice", "alice@example.com"),
+  )
   println("Created user with id: \{user_id}")
 
   // Test GetUser
@@ -35,7 +38,10 @@ async fn run_tests_inner() -> Unit {
   }
 
   // Create another user
-  let user_id2 = @gen.create_user(pool, @gen.CreateUserParams::new("Bob", "bob@example.com"))
+  let user_id2 = @gen.create_user(
+    pool,
+    @gen.CreateUserParams::new("Bob", "bob@example.com"),
+  )
   println("\nCreated second user with id: \{user_id2}")
 
   // Test ListUsers
@@ -48,7 +54,12 @@ async fn run_tests_inner() -> Unit {
 
   // Test UpdateUser
   println("\n[Test] UpdateUser")
-  let updated = @gen.update_user(pool, @gen.UpdateUserParams::new("Alice Updated", "alice.updated@example.com", user_id))
+  let updated = @gen.update_user(
+    pool,
+    @gen.UpdateUserParams::new(
+      "Alice Updated", "alice.updated@example.com", user_id,
+    ),
+  )
   println("Updated rows: \{updated}")
 
   // Verify update
@@ -74,9 +85,7 @@ async fn run_tests_inner() -> Unit {
 
 ///|
 async fn run_tests() -> Unit noraise {
-  try {
-    run_tests_inner()
-  } catch {
+  run_tests_inner() catch {
     e => {
       log_error(@core.any(e))
       println("Error")

@@ -24,7 +24,7 @@ pub struct GetUserRow {
     float_var : Float?  // nullable float4
     double_var : Double?  // nullable float8
     numeric_var : @decimal.Decimal?  // nullable numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct GetByDateRow {
     id : Int  // serial
@@ -49,7 +49,7 @@ pub struct GetByDateRow {
     float_var : Float?  // nullable float4
     double_var : Double?  // nullable float8
     numeric_var : @decimal.Decimal?  // nullable numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct GetByUuidRow {
     id : Int  // serial
@@ -74,7 +74,7 @@ pub struct GetByUuidRow {
     float_var : Float?  // nullable float4
     double_var : Double?  // nullable float8
     numeric_var : @decimal.Decimal?  // nullable numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct ListUsersRow {
     id : Int  // serial
@@ -99,7 +99,7 @@ pub struct ListUsersRow {
     float_var : Float?  // nullable float4
     double_var : Double?  // nullable float8
     numeric_var : @decimal.Decimal?  // nullable numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct GetUserNNRow {
     id : Int  // serial
@@ -124,7 +124,7 @@ pub struct GetUserNNRow {
     float_var : Float  // float4
     double_var : Double  // float8
     numeric_var : @decimal.Decimal  // numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct GetByDateNNRow {
     id : Int  // serial
@@ -149,7 +149,7 @@ pub struct GetByDateNNRow {
     float_var : Float  // float4
     double_var : Double  // float8
     numeric_var : @decimal.Decimal  // numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct GetByUuidNNRow {
     id : Int  // serial
@@ -174,7 +174,7 @@ pub struct GetByUuidNNRow {
     float_var : Float  // float4
     double_var : Double  // float8
     numeric_var : @decimal.Decimal  // numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 pub struct ListUsersNNRow {
     id : Int  // serial
@@ -199,7 +199,7 @@ pub struct ListUsersNNRow {
     float_var : Float  // float4
     double_var : Double  // float8
     numeric_var : @decimal.Decimal  // numeric
-} derive(Show)
+} derive(Eq, Debug, ToJson)
 
 // SQL queries
 const GET_USER_SQL : String = "SELECT id, name, uuid_var, date_var, time_var, timestamp_var, timestampz_var, bool_var, bigserial_var, int64_var, pg_int8_var, int_var, interval_var, timetz_var, smallint_var, int2_var, json_var, jsonb_var, bytes_var, float_var, double_var, numeric_var FROM test_users WHERE id = $1"

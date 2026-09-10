@@ -36,7 +36,7 @@ fn sqlc_slice_placeholders(n : Int) -> String {
   if n <= 0 {
     return "NULL"
   }
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for i = 0; i < n; i = i + 1 {
     if i > 0 {
       buf.write_string(",")

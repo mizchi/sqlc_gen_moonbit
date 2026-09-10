@@ -7,3 +7,5 @@ _build/
 node_modules/
 bin/
 vendor/protoc-gen-mbt/
+.openseek/
+.pi/

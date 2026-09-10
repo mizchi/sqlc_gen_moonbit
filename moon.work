@@ -1,0 +1,4 @@
+members = [
+	".",
+	"../protoc-gen-mbt/lib"
+]

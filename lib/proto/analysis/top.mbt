@@ -41,7 +41,7 @@ pub fn Identifier::new(
   schema : String,
   name : String,
 ) -> Identifier {
-  Identifier::{ catalog, schema, name }
+  Identifier::{ catalog, schema, name, }
 }
 
 ///|
@@ -571,12 +571,12 @@ pub impl @protobuf.Sized for Parameter with fn size_of(self) {
 
 ///|
 pub impl Default for Parameter with fn default() -> Parameter {
-  Parameter::{ number: Default::default(), column: Column::default() }
+  Parameter::{ number: Default::default(), column: Column::default(), }
 }
 
 ///|
 pub fn Parameter::new(number : Int, column : Column) -> Parameter {
-  Parameter::{ number, column }
+  Parameter::{ number, column, }
 }
 
 ///|
@@ -697,7 +697,7 @@ pub impl @protobuf.Sized for Analysis with fn size_of(self) {
 
 ///|
 pub impl Default for Analysis with fn default() -> Analysis {
-  Analysis::{ columns: [], params: [] }
+  Analysis::{ columns: [], params: [], }
 }
 
 ///|
@@ -705,7 +705,7 @@ pub fn Analysis::new(
   columns : Array[Column],
   params : Array[Parameter],
 ) -> Analysis {
-  Analysis::{ columns, params }
+  Analysis::{ columns, params, }
 }
 
 ///|

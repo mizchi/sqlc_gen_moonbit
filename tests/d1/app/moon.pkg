@@ -9,7 +9,8 @@ import {
   "backend_d1_test/db/gen",
 }
 
+supported_targets = [ "js" ]
+
 options(
   link: { "js": { "exports": [ "get_fetch_handler" ] } },
-  "supported-targets": [ "js" ],
 )

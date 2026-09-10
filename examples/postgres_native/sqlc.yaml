@@ -2,8 +2,7 @@ version: "2"
 plugins:
   - name: moonbit
     wasm:
-      url: "file://../../_build/wasm/release/build/cmd/wasm/wasm.wasm"
-      sha256: "192bbe972d61c3f90e81a3313d457f690301ddb26772c819eb00ab914b5e2a4c"
+      url: "file://../../_build/wasm/release/build/mizchi/sqlc_gen_moonbit/cmd/wasm/wasm.wasm"
 sql:
   - engine: postgresql
     schema: "db/postgres/schema.sql"
@@ -13,3 +12,4 @@ sql:
         out: "db/gen"
         options:
           backend: "postgres"
+          derives: ["Eq", "Debug", "ToJson"]

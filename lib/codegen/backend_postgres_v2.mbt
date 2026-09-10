@@ -7,7 +7,7 @@ pub struct PostgresBackend {
 
 ///|
 pub fn PostgresBackend::new() -> PostgresBackend {
-  { _placeholder: () }
+  { _placeholder: (), }
 }
 
 ///|

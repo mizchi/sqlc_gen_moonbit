@@ -19,7 +19,7 @@ pub fn BackendInfo::new(
   is_async : Bool,
   target : String,
 ) -> BackendInfo {
-  { name, db_type, error_type, uses_result, is_async, target }
+  { name, db_type, error_type, uses_result, is_async, target, }
 }
 
 ///|
@@ -67,7 +67,7 @@ pub fn[B : BackendCodeGen] generate_queries_with_backend(
   request : @plugin.GenerateRequest,
   overrides : Array[TypeOverride],
 ) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let info = BackendCodeGen::info(backend)
 
   // Header comment

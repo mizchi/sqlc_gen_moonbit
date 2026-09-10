@@ -87,6 +87,7 @@ sql:
         out: "db/gen"
         options:
           backend: "postgres"
+          derives: ["Eq", "Debug"]
 ```
 
 ### 4. Create Schema and Queries

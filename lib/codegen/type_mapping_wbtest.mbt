@@ -107,7 +107,7 @@ test "js database backends emit BigInt-compatible Int64 helpers" {
 
 ///|
 test "emit_sql_doc_lines preserves newlines from query.sql" {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let sql =
     #|SELECT id, name
     #|FROM users
@@ -124,7 +124,7 @@ test "emit_sql_doc_lines preserves newlines from query.sql" {
 
 ///|
 test "emit_sql_doc_lines normalises CRLF and drops trailing blank lines" {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   emit_sql_doc_lines(buf, "SELECT 1\r\nFROM t\r\nWHERE x = ?\r\n\r\n")
   let out = buf.to_string()
   let expected =
@@ -137,7 +137,7 @@ test "emit_sql_doc_lines normalises CRLF and drops trailing blank lines" {
 
 ///|
 test "emit_sql_doc_lines trims trailing whitespace per line" {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   emit_sql_doc_lines(buf, "SELECT id   \nFROM users\t \nWHERE id = ?")
   let out = buf.to_string()
   let expected =
@@ -150,7 +150,7 @@ test "emit_sql_doc_lines trims trailing whitespace per line" {
 
 ///|
 test "emit_sql_doc_lines emits empty lines without trailing space" {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   emit_sql_doc_lines(buf, "\nSELECT id\n\nFROM users")
   let out = buf.to_string()
   let expected =

@@ -48,9 +48,30 @@ async test "D1: list users and get by id" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  @gen.create_user(db, @gen.CreateUserParams::new("bob", "bob@example.com", "Bob", None, None))
-  @gen.create_user(db, @gen.CreateUserParams::new("charlie", "charlie@example.com", "Charlie", None, None))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new("bob", "bob@example.com", "Bob", None, None),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "charlie",
+      "charlie@example.com",
+      "Charlie",
+      None,
+      None,
+    ),
+  )
   let users = @gen.list_users(db)
   assert_eq(users.length(), 3)
   let user = @gen.get_user_by_id(db, @gen.GetUserByIdParams::new(2L))
@@ -68,9 +89,27 @@ async test "D1: create user returning id and delete" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  let id1 = @gen.create_user_returning_id(db, @gen.CreateUserReturningIdParams::new("alice", "alice@example.com", "Alice", None, None))
+  let id1 = @gen.create_user_returning_id(
+    db,
+    @gen.CreateUserReturningIdParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
   assert_eq(id1, 1L)
-  let id2 = @gen.create_user_returning_id(db, @gen.CreateUserReturningIdParams::new("bob", "bob@example.com", "Bob", None, None))
+  let id2 = @gen.create_user_returning_id(
+    db,
+    @gen.CreateUserReturningIdParams::new(
+      "bob",
+      "bob@example.com",
+      "Bob",
+      None,
+      None,
+    ),
+  )
   assert_eq(id2, 2L)
   let deleted = @gen.delete_user_by_id(db, @gen.DeleteUserByIdParams::new(1L))
   assert_eq(deleted, 1)
@@ -88,8 +127,20 @@ async test "D1: update user display name" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  let updated = @gen.update_user_display_name(db, @gen.UpdateUserDisplayNameParams::new("Alicia Developer", 1L))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  let updated = @gen.update_user_display_name(
+    db,
+    @gen.UpdateUserDisplayNameParams::new("Alicia Developer", 1L),
+  )
   assert_eq(updated, 1)
   let user = @gen.get_user_by_id(db, @gen.GetUserByIdParams::new(1L))
   assert_eq(user.unwrap().display_name, "Alicia Developer")
@@ -105,8 +156,18 @@ async test "D1: categories CRUD" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_category(db, @gen.CreateCategoryParams::new("Technology", "technology", Some("Tech posts")))
-  @gen.create_category(db, @gen.CreateCategoryParams::new("Lifestyle", "lifestyle", None))
+  @gen.create_category(
+    db,
+    @gen.CreateCategoryParams::new(
+      "Technology",
+      "technology",
+      Some("Tech posts"),
+    ),
+  )
+  @gen.create_category(
+    db,
+    @gen.CreateCategoryParams::new("Lifestyle", "lifestyle", None),
+  )
   let categories = @gen.list_categories(db)
   assert_eq(categories.length(), 2)
   let cat = @gen.get_category_by_id(db, @gen.GetCategoryByIdParams::new(1L))
@@ -124,12 +185,35 @@ async test "D1: posts CRUD" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "First Post", "first-post", "Content", None, "draft"))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "First Post",
+      "first-post",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
   let post = @gen.get_post_by_id(db, @gen.GetPostByIdParams::new(1L))
   assert_true(post is Some(_))
   assert_eq(post.unwrap().title, "First Post")
-  let post2 = @gen.get_post_by_slug(db, @gen.GetPostBySlugParams::new("first-post"))
+  let post2 = @gen.get_post_by_slug(
+    db,
+    @gen.GetPostBySlugParams::new("first-post"),
+  )
   assert_true(post2 is Some(_))
   @gen.publish_post(db, @gen.PublishPostParams::new(1L))
   let published = @gen.get_post_by_id(db, @gen.GetPostByIdParams::new(1L))
@@ -146,14 +230,65 @@ async test "D1: list posts by author" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  @gen.create_user(db, @gen.CreateUserParams::new("bob", "bob@example.com", "Bob", None, None))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "Alice Post 1", "alice-1", "Content", None, "draft"))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "Alice Post 2", "alice-2", "Content", None, "draft"))
-  @gen.create_post(db, @gen.CreatePostParams::new(2L, None, "Bob Post 1", "bob-1", "Content", None, "draft"))
-  let alice_posts = @gen.list_posts_by_author(db, @gen.ListPostsByAuthorParams::new(1L))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new("bob", "bob@example.com", "Bob", None, None),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "Alice Post 1",
+      "alice-1",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "Alice Post 2",
+      "alice-2",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      2L,
+      None,
+      "Bob Post 1",
+      "bob-1",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
+  let alice_posts = @gen.list_posts_by_author(
+    db,
+    @gen.ListPostsByAuthorParams::new(1L),
+  )
   assert_eq(alice_posts.length(), 2)
-  let bob_posts = @gen.list_posts_by_author(db, @gen.ListPostsByAuthorParams::new(2L))
+  let bob_posts = @gen.list_posts_by_author(
+    db,
+    @gen.ListPostsByAuthorParams::new(2L),
+  )
   assert_eq(bob_posts.length(), 1)
   mf.dispose()
 }
@@ -230,8 +365,28 @@ async test "D1: post tags relationship" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "Post", "post", "Content", None, "draft"))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "Post",
+      "post",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
   @gen.create_tag(db, @gen.CreateTagParams::new("MoonBit", "moonbit"))
   @gen.create_tag(db, @gen.CreateTagParams::new("WASM", "wasm"))
   @gen.add_tag_to_post(db, @gen.AddTagToPostParams::new(1L, 1L))
@@ -253,15 +408,47 @@ async test "D1: comments" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "Post", "post", "Content", None, "draft"))
-  @gen.create_comment(db, @gen.CreateCommentParams::new(1L, "Bob", "bob@example.com", "Great!"))
-  @gen.create_comment(db, @gen.CreateCommentParams::new(1L, "Charlie", "charlie@example.com", "Nice!"))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "Post",
+      "post",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
+  @gen.create_comment(
+    db,
+    @gen.CreateCommentParams::new(1L, "Bob", "bob@example.com", "Great!"),
+  )
+  @gen.create_comment(
+    db,
+    @gen.CreateCommentParams::new(1L, "Charlie", "charlie@example.com", "Nice!"),
+  )
   // Not approved yet
-  let comments = @gen.list_comments_for_post(db, @gen.ListCommentsForPostParams::new(1L))
+  let comments = @gen.list_comments_for_post(
+    db,
+    @gen.ListCommentsForPostParams::new(1L),
+  )
   assert_eq(comments.length(), 0)
   @gen.approve_comment(db, @gen.ApproveCommentParams::new(1L))
-  let comments2 = @gen.list_comments_for_post(db, @gen.ListCommentsForPostParams::new(1L))
+  let comments2 = @gen.list_comments_for_post(
+    db,
+    @gen.ListCommentsForPostParams::new(1L),
+  )
   assert_eq(comments2.length(), 1)
   mf.dispose()
 }
@@ -275,10 +462,36 @@ async test "D1: aggregate sqlc.arg inference" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice", None, None))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "Post", "post", "Content", None, "draft"))
-  @gen.create_comment(db, @gen.CreateCommentParams::new(1L, "Alice", "alice@example.com", "First"))
-  @gen.create_comment(db, @gen.CreateCommentParams::new(1L, "Bob", "bob@example.com", "Second"))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice",
+      None,
+      None,
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "Post",
+      "post",
+      "Content",
+      None,
+      "draft",
+    ),
+  )
+  @gen.create_comment(
+    db,
+    @gen.CreateCommentParams::new(1L, "Alice", "alice@example.com", "First"),
+  )
+  @gen.create_comment(
+    db,
+    @gen.CreateCommentParams::new(1L, "Bob", "bob@example.com", "Second"),
+  )
   @gen.approve_comment(db, @gen.ApproveCommentParams::new(1L))
   let rows = @gen.list_comment_aggregate_candidates(
     db,
@@ -300,9 +513,32 @@ async test "D1: post with author JOIN" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "alice@example.com", "Alice Dev", Some("Bio"), None))
-  @gen.create_post(db, @gen.CreatePostParams::new(1L, None, "Post", "post", "Content", None, "published"))
-  let post = @gen.get_post_with_author(db, @gen.GetPostWithAuthorParams::new(1L))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "alice",
+      "alice@example.com",
+      "Alice Dev",
+      Some("Bio"),
+      None,
+    ),
+  )
+  @gen.create_post(
+    db,
+    @gen.CreatePostParams::new(
+      1L,
+      None,
+      "Post",
+      "post",
+      "Content",
+      None,
+      "published",
+    ),
+  )
+  let post = @gen.get_post_with_author(
+    db,
+    @gen.GetPostWithAuthorParams::new(1L),
+  )
   assert_true(post is Some(_))
   let p = post.unwrap()
   assert_eq(p.author_username, "alice")
@@ -319,14 +555,38 @@ async test "D1: pagination" {
   mf.ready()
   let db = mf.get_d1_database("TEST_DB")
   let _ = db.exec(get_schema_sql())
-  @gen.create_user(db, @gen.CreateUserParams::new("alice", "a@example.com", "Alice", None, None))
-  @gen.create_user(db, @gen.CreateUserParams::new("bob", "b@example.com", "Bob", None, None))
-  @gen.create_user(db, @gen.CreateUserParams::new("charlie", "c@example.com", "Charlie", None, None))
-  @gen.create_user(db, @gen.CreateUserParams::new("diana", "d@example.com", "Diana", None, None))
-  let page1 = @gen.list_users_paginated(db, @gen.ListUsersPaginatedParams::new(0L, 2L))
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new("alice", "a@example.com", "Alice", None, None),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new("bob", "b@example.com", "Bob", None, None),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new(
+      "charlie",
+      "c@example.com",
+      "Charlie",
+      None,
+      None,
+    ),
+  )
+  @gen.create_user(
+    db,
+    @gen.CreateUserParams::new("diana", "d@example.com", "Diana", None, None),
+  )
+  let page1 = @gen.list_users_paginated(
+    db,
+    @gen.ListUsersPaginatedParams::new(0L, 2L),
+  )
   assert_eq(page1.length(), 2)
   assert_eq(page1[0].id, 1L)
-  let page2 = @gen.list_users_paginated(db, @gen.ListUsersPaginatedParams::new(2L, 2L))
+  let page2 = @gen.list_users_paginated(
+    db,
+    @gen.ListUsersPaginatedParams::new(2L, 2L),
+  )
   assert_eq(page2.length(), 2)
   assert_eq(page2[0].id, 3L)
   mf.dispose()

@@ -22,12 +22,12 @@ pub impl @protobuf.Sized for File with fn size_of(self) {
 
 ///|
 pub impl Default for File with fn default() -> File {
-  File::{ name: Default::default(), contents: Default::default() }
+  File::{ name: Default::default(), contents: Default::default(), }
 }
 
 ///|
 pub fn File::new(name : String, contents : Bytes) -> File {
-  File::{ name, contents }
+  File::{ name, contents, }
 }
 
 ///|
@@ -86,7 +86,9 @@ pub impl @json.FromJson for File with fn from_json(
     match (key, value) {
       ("name", value) => message.name = @json.from_json(value, path~)
       ("contents", String(value)) =>
-        message.contents = @protobuf.base64_decode(value)
+        message.contents = @protobuf.base64_decode(value) catch {
+          _ => raise @json.JsonDecodeError((path, "Invalid Base64 " + key))
+        }
       (key, _) => raise @json.JsonDecodeError((path, "Unknown field " + key))
     }
   }
@@ -181,7 +183,7 @@ pub fn Settings::new(
   queries : Array[String],
   codegen : Codegen,
 ) -> Settings {
-  Settings::{ version, engine, schema, queries, codegen }
+  Settings::{ version, engine, schema, queries, codegen, }
 }
 
 ///|
@@ -338,7 +340,7 @@ pub impl @protobuf.Sized for Codegen_Process with fn size_of(self) {
 
 ///|
 pub impl Default for Codegen_Process with fn default() -> Codegen_Process {
-  Codegen_Process::{ cmd: Default::default() }
+  Codegen_Process::{ cmd: Default::default(), }
 }
 
 ///|
@@ -455,12 +457,12 @@ pub impl @protobuf.Sized for Codegen_WASM with fn size_of(self) {
 
 ///|
 pub impl Default for Codegen_WASM with fn default() -> Codegen_WASM {
-  Codegen_WASM::{ url: Default::default(), sha256: Default::default() }
+  Codegen_WASM::{ url: Default::default(), sha256: Default::default(), }
 }
 
 ///|
 pub fn Codegen_WASM::new(url : String, sha256 : String) -> Codegen_WASM {
-  Codegen_WASM::{ url, sha256 }
+  Codegen_WASM::{ url, sha256, }
 }
 
 ///|
@@ -622,7 +624,7 @@ pub fn Codegen::new(
   process : Codegen_Process,
   wasm : Codegen_WASM,
 ) -> Codegen {
-  Codegen::{ out, plugin, options, env, process, wasm }
+  Codegen::{ out, plugin, options, env, process, wasm, }
 }
 
 ///|
@@ -711,7 +713,9 @@ pub impl @json.FromJson for Codegen with fn from_json(
       ("out", value) => message.out = @json.from_json(value, path~)
       ("plugin", value) => message.plugin = @json.from_json(value, path~)
       ("options", String(value)) =>
-        message.options = @protobuf.base64_decode(value)
+        message.options = @protobuf.base64_decode(value) catch {
+          _ => raise @json.JsonDecodeError((path, "Invalid Base64 " + key))
+        }
       ("env", Array(value)) =>
         message.env = value.map(v => @json.from_json(v, path~))
       ("process", value) => message.process = @json.from_json(value, path~)
@@ -822,7 +826,7 @@ pub fn Catalog::new(
   name : String,
   schemas : Array[Schema],
 ) -> Catalog {
-  Catalog::{ comment, default_schema, name, schemas }
+  Catalog::{ comment, default_schema, name, schemas, }
 }
 
 ///|
@@ -1004,7 +1008,7 @@ pub fn Schema::new(
   enums : Array[Enum],
   composite_types : Array[CompositeType],
 ) -> Schema {
-  Schema::{ comment, name, tables, enums, composite_types }
+  Schema::{ comment, name, tables, enums, composite_types, }
 }
 
 ///|
@@ -1183,12 +1187,12 @@ pub impl @protobuf.Sized for CompositeType with fn size_of(self) {
 
 ///|
 pub impl Default for CompositeType with fn default() -> CompositeType {
-  CompositeType::{ name: Default::default(), comment: Default::default() }
+  CompositeType::{ name: Default::default(), comment: Default::default(), }
 }
 
 ///|
 pub fn CompositeType::new(name : String, comment : String) -> CompositeType {
-  CompositeType::{ name, comment }
+  CompositeType::{ name, comment, }
 }
 
 ///|
@@ -1313,12 +1317,12 @@ pub impl @protobuf.Sized for Enum with fn size_of(self) {
 
 ///|
 pub impl Default for Enum with fn default() -> Enum {
-  Enum::{ name: Default::default(), vals: [], comment: Default::default() }
+  Enum::{ name: Default::default(), vals: [], comment: Default::default(), }
 }
 
 ///|
 pub fn Enum::new(name : String, vals : Array[String], comment : String) -> Enum {
-  Enum::{ name, vals, comment }
+  Enum::{ name, vals, comment, }
 }
 
 ///|
@@ -1471,7 +1475,7 @@ pub fn Table::new(
   columns : Array[Column],
   comment : String,
 ) -> Table {
-  Table::{ rel, columns, comment }
+  Table::{ rel, columns, comment, }
 }
 
 ///|
@@ -1632,7 +1636,7 @@ pub fn Identifier::new(
   schema : String,
   name : String,
 ) -> Identifier {
-  Identifier::{ catalog, schema, name }
+  Identifier::{ catalog, schema, name, }
 }
 
 ///|
@@ -2421,12 +2425,12 @@ pub impl @protobuf.Sized for Parameter with fn size_of(self) {
 
 ///|
 pub impl Default for Parameter with fn default() -> Parameter {
-  Parameter::{ number: Default::default(), column: Column::default() }
+  Parameter::{ number: Default::default(), column: Column::default(), }
 }
 
 ///|
 pub fn Parameter::new(number : Int, column : Column) -> Parameter {
-  Parameter::{ number, column }
+  Parameter::{ number, column, }
 }
 
 ///|
@@ -2693,9 +2697,13 @@ pub impl @json.FromJson for GenerateRequest with fn from_json(
       ("sqlc_version", value) =>
         message.sqlc_version = @json.from_json(value, path~)
       ("plugin_options", String(value)) =>
-        message.plugin_options = @protobuf.base64_decode(value)
+        message.plugin_options = @protobuf.base64_decode(value) catch {
+          _ => raise @json.JsonDecodeError((path, "Invalid Base64 " + key))
+        }
       ("global_options", String(value)) =>
-        message.global_options = @protobuf.base64_decode(value)
+        message.global_options = @protobuf.base64_decode(value) catch {
+          _ => raise @json.JsonDecodeError((path, "Invalid Base64 " + key))
+        }
       (key, _) => raise @json.JsonDecodeError((path, "Unknown field " + key))
     }
   }
@@ -2770,7 +2778,7 @@ pub impl @protobuf.Sized for GenerateResponse with fn size_of(self) {
 
 ///|
 pub impl Default for GenerateResponse with fn default() -> GenerateResponse {
-  GenerateResponse::{ files: [] }
+  GenerateResponse::{ files: [], }
 }
 
 ///|

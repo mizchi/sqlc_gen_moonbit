@@ -12,7 +12,7 @@ pub impl @protobuf.Sized for Parameter with fn size_of(self) {
 
 ///|
 pub impl Default for Parameter with fn default() -> Parameter {
-  Parameter::{ number: Default::default() }
+  Parameter::{ number: Default::default(), }
 }
 
 ///|
@@ -152,7 +152,7 @@ pub fn Config::new(
   schema : Array[String],
   queries : Array[String],
 ) -> Config {
-  Config::{ version, engine, schema, queries }
+  Config::{ version, engine, schema, queries, }
 }
 
 ///|
@@ -328,7 +328,7 @@ pub fn Query::new(
   cmd : String,
   params : Array[Parameter],
 ) -> Query {
-  Query::{ sql, name, cmd, params }
+  Query::{ sql, name, cmd, params, }
 }
 
 ///|
@@ -473,7 +473,7 @@ pub impl @protobuf.Sized for PostgreSQL with fn size_of(self) {
 
 ///|
 pub impl Default for PostgreSQL with fn default() -> PostgreSQL {
-  PostgreSQL::{ explain: PostgreSQLExplain::default() }
+  PostgreSQL::{ explain: PostgreSQLExplain::default(), }
 }
 
 ///|
@@ -606,7 +606,7 @@ pub fn PostgreSQLExplain_SettingsEntry::new(
   key : String,
   value : String,
 ) -> PostgreSQLExplain_SettingsEntry {
-  PostgreSQLExplain_SettingsEntry::{ key, value }
+  PostgreSQLExplain_SettingsEntry::{ key, value, }
 }
 
 ///|
@@ -1676,7 +1676,7 @@ pub fn PostgreSQLExplain::new(
   settings : Map[String, String],
   planning : PostgreSQLExplain_Planning,
 ) -> PostgreSQLExplain {
-  PostgreSQLExplain::{ plan, settings, planning }
+  PostgreSQLExplain::{ plan, settings, planning, }
 }
 
 ///|
@@ -1691,7 +1691,7 @@ pub impl @protobuf.Read for PostgreSQLExplain with fn read_with_limit(
           msg.plan = (
             reader |> @protobuf.read_message() : PostgreSQLExplain_Plan)
         (2, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.read_message() : PostgreSQLExplain_SettingsEntry)
           msg.settings[key] = value
         }
@@ -1791,7 +1791,7 @@ pub impl @protobuf.AsyncRead for PostgreSQLExplain with fn read_with_limit(
           msg.plan = (
             reader |> @protobuf.async_read_message() : PostgreSQLExplain_Plan)
         (2, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.async_read_message() :
             PostgreSQLExplain_SettingsEntry)
           msg.settings[key] = value
@@ -1862,7 +1862,7 @@ pub impl @protobuf.Sized for MySQL with fn size_of(self) {
 
 ///|
 pub impl Default for MySQL with fn default() -> MySQL {
-  MySQL::{ explain: MySQLExplain::default() }
+  MySQL::{ explain: MySQLExplain::default(), }
 }
 
 ///|
@@ -1994,7 +1994,7 @@ pub fn MySQLExplain_QueryBlock_CostInfoEntry::new(
   key : String,
   value : String,
 ) -> MySQLExplain_QueryBlock_CostInfoEntry {
-  MySQLExplain_QueryBlock_CostInfoEntry::{ key, value }
+  MySQLExplain_QueryBlock_CostInfoEntry::{ key, value, }
 }
 
 ///|
@@ -2186,7 +2186,7 @@ pub impl @protobuf.Read for MySQLExplain_QueryBlock with fn read_with_limit(
         (1, _) => msg.select_id = reader |> @protobuf.read_uint64()
         (2, _) => msg.message = reader |> @protobuf.read_string()
         (3, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.read_message() :
             MySQLExplain_QueryBlock_CostInfoEntry)
           msg.cost_info[key] = value
@@ -2315,7 +2315,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_QueryBlock with fn read_with_limit
         (1, _) => msg.select_id = reader |> @protobuf.async_read_uint64()
         (2, _) => msg.message = reader |> @protobuf.async_read_string()
         (3, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.async_read_message() :
             MySQLExplain_QueryBlock_CostInfoEntry)
           msg.cost_info[key] = value
@@ -2424,7 +2424,7 @@ pub fn MySQLExplain_Table_CostInfoEntry::new(
   key : String,
   value : String,
 ) -> MySQLExplain_Table_CostInfoEntry {
-  MySQLExplain_Table_CostInfoEntry::{ key, value }
+  MySQLExplain_Table_CostInfoEntry::{ key, value, }
 }
 
 ///|
@@ -2671,7 +2671,7 @@ pub impl @protobuf.Read for MySQLExplain_Table with fn read_with_limit(
         (4, _) => msg.rows_produced_per_join = reader |> @protobuf.read_uint64()
         (5, _) => msg.filtered = reader |> @protobuf.read_string()
         (6, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.read_message() :
             MySQLExplain_Table_CostInfoEntry)
           msg.cost_info[key] = value
@@ -2853,7 +2853,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_Table with fn read_with_limit(
           msg.rows_produced_per_join = reader |> @protobuf.async_read_uint64()
         (5, _) => msg.filtered = reader |> @protobuf.async_read_string()
         (6, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.async_read_message() :
             MySQLExplain_Table_CostInfoEntry)
           msg.cost_info[key] = value
@@ -2955,7 +2955,7 @@ pub impl @protobuf.Sized for MySQLExplain_NestedLoopObj with fn size_of(self) {
 
 ///|
 pub impl Default for MySQLExplain_NestedLoopObj with fn default() -> MySQLExplain_NestedLoopObj {
-  MySQLExplain_NestedLoopObj::{ table: MySQLExplain_Table::default() }
+  MySQLExplain_NestedLoopObj::{ table: MySQLExplain_Table::default(), }
 }
 
 ///|
@@ -3092,7 +3092,7 @@ pub fn MySQLExplain_OrderingOperation_CostInfoEntry::new(
   key : String,
   value : String,
 ) -> MySQLExplain_OrderingOperation_CostInfoEntry {
-  MySQLExplain_OrderingOperation_CostInfoEntry::{ key, value }
+  MySQLExplain_OrderingOperation_CostInfoEntry::{ key, value, }
 }
 
 ///|
@@ -3271,7 +3271,7 @@ pub impl @protobuf.Read for MySQLExplain_OrderingOperation with fn read_with_lim
       match (reader |> @protobuf.read_tag()) {
         (1, _) => msg.using_filesort = reader |> @protobuf.read_bool()
         (2, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.read_message() :
             MySQLExplain_OrderingOperation_CostInfoEntry)
           msg.cost_info[key] = value
@@ -3383,7 +3383,7 @@ pub impl @protobuf.AsyncRead for MySQLExplain_OrderingOperation with fn read_wit
       match (reader |> @protobuf.async_read_tag()) {
         (1, _) => msg.using_filesort = reader |> @protobuf.async_read_bool()
         (2, _) => {
-          let { key, value } = (
+          let { key, value, } = (
             reader |> @protobuf.async_read_message() :
             MySQLExplain_OrderingOperation_CostInfoEntry)
           msg.cost_info[key] = value
@@ -3463,7 +3463,7 @@ pub impl @protobuf.Sized for MySQLExplain with fn size_of(self) {
 
 ///|
 pub impl Default for MySQLExplain with fn default() -> MySQLExplain {
-  MySQLExplain::{ query_block: MySQLExplain_QueryBlock::default() }
+  MySQLExplain::{ query_block: MySQLExplain_QueryBlock::default(), }
 }
 
 ///|

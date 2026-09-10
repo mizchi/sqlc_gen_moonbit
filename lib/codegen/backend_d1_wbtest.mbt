@@ -39,7 +39,7 @@ fn make_simple_column(
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: type_name },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: type_name, },
     is_sqlc_slice,
     embed_table: @plugin.Identifier::default(),
     original_name: "",

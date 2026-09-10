@@ -13,7 +13,7 @@ test "column_to_ir_type - integer not null" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER", },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -41,7 +41,7 @@ test "column_to_ir_type - text nullable" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT", },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -69,7 +69,7 @@ test "column_to_ir_type - sqlc.slice text param wraps in Array" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT", },
     is_sqlc_slice: true,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -99,7 +99,7 @@ test "column_to_ir_type - sqlc.slice integer param wraps in Array" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER", },
     is_sqlc_slice: true,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -126,7 +126,7 @@ test "column_to_constraints - required string" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT", },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -151,7 +151,7 @@ test "column_to_constraints - varchar with length" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "VARCHAR" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "VARCHAR", },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -181,7 +181,7 @@ test "generated structs use current derive syntax" {
         scope: "",
         table: @plugin.Identifier::default(),
         table_alias: "",
-        type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER" },
+        type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER", },
         is_sqlc_slice: false,
         embed_table: @plugin.Identifier::default(),
         original_name: "",
@@ -194,7 +194,7 @@ test "generated structs use current derive syntax" {
     filename: "",
     insert_into_table: @plugin.Identifier::default(),
   }
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   generate_result_struct(buf, "GetUserRow", query.columns, [], query)
   let code = buf.to_string()
   assert_true(code.contains("} derive(Debug, Eq)"))
@@ -239,7 +239,7 @@ test "single-field params constructor is unambiguous" {
     filename: "",
     insert_into_table: @plugin.Identifier::default(),
   }
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   generate_params_struct(buf, "GetUserByIdParams", query.params, [], query)
   let code = buf.to_string()
   assert_true(code.contains("{ id, }"))
@@ -372,7 +372,7 @@ test "column_to_constraints - unsigned integer" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "INTEGER", },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -396,7 +396,7 @@ test "column_to_ir_field" {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "VARCHAR" },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: "VARCHAR", },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -435,7 +435,7 @@ test "query_params_to_ir_struct" {
           scope: "",
           table: @plugin.Identifier::default(),
           table_alias: "",
-          type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT" },
+          type_: @plugin.Identifier::{ catalog: "", schema: "", name: "TEXT", },
           is_sqlc_slice: false,
           embed_table: @plugin.Identifier::default(),
           original_name: "",

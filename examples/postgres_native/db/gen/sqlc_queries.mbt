@@ -2,7 +2,7 @@
 // Requires: moonbit-community/postgres
 
 // Query functions
-///| GetUser
+///| get_user
 /// SELECT id, name, uuid_var, date_var, time_var, timestamp_var, timestampz_var, bool_var, bigserial_var, int64_var, pg_int8_var, int_var, interval_var, timetz_var, smallint_var, int2_var, json_var, jsonb_var, bytes_var, float_var, double_var, numeric_var FROM test_users WHERE id = $1
 pub async fn get_user(client : @pgclient.Client, id~ : Int) -> GetUserRow {
   let params : Array[&@pgclient.ToSql] = [
