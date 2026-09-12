@@ -154,11 +154,11 @@ async fn main {
   println("Generated types and queries are in db/gen/")
 
   let config = @client.Config::new(
-    "postgres",
-    user="postgres",
-    database="postgres",
-    password="postgres",
+    "localhost",
     port=5432,
+    user="postgres",
+    password="postgres",
+    database="testdb",
     ssl_mode=@client.SslMode::Disable,
     application_name="my-service",
   )
@@ -182,7 +182,7 @@ async fn main {
 
     let row = @sql.get_user(client, id=serial)
     if row.id == serial {
-      println("Select by ID - \{row.to_string()}")
+      println("Select by ID - \{Repr(row)}")
     } else {
       panic()
     }
@@ -220,7 +220,7 @@ async fn main {
     if rows.length() > 0 {
       println("Found \{rows.length()} rows")
       for row in rows {
-        println("Select row \{row.to_string()}")
+        println("Select row \{Repr(row)}")
       }
     } else {
       panic()
@@ -244,7 +244,7 @@ async fn main {
     }
     let row = @sql.get_user_nn(client, id=serial)
     if row.id == serial {
-      println("Select by ID - \{row.to_string()}")
+      println("Select by ID - \{Repr(row)}")
     } else {
       panic()
     }
@@ -259,7 +259,7 @@ async fn main {
     }
     if rows.length() > 0 {
       for row in rows {
-        println("Select by date: \{row.to_string()}")
+        println("Select by date: \{Repr(row)}")
       }
     } else {
       panic()
@@ -276,7 +276,7 @@ async fn main {
     }
     if rows.length() > 0 {
       for row in rows {
-        println("Select by UUID: \{row.to_string()}")
+        println("Select by UUID: \{Repr(row)}")
       }
     } else {
       panic()
@@ -285,7 +285,7 @@ async fn main {
     if rows.length() > 0 {
       println("Found \{rows.length()} rows")
       for row in rows {
-        println("Select row \{row.to_string()}")
+        println("Select row \{Repr(row)}")
       }
     } else {
       panic()

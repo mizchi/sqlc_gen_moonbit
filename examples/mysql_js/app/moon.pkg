@@ -5,11 +5,8 @@ import {
 
 supported_targets = "js"
 
+pkgtype(kind: "executable")
+
 options(
-  "is-main": true,
-  link: {
-    "js": {
-      "exports": ["main"],
-    },
-  },
+  link: { "js": { "exports": [ "main" ] } },
 )

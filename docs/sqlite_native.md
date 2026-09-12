@@ -44,7 +44,7 @@ moon new .
   "version": "0.0.1",
   "deps": {
     "mizchi/sqlite": "0.1.3",
-    "moonbitlang/x": "0.4.40"
+    "moonbitlang/x": "0.5.5"
   },
   "supported-targets": ["native"]
 }
@@ -63,8 +63,8 @@ version: "2"
 plugins:
   - name: moonbit
     wasm:
-      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.2.1/sqlc-gen-moonbit.wasm"
-      sha256: "c12dd1b4984b83b7ca97930c329779a9bd2c1505a650f7417638bdf00426e57f"
+      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.5.0/sqlc-gen-moonbit.wasm"
+      sha256: "c20285396a80baf4c950b8b44031e88909b42d271c35ab9d2855169e666dcc3c"
 sql:
   - engine: sqlite
     schema: "db/sqlite/schema.sql"
@@ -115,6 +115,7 @@ sqlc generate
 ```
 
 This generates the following files in `db/gen/`:
+
 - `sqlc_types.mbt` - Type definitions
 - `sqlc_queries.mbt` - Query functions
 
@@ -124,9 +125,7 @@ This generates the following files in `db/gen/`:
 
 ```json
 {
-  "import": [
-    "mizchi/sqlite"
-  ]
+  "import": ["mizchi/sqlite"]
 }
 ```
 
@@ -229,23 +228,23 @@ let db = @sqlite.sqlite_open_v2(
 
 ## Query Types
 
-| Annotation | Return Type | Description |
-|------------|-------------|-------------|
-| `:one` | `T?` | Single row or None |
-| `:many` | `Array[T]` | Multiple rows |
-| `:exec` | `Unit` | Execute only (no return value) |
-| `:execlastid` | `Int64` | last_insert_rowid after insert |
-| `:execrows` | `Int64` | Number of affected rows |
+| Annotation    | Return Type | Description                    |
+| ------------- | ----------- | ------------------------------ |
+| `:one`        | `T?`        | Single row or None             |
+| `:many`       | `Array[T]`  | Multiple rows                  |
+| `:exec`       | `Unit`      | Execute only (no return value) |
+| `:execlastid` | `Int64`     | last_insert_rowid after insert |
+| `:execrows`   | `Int64`     | Number of affected rows        |
 
 ## Type Mapping
 
 | SQLite Type | MoonBit Type |
-|-------------|--------------|
-| INTEGER | Int64 |
-| TEXT | String |
-| REAL | Double |
-| BLOB | Bytes |
-| NULL | Option[T] |
+| ----------- | ------------ |
+| INTEGER     | Int64        |
+| TEXT        | String       |
+| REAL        | Double       |
+| BLOB        | Bytes        |
+| NULL        | Option[T]    |
 
 ## Transactions
 

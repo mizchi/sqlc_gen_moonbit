@@ -12,11 +12,13 @@ This guide explains how to use PostgreSQL database with MoonBit native binaries.
 ### Installing libpq
 
 **macOS:**
+
 ```bash
 brew install libpq
 ```
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt-get install libpq-dev
 ```
@@ -57,7 +59,7 @@ moon new .
   "version": "0.0.1",
   "deps": {
     "moonbit-community/postgres": "0.0.6",
-    "moonbitlang/x": "0.4.40"
+    "moonbitlang/x": "0.5.5"
   },
   "supported-targets": ["native"]
 }
@@ -76,8 +78,8 @@ version: "2"
 plugins:
   - name: moonbit
     wasm:
-      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.2.1/sqlc-gen-moonbit.wasm"
-      sha256: "c12dd1b4984b83b7ca97930c329779a9bd2c1505a650f7417638bdf00426e57f"
+      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.5.0/sqlc-gen-moonbit.wasm"
+      sha256: "c20285396a80baf4c950b8b44031e88909b42d271c35ab9d2855169e666dcc3c"
 sql:
   - engine: postgresql
     schema: "db/postgres/schema.sql"
@@ -87,6 +89,7 @@ sql:
         out: "db/gen"
         options:
           backend: "postgres"
+          derives: ["Eq", "Debug"]
 ```
 
 ### 4. Create Schema and Queries
@@ -130,6 +133,7 @@ sqlc generate
 ```
 
 This generates the following files in `db/gen/`:
+
 - `sqlc_types.mbt` - Type definitions
 - `sqlc_queries.mbt` - Query functions
 
@@ -139,10 +143,7 @@ This generates the following files in `db/gen/`:
 
 ```json
 {
-  "import": [
-    "moonbit-community/postgres",
-    "moonbitlang/x/strconv"
-  ]
+  "import": ["moonbit-community/postgres"]
 }
 ```
 
@@ -252,6 +253,7 @@ postgres://user:password@host:port/database
 ```
 
 Examples:
+
 - `postgres://admin:secret@localhost:5432/myapp`
 - `postgres://user@localhost/testdb` (no password)
 
@@ -273,29 +275,29 @@ fn main {
 
 ## Query Types
 
-| Annotation | Return Type | Description |
-|------------|-------------|-------------|
-| `:one` | `Result[T?, PgError]` | Single row or None |
-| `:many` | `Result[Array[T], PgError]` | Multiple rows |
-| `:exec` | `Result[Unit, PgError]` | Execute only |
-| `:execlastid` | `Result[Int64, PgError]` | INSERT RETURNING id |
-| `:execrows` | `Result[Int, PgError]` | Number of affected rows |
+| Annotation    | Return Type                 | Description             |
+| ------------- | --------------------------- | ----------------------- |
+| `:one`        | `Result[T?, PgError]`       | Single row or None      |
+| `:many`       | `Result[Array[T], PgError]` | Multiple rows           |
+| `:exec`       | `Result[Unit, PgError]`     | Execute only            |
+| `:execlastid` | `Result[Int64, PgError]`    | INSERT RETURNING id     |
+| `:execrows`   | `Result[Int, PgError]`      | Number of affected rows |
 
 ## Type Mapping
 
-| PostgreSQL Type | MoonBit Type |
-|-----------------|--------------|
-| INTEGER, INT4 | Int |
-| BIGINT, INT8 | Int64 |
-| SMALLINT | Int |
-| SERIAL | Int64 |
-| VARCHAR, TEXT, CHAR | String |
-| BOOLEAN | Bool |
-| REAL, FLOAT4 | Float |
-| DOUBLE PRECISION, FLOAT8 | Double |
-| TIMESTAMP, TIMESTAMPTZ | String |
-| DATE | String |
-| NULL | Option[T] |
+| PostgreSQL Type          | MoonBit Type |
+| ------------------------ | ------------ |
+| INTEGER, INT4            | Int          |
+| BIGINT, INT8             | Int64        |
+| SMALLINT                 | Int          |
+| SERIAL                   | Int64        |
+| VARCHAR, TEXT, CHAR      | String       |
+| BOOLEAN                  | Bool         |
+| REAL, FLOAT4             | Float        |
+| DOUBLE PRECISION, FLOAT8 | Double       |
+| TIMESTAMP, TIMESTAMPTZ   | String       |
+| DATE                     | String       |
+| NULL                     | Option[T]    |
 
 ## Error Handling
 

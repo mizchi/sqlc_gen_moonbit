@@ -4,6 +4,8 @@ package "mizchi/sqlc_gen_moonbit/lib/codegen"
 import {
   "mizchi/codegen/ir",
   "mizchi/sqlc_gen_moonbit/lib/proto/plugin",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -37,7 +39,7 @@ pub fn generate_json_schema(@plugin.GenerateRequest) -> String
 
 pub fn generate_params_struct(StringBuilder, String, Array[@plugin.Parameter], Array[TypeOverride], @plugin.Query) -> Unit
 
-pub fn generate_postgres_result_struct(StringBuilder, String, Array[@plugin.Column], Array[TypeOverride], @plugin.Query) -> Unit
+pub fn generate_postgres_result_struct(StringBuilder, String, Array[@plugin.Column], Options, @plugin.Query) -> Unit
 
 pub fn generate_queries_d1(@plugin.GenerateRequest, Array[TypeOverride]) -> String
 
@@ -99,6 +101,8 @@ pub enum Backend {
   MysqlJs
 }
 pub fn Backend::to_string(Self) -> String
+pub impl @debug.Debug for Backend
+pub impl @json.FromJson for Backend
 
 pub struct BackendInfo {
   name : String
@@ -119,9 +123,11 @@ pub struct Options {
   backend : Backend
   validators : Bool
   json_schema : Bool
+  derives : Array[String]
+  file_prefix : String
   overrides : Array[TypeOverride]
-}
-pub fn Options::default() -> Self
+} derive(@debug.Debug)
+pub impl @json.FromJson for Options
 
 pub struct PostgresBackend {
   _placeholder : Unit
@@ -151,7 +157,7 @@ pub struct TypeOverride {
   db_type : String?
   moonbit_type : String
   nullable : Bool?
-}
+} derive(@debug.Debug, @json.FromJson)
 
 // Type aliases
 

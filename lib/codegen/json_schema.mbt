@@ -2,7 +2,7 @@
 
 ///|
 pub fn generate_json_schema(request : @plugin.GenerateRequest) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("{\n")
   buf.write_string(
     "  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n",

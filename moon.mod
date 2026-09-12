@@ -1,13 +1,14 @@
 name = "mizchi/sqlc_gen_moonbit"
 
-version = "0.4.0"
+version = "0.5.0"
 
 import {
-  "moonbitlang/protobuf@0.1.1",
-  "moonbitlang/x@0.4.41",
+  "moonbitlang/protobuf@0.1.2",
+  "moonbitlang/x@0.5.5",
   "mizchi/sqlite@0.2.3",
   "BigOrangeQWQ/wasi-io@0.2.6",
   "mizchi/codegen@0.2.3",
+  "moonbitlang/parser@0.3.19",
 }
 
 readme = "README.mbt.md"

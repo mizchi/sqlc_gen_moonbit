@@ -8,14 +8,14 @@
 
 ## Supported Backends
 
-| Backend | Target | Runtime | Dependencies |
-|---------|--------|---------|--------------|
-| `sqlite` | `native` | Native binary | `mizchi/sqlite` |
-| `sqlite_js` | `js` | Node.js / Browser | `mizchi/sqlite`, `mizchi/js` |
-| `d1` | `js` | Cloudflare Workers | `mizchi/cloudflare`, `mizchi/js` |
-| `postgres` | `native` | Native binary | `moonbit-community/postgres` |
-| `postgres_js` | `js` | Node.js | `mizchi/npm_typed/pg`, `mizchi/js` |
-| `mysql_js` | `js` | Node.js | `mizchi/js` (mysql2 npm package) |
+| Backend       | Target   | Runtime            | Dependencies                       |
+| ------------- | -------- | ------------------ | ---------------------------------- |
+| `sqlite`      | `native` | Native binary      | `mizchi/sqlite`                    |
+| `sqlite_js`   | `js`     | Node.js / Browser  | `mizchi/sqlite`, `mizchi/js`       |
+| `d1`          | `js`     | Cloudflare Workers | `mizchi/cloudflare`, `mizchi/js`   |
+| `postgres`    | `native` | Native binary      | `moonbit-community/postgres`       |
+| `postgres_js` | `js`     | Node.js            | `mizchi/npm_typed/pg`, `mizchi/js` |
+| `mysql_js`    | `js`     | Node.js            | `mizchi/js` (mysql2 npm package)   |
 
 ## Features
 
@@ -36,8 +36,8 @@ version: "2"
 plugins:
   - name: moonbit
     wasm:
-      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.4.0/sqlc-gen-moonbit.wasm"
-      sha256: "8639024dc5ee7271e1b4a8dfec853e85a72814577d66f30810b64270f7fead05"
+      url: "https://github.com/mizchi/sqlc_gen_moonbit/releases/download/v0.5.0/sqlc-gen-moonbit.wasm"
+      sha256: "c20285396a80baf4c950b8b44031e88909b42d271c35ab9d2855169e666dcc3c"
 sql:
   - engine: sqlite
     schema: "schema.sql"
@@ -46,7 +46,9 @@ sql:
       - plugin: moonbit
         out: "gen"
         options:
-          backend: "sqlite"  # or "d1" for Cloudflare D1
+          backend: "sqlite" # or "d1" for Cloudflare D1
+          derives: ["Debug", "Eq"]
+          file_prefix: "sqlc" # produces sqlc_types.mbt
 ```
 
 Check the [releases page](https://github.com/mizchi/sqlc_gen_moonbit/releases) for the latest version and sha256.
@@ -66,7 +68,7 @@ plugins:
   - name: moonbit
     wasm:
       url: "file://./path/to/wasm.wasm"
-      sha256: ""  # Optional for local files
+      sha256: "" # Optional for local files
 ```
 
 ## Usage
@@ -114,7 +116,7 @@ Add dependencies to `moon.mod.json`:
 {
   "deps": {
     "mizchi/sqlite": "0.1.3",
-    "moonbitlang/x": "0.4.40"
+    "moonbitlang/x": "0.5.5"
   }
 }
 ```
@@ -179,7 +181,7 @@ Add dependencies to `moon.mod.json`:
   "deps": {
     "mizchi/npm_typed": "0.1.2",
     "mizchi/js": "0.10.10",
-    "moonbitlang/x": "0.4.40"
+    "moonbitlang/x": "0.5.5"
   }
 }
 ```
@@ -233,12 +235,12 @@ fn main {
 
 ## Plugin Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `backend` | `"sqlite"` \| `"sqlite_js"` \| `"d1"` \| `"postgres"` \| `"postgres_js"` \| `"mysql_js"` | `"sqlite"` | Target backend |
-| `validators` | `bool` | `false` | Generate validation functions |
-| `json_schema` | `bool` | `false` | Generate JSON Schema |
-| `overrides` | `array` | `[]` | Custom type mappings |
+| Option        | Type                                                                                     | Default    | Description                   |
+| ------------- | ---------------------------------------------------------------------------------------- | ---------- | ----------------------------- |
+| `backend`     | `"sqlite"` \| `"sqlite_js"` \| `"d1"` \| `"postgres"` \| `"postgres_js"` \| `"mysql_js"` | `"sqlite"` | Target backend                |
+| `validators`  | `bool`                                                                                   | `false`    | Generate validation functions |
+| `json_schema` | `bool`                                                                                   | `false`    | Generate JSON Schema          |
+| `overrides`   | `array`                                                                                  | `[]`       | Custom type mappings          |
 
 Example with all options:
 
@@ -261,10 +263,10 @@ codegen:
 
 Override default type mappings for specific columns or database types:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `column` | `string` | Column name in `table.column` format |
-| `db_type` | `string` | Database type (e.g., `INTEGER`, `TEXT`) |
+| Field          | Type     | Description                                            |
+| -------------- | -------- | ------------------------------------------------------ |
+| `column`       | `string` | Column name in `table.column` format                   |
+| `db_type`      | `string` | Database type (e.g., `INTEGER`, `TEXT`)                |
 | `moonbit_type` | `string` | MoonBit type (supports package paths like `@pkg.Type`) |
 
 Column overrides take precedence over db_type overrides.
@@ -281,13 +283,13 @@ For each query, sqlc-gen-moonbit generates:
 
 ## Query Types
 
-| Annotation | Return Type | Description |
-|------------|-------------|-------------|
-| `:one`     | `T?`        | Returns single row or None |
-| `:many`    | `Array[T]`  | Returns all matching rows |
-| `:exec`    | `Unit`      | Executes without returning data |
-| `:execrows`| `Int`       | Returns number of affected rows |
-| `:execlastid` | `Int64`  | Returns last inserted ID (for `INSERT ... RETURNING id`) |
+| Annotation    | Return Type | Description                                              |
+| ------------- | ----------- | -------------------------------------------------------- |
+| `:one`        | `T?`        | Returns single row or None                               |
+| `:many`       | `Array[T]`  | Returns all matching rows                                |
+| `:exec`       | `Unit`      | Executes without returning data                          |
+| `:execrows`   | `Int`       | Returns number of affected rows                          |
+| `:execlastid` | `Int64`     | Returns last inserted ID (for `INSERT ... RETURNING id`) |
 
 ### D1 `Int64` parameters bind as JavaScript `Number`
 
@@ -338,14 +340,14 @@ moon run tools/codegen --target native -- --check-deps -b d1 queries.sql
 
 CLI Options:
 
-| Option | Description |
-|--------|-------------|
-| `-o, --output <file>` | Output file (default: stdout) |
-| `-c, --config <file>` | Config file (JSON) |
+| Option                 | Description                                                     |
+| ---------------------- | --------------------------------------------------------------- |
+| `-o, --output <file>`  | Output file (default: stdout)                                   |
+| `-c, --config <file>`  | Config file (JSON)                                              |
 | `-b, --backend <type>` | Backend: sqlite, sqlite_js, d1, postgres, postgres_js, mysql_js |
-| `--validators` | Generate validation functions |
-| `--json-schema` | Generate JSON schema |
-| `--check-deps` | Check required dependencies in moon.mod.json |
+| `--validators`         | Generate validation functions                                   |
+| `--json-schema`        | Generate JSON schema                                            |
+| `--check-deps`         | Check required dependencies in moon.mod.json                    |
 
 Config file format (`config.json`):
 
@@ -433,7 +435,7 @@ moon run tasks > db/gen/sqlc_queries.mbt
 Workers codebases often have `extern "js"` blocks with inline
 `db.prepare(...)` statements. Migrating one such statement at a
 time to the generated bindings is straightforward once you know the
-shape: the generated MoonBit function can't be called *from* an
+shape: the generated MoonBit function can't be called _from_ an
 `extern "js"` block directly, but it can be called from MoonBit and
 the result handed back into a JS-only renderer via a JSON bridge.
 

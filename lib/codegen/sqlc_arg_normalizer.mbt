@@ -173,7 +173,7 @@ fn parse_sqlc_arg_at(text : String, start : Int) -> SqlcArgOccurrence? {
   if i >= text.length() || text[i] != ')' {
     return None
   }
-  Some(SqlcArgOccurrence::{ name, start, end: i + 1 })
+  Some(SqlcArgOccurrence::{ name, start, end: i + 1, })
 }
 
 ///|
@@ -183,7 +183,7 @@ fn rewrite_sqlc_arg_occurrences(
   query : @plugin.Query,
   backend : Backend,
 ) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let mut last = 0
   for occurrence in occurrences {
     for i = last; i < occurrence.start; i = i + 1 {
@@ -507,7 +507,7 @@ fn synthetic_type_source_column(type_name : String) -> @plugin.Column {
     scope: "",
     table: @plugin.Identifier::default(),
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: type_name },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: type_name, },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",

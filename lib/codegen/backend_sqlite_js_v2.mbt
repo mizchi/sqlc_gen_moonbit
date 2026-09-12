@@ -7,7 +7,7 @@ pub struct SqliteJsBackend {
 
 ///|
 pub fn SqliteJsBackend::new() -> SqliteJsBackend {
-  { _placeholder: () }
+  { _placeholder: (), }
 }
 
 ///|

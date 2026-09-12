@@ -7,7 +7,7 @@ pub struct D1Backend {
 
 ///|
 pub fn D1Backend::new() -> D1Backend {
-  { _placeholder: () }
+  { _placeholder: (), }
 }
 
 ///|

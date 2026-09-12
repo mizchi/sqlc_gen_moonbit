@@ -2,7 +2,7 @@
 
 ///|
 pub fn to_pascal_case(s : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let mut capitalize_next = true
   for c in s {
     if c == '_' || c == '-' {
@@ -19,7 +19,7 @@ pub fn to_pascal_case(s : String) -> String {
 
 ///|
 pub fn to_snake_case(s : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let mut prev_lower = false
   for c in s {
     if is_upper(c) {
@@ -66,7 +66,7 @@ fn is_lower(c : Char) -> Bool {
 
 ///|
 pub fn sanitize_newlines(s : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for c in s {
     match c {
       '\n' | '\r' => buf.write_char(' ')
@@ -87,7 +87,7 @@ pub fn sanitize_newlines(s : String) -> String {
 /// emitted block doesn't end with a dangling `/// `.
 pub fn emit_sql_doc_lines(buf : StringBuilder, sql : String) -> Unit {
   // Normalise CR/CRLF → LF first so the split below sees one shape.
-  let normalised = StringBuilder::new()
+  let normalised = StringBuilder()
   let mut prev_cr = false
   for c in sql {
     match c {
@@ -131,7 +131,7 @@ pub fn emit_sql_doc_lines(buf : StringBuilder, sql : String) -> Unit {
 
 ///|
 pub fn escape_string(s : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_char('"')
   for c in s {
     match c {
@@ -173,7 +173,7 @@ pub fn string_to_utf8(s : String) -> Bytes {
 
 ///|
 pub fn bytes_to_string_simple(b : Bytes) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for i = 0; i < b.length(); i = i + 1 {
     let byte = b[i]
     if byte >= 32 && byte < 127 {
@@ -287,7 +287,7 @@ pub fn count_substring(haystack : String, needle : String) -> Int {
 
 ///|
 pub fn substring(s : String, start : Int, end : Int) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for i = start; i < end && i < s.length(); i = i + 1 {
     buf.write_char(s[i].to_int().unsafe_to_char())
   }

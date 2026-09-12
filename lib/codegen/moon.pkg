@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/core/json",
   "moonbitlang/protobuf",
   "mizchi/sqlc_gen_moonbit/lib/proto/plugin",
   "mizchi/codegen/ir",

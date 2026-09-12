@@ -7,9 +7,5 @@ import {
 supported_targets = "native"
 
 options(
-  link: {
-    "native": {
-      "cc-link-flags": "-lsqlite3",
-    },
-  },
+  link: { "native": { "cc-link-flags": "-lsqlite3" } },
 )

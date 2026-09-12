@@ -9,9 +9,9 @@ fn issue18_column(name : String, type_name : String) -> @plugin.Column {
     is_named_param: false,
     is_func_call: false,
     scope: "",
-    table: @plugin.Identifier::{ catalog: "", schema: "", name: "t" },
+    table: @plugin.Identifier::{ catalog: "", schema: "", name: "t", },
     table_alias: "",
-    type_: @plugin.Identifier::{ catalog: "", schema: "", name: type_name },
+    type_: @plugin.Identifier::{ catalog: "", schema: "", name: type_name, },
     is_sqlc_slice: false,
     embed_table: @plugin.Identifier::default(),
     original_name: "",
@@ -22,7 +22,7 @@ fn issue18_column(name : String, type_name : String) -> @plugin.Column {
 
 ///|
 fn issue18_param(number : Int, col : @plugin.Column) -> @plugin.Parameter {
-  @plugin.Parameter::{ number, column: col }
+  @plugin.Parameter::{ number, column: col, }
 }
 
 ///|
@@ -31,7 +31,7 @@ fn issue18_request() -> @plugin.GenerateRequest {
   let value_col = issue18_column("value", "TEXT")
   let slug_col = issue18_column("slug", "TEXT")
   let table = @plugin.Table::{
-    rel: @plugin.Identifier::{ catalog: "", schema: "", name: "t" },
+    rel: @plugin.Identifier::{ catalog: "", schema: "", name: "t", },
     columns: [id_col, value_col, slug_col],
     comment: "",
   }
@@ -83,7 +83,7 @@ fn issue19_request() -> @plugin.GenerateRequest {
   let object_sha_col = issue18_column("object_sha", "TEXT")
   let size_bytes_col = issue18_column("size_bytes", "INTEGER")
   let table = @plugin.Table::{
-    rel: @plugin.Identifier::{ catalog: "", schema: "", name: "objects" },
+    rel: @plugin.Identifier::{ catalog: "", schema: "", name: "objects", },
     columns: [object_sha_col, size_bytes_col],
     comment: "",
   }
@@ -168,6 +168,8 @@ test "normalized sqlc.arg is emitted in types and D1 bind sequence" {
     backend: D1,
     validators: false,
     json_schema: false,
+    file_prefix: "sql",
+    derives: [],
     overrides: [],
   }
   let types = generate_types(request, options)
@@ -220,6 +222,8 @@ test "normalized aggregate inference is emitted in D1 types and binds" {
   let options = Options::{
     backend: D1,
     validators: false,
+    derives: [],
+    file_prefix: "sql",
     json_schema: false,
     overrides: [],
   }
