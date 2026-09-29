@@ -30,12 +30,20 @@ pub fn MysqlPool::new(
 }
 
 ///| Execute query with parameters
-extern "js" fn ffi_mysql_execute(
+extern "js" fn ffi_mysql_execute_ffi(
+  pool : MysqlPool,
+  sql : String,
+  params : FixedArray[@core.Any],
+) -> @core.Promise[MysqlResult] =
+  #| async (pool, sql, params) => { const [rows, fields] = await pool.execute(sql, params); return { rows, fields, insertId: rows.insertId, affectedRows: rows.affectedRows }; }
+
+fn ffi_mysql_execute(
   pool : MysqlPool,
   sql : String,
   params : Array[@core.Any],
-) -> @core.Promise[MysqlResult] =
-  #| async (pool, sql, params) => { const [rows, fields] = await pool.execute(sql, params); return { rows, fields, insertId: rows.insertId, affectedRows: rows.affectedRows }; }
+) -> @core.Promise[MysqlResult] {
+  ffi_mysql_execute_ffi(pool, sql, FixedArray::from_array(params))
+}
 
 ///| Execute query without parameters
 extern "js" fn ffi_mysql_execute_no_params(
